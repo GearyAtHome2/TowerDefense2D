@@ -1,4 +1,4 @@
-package com.Geary.towerdefense;
+package com.Geary.towerdefense.entity;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;

@@ -1,5 +1,7 @@
-package com.Geary.towerdefense;
+package com.Geary.towerdefense.entity;
 
+import com.Geary.towerdefense.Direction;
+import com.Geary.towerdefense.entity.world.Cell;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -9,7 +11,7 @@ import static com.badlogic.gdx.math.MathUtils.random;
 
 public class Enemy {
 
-    float x, y;
+    public float x, y;
     Texture texture;
 
     public int health = 2;
@@ -19,6 +21,7 @@ public class Enemy {
     float tileProgress = 0f;
     float speed;
     boolean reachedEnd = false;
+    boolean turnedThisTile = false;
 
     public Enemy(float startX, float startY) {
         texture = new Texture("enemy.png");
@@ -29,8 +32,6 @@ public class Enemy {
     }
 
     public void update(float delta, List<Cell> path, int cellSize) {
-
-        //todo: consolidate these two - need to make them cause base damage anyway
         if (health <= 0 || reachedEnd) return;
         if (pathIndex >= path.size()) {
             reachedEnd = true;
@@ -39,20 +40,25 @@ public class Enemy {
 
         Cell cell = path.get(pathIndex);
         // --- Advance along path ---
-        tileProgress = computeTileProgress(cell, cellSize);
+        Direction moveDir = cell.direction;
 
         if (tileProgress >= 1f) {
             pathIndex++;
             tileProgress = 0f;
-
+            turnedThisTile = false;
             if (pathIndex >= path.size()) {
                 reachedEnd = true;
                 return;
             }
         }
+        cell = path.get(pathIndex);
+
+        if (cell.type == Cell.Type.TURN) {
+            moveDir = cell.calculateTurnDirection(this);
+        }
         float move = speed * delta * cellSize;
 
-        switch (cell.direction) {
+        switch (moveDir) {
             case RIGHT -> x += move;
             case LEFT -> x -= move;
             case UP -> y += move;
@@ -66,17 +72,18 @@ public class Enemy {
         else if (ran < 0.5) x -= 1;
         else if (ran < 0.75) y += 1;
         else y -= 1;
-        if (cell.direction == Direction.LEFT || cell.direction == Direction.RIGHT) {
+        if (moveDir == Direction.LEFT || moveDir == Direction.RIGHT) {
             centrePositionUD(cellY, cellSize);
         }
-        if (cell.direction == Direction.UP || cell.direction == Direction.DOWN) {
+        if (moveDir == Direction.UP || moveDir == Direction.DOWN) {
             centrePositionLR(cellX, cellSize);
         }
+        tileProgress = computeTileProgress(cell, moveDir, cellSize);
     }
 
     public void centrePositionLR(float cellX, int cellSize) {
-        float delta = cellX - (cellSize / 2f);          // -50..50 for 100px tile
-        float fraction = delta / (0.9F * (cellSize / 2f)) ;     // -1..1
+        float delta = cellX - (cellSize / 2f);
+        float fraction = delta / (0.95F * (cellSize / 2f));//the first float here determines freedom
         float deltaChance = Math.min(1f, Math.abs(fraction * fraction)); // square it
         if (random.nextDouble() < Math.abs(deltaChance)) {
             if (delta < 0) {
@@ -104,12 +111,10 @@ public class Enemy {
     }
 
     // --- Targeting helpers ---
-    private float computeTileProgress(Cell cell, int cellSize) {
-
+    private float computeTileProgress(Cell cell, Direction dir, int cellSize) {
         float localX = x - cell.x;
         float localY = y - cell.y;
-
-        switch (cell.direction) {
+        switch (dir) {
             case RIGHT:
                 return clamp(localX / cellSize);
             case LEFT:

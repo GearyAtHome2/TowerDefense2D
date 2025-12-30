@@ -1,4 +1,4 @@
-package com.Geary.towerdefense;
+package com.Geary.towerdefense.entity;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -6,13 +6,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import java.util.List;
 
 public class Tower {
-    float xPos, yPos;
-    Texture texture;
+    public float xPos, yPos;
+    public Texture texture;
 
-    protected int maxCooldown = 50;
-    public int cooldown = maxCooldown;
+    public float range = 207f; // pixels
 
-    float range = 250f; // pixels
+    public float maxCooldown = 2f;
+    public float cooldown = maxCooldown;
+
 
     public Tower(float x, float y) {
         this.xPos = x;

@@ -1,239 +1,286 @@
 package com.Geary.towerdefense;
 
+import com.Geary.towerdefense.UI.CameraController;
+import com.Geary.towerdefense.UI.TowerRenderer;
+import com.Geary.towerdefense.behaviour.EnemyManager;
+import com.Geary.towerdefense.behaviour.SpawnerManager;
+import com.Geary.towerdefense.behaviour.TowerManager;
+import com.Geary.towerdefense.entity.Bullet;
+import com.Geary.towerdefense.entity.Enemy;
+import com.Geary.towerdefense.entity.Spawner;
+import com.Geary.towerdefense.entity.Tower;
+import com.Geary.towerdefense.entity.world.Cell;
+import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class GameScreen implements Screen {
 
-    SpriteBatch batch;
-    List<Enemy> enemies;
-    List<Tower> towers;
-    List<Bullet> bullets;
-    List<Spawner> spawners;
+    private static final int UI_BAR_HEIGHT = 90;
+    private static final float PLACE_TOWER_X = 80;
+    private static final float PLACE_TOWER_Y = 20;
+    private static final float PLACE_TOWER_WIDTH = 150;
+    private static final float PLACE_TOWER_HEIGHT = 40;
 
-    List<Cell> path = new ArrayList<>();
+    private SpriteBatch batch;
+    private ShapeRenderer shapeRenderer;
+    private BitmapFont uiFont;
 
-    ShapeRenderer shapeRenderer = new ShapeRenderer();
+    private GameWorld world;
+    private CameraController cameraController;
+    private TowerManager towerManager;
+    private EnemyManager enemyManager;
+    private SpawnerManager spawnerManager;
 
-    // Grid settings
-    private final int cellSize = 100; // pixels per grid cell
-    private final int gridWidth = 8;  // 800px / 100
-    private final int gridHeight = 6; // 600px / 100
-    private boolean[][] occupied;     // track tower placement
-    private Cell[][] grid;
-    boolean paused = false;
+    private OrthographicCamera uiCamera;
+    private Viewport uiViewport;
+
+    private OrthographicCamera worldCamera;
+    private Viewport worldViewport;
+
+    private TowerRenderer towerRenderer;
+
+    private boolean paused = false;
+    private float gameSpeed = 1f; // normal speed
 
     @Override
     public void show() {
         batch = new SpriteBatch();
-        enemies = new ArrayList<>();
-        towers = new ArrayList<>();
-        bullets = new ArrayList<>();
-        spawners = new ArrayList<>();
+        shapeRenderer = new ShapeRenderer();
+        uiFont = new BitmapFont();
+        uiFont.getData().setScale(1.5f);
 
-        occupied = new boolean[gridWidth][gridHeight];
+        // --- Initialize World & Managers ---
+        world = new GameWorld();
+        towerRenderer = new TowerRenderer(world);
+        setupWorldCamera();
+        setupUICamera();
 
-        grid = new Cell[gridWidth][gridHeight];
-        for (int x = 0; x < gridWidth; x++) {
-            for (int y = 0; y < gridHeight; y++) {
-                float px = x * cellSize;
-                float py = y * cellSize;
+        cameraController = new CameraController(worldCamera, worldViewport, world);
+        towerManager = new TowerManager(world, worldCamera);
+        enemyManager = new EnemyManager(world);
+        spawnerManager = new SpawnerManager(world);
 
-                // Hardcoded path: row 2 from columns 0→4, then column 4 up to row 5
-                if (y == 2 && x == 0) {
-                    Direction dir = Direction.RIGHT;
-                    Cell cell = new Cell(Cell.Type.PATH, px, py, dir);
-                    path.add(cell);
-                    grid[x][y] = cell;
-                    spawners.add(new Spawner(px + 10, py + 10));//just make the spawner larger in future?
-
-                } else if (y == 2 && x <= 4 && x > 0) {
-                    Direction dir = (x < 4) ? Direction.RIGHT : Direction.UP;
-                    Cell cell = new Cell(Cell.Type.PATH, px, py, dir);
-                    path.add(cell);
-                    grid[x][y] = cell;
-                } else if (x == 4 && y >= 2 && y <= 5) {
-                    Direction dir = Direction.UP;
-                    Cell cell = new Cell(Cell.Type.PATH, px, py, dir);
-                    path.add(cell);
-                    grid[x][y] = cell;
-                } else {
-                    grid[x][y] = new Cell(Cell.Type.TOWER, px, py, Direction.NONE);
-                }
+        // --- Input ---
+        Gdx.input.setInputProcessor(new InputAdapter() {
+            @Override
+            public boolean scrolled(float amountX, float amountY) {
+                cameraController.scrolled(amountX, amountY);
+                return true;
             }
-        }
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(1, 1, 1, 0.3f); // white, semi-transparent
-        for (int i = 0; i <= gridWidth; i++) {
-            shapeRenderer.line(i * cellSize, 0, i * cellSize, gridHeight * cellSize);
-        }
-        for (int j = 0; j <= gridHeight; j++) {
-            shapeRenderer.line(0, j * cellSize, gridWidth * cellSize, j * cellSize);
-        }
-        shapeRenderer.end();
-
-        ShapeRenderer sr = new ShapeRenderer();
-        sr.begin(ShapeRenderer.ShapeType.Line);
-
-        for (int x = 0; x < gridWidth; x++) {
-            for (int y = 0; y < gridHeight; y++) {
-                Cell cell = grid[x][y];
-                if (cell.type == Cell.Type.PATH) sr.setColor(1, 0, 0, 0.5f); // red for path
-                else sr.setColor(0, 1, 0, 0.5f); // green for tower
-                sr.rect(cell.x, cell.y, cellSize, cellSize);
-            }
-        }
-        sr.end();
+        });
     }
 
     @Override
     public void render(float delta) {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            paused = !paused;
-        }
+        setGameSpeed();
+        delta = delta * gameSpeed;
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         if (!paused) {
-            Gdx.gl.glClearColor(0, 0, 0, 1);
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+            cameraController.update();
+            towerManager.handlePlacement();
+            enemyManager.update(delta);
+            spawnerManager.update(delta);
+        }
 
-            // Handle input for tower placement
-            if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-                int x = Gdx.input.getX() / cellSize;
-                int y = (Gdx.graphics.getHeight() - Gdx.input.getY()) / cellSize; // invert Y
-                if (x >= 0 && x < gridWidth && y >= 0 && y < gridHeight && !occupied[x][y] && grid[x][y].type == Cell.Type.TOWER) {
-                    towers.add(new Tower(x * cellSize, y * cellSize));
-                    occupied[x][y] = true;
-                }
-            }
+        drawWorld(delta);
+        drawUI();
 
-            enemyAct(delta);
+        // Pause toggle
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) paused = !paused;
 
-            // Update bullets and their effect on enemies
-            removeDamagers(delta);
-
-            spawnerAct();
-            drawTowerRadii();
-            drawActors();
-            drawGrid();
-        } else {
-            pauseScreen();
+        // Handle tower placement button toggle
+        if (Gdx.input.justTouched()) {
+            Vector3 uiClick = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+            uiViewport.unproject(uiClick);
+            towerManager.togglePlacement(uiClick, PLACE_TOWER_X, PLACE_TOWER_Y, PLACE_TOWER_WIDTH, PLACE_TOWER_HEIGHT);
         }
     }
 
-    public void pauseScreen(){
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(0, 0, 0, 0.7f); // semi-transparent overlay
-        shapeRenderer.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        shapeRenderer.end();
+    private void drawWorld(float delta) {
+        // --- World viewport ---
+        worldViewport.apply();
+        worldCamera.update();
+        batch.setProjectionMatrix(worldCamera.combined);
+        shapeRenderer.setProjectionMatrix(worldCamera.combined);
 
-        batch.begin();
-        BitmapFont font = new BitmapFont(); // simple default font
-        font.setColor(1, 1, 1, 1);
-        font.getData().setScale(2f);
-        font.draw(batch, "PAUSED", Gdx.graphics.getWidth() / 2f - 50, Gdx.graphics.getHeight() / 2f + 50);
-        font.draw(batch, "Press ESC to resume", Gdx.graphics.getWidth() / 2f - 100, Gdx.graphics.getHeight() / 2f);
-        batch.end();
+        drawGridLines();
+//        drawBaseCells();
+        drawPathCells();
+
+        towerRenderer.drawTowerRanges(shapeRenderer);
+        towerManager.updateTowers(world.bullets, delta);
+        drawActors();
     }
 
-    public void removeDamagers(float delta){
-        bullets.removeIf(b -> !b.update(delta));
-        enemies.removeIf(e -> e.health < 1);
-    }
-
-    public void enemyAct(float delta){
-        for (Enemy e : enemies) {
-            e.update(delta, path, cellSize);
-        }
-    }
-    public void drawTowerRadii(){
+    private void drawGridLines() {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(0, 0, 1, 0.4f);
-        // Towers shoot respecting cooldown
-        for (Tower tower : towers) {
-            float cx = tower.xPos + 50;
-            float cy = tower.yPos + 50;
-            shapeRenderer.circle(cx, cy, tower.range);
-            tower.cooldown--;
-            if (tower.cooldown < 1) {
-                Enemy target = tower.findTarget(enemies);
-                if (target != null) {
-                    bullets.add(tower.shoot(target));
+        shapeRenderer.setColor(1, 1, 1, 0.3f);
+
+        for (int x = 0; x <= world.gridWidth; x++) {
+            shapeRenderer.line(
+                x * world.cellSize, 0,
+                x * world.cellSize, world.gridHeight * world.cellSize
+            );
+        }
+
+        for (int y = 0; y <= world.gridHeight; y++) {
+            shapeRenderer.line(
+                0, y * world.cellSize,
+                world.gridWidth * world.cellSize, y * world.cellSize
+            );
+        }
+
+        shapeRenderer.end();
+    }
+    private void drawBaseCells() {
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+        for (int x = 0; x < world.gridWidth; x++) {
+            for (int y = 0; y < world.gridHeight; y++) {
+                Cell cell = world.grid[x][y];
+                if (cell.type == Cell.Type.TOWER) {
+                    shapeRenderer.setColor(0, 1, 0, 0.35f);
+                    shapeRenderer.rect(cell.x, cell.y, world.cellSize, world.cellSize);
                 }
-                tower.cooldown = tower.maxCooldown;
+            }
+        }
+
+        shapeRenderer.end();
+    }
+    private void drawPathCells() {
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+
+        for (int x = 0; x < world.gridWidth; x++) {
+            for (int y = 0; y < world.gridHeight; y++) {
+                Cell cell = world.grid[x][y];
+
+                if (cell.type == Cell.Type.PATH) {
+                    shapeRenderer.setColor(1f, 0f, 0f, 0.5f);
+
+                } else if (cell.type == Cell.Type.TURN) {
+                    shapeRenderer.setColor(0.9f, 0.6f, 0.3f, 0.6f);
+                    float x0 = cell.x;
+                    float y0 = cell.y;
+                    float x1 = cell.x + GameWorld.cellSize;
+                    float y1 = cell.y + GameWorld.cellSize;
+                    if (cell.turnType == Cell.TurnType.TL_BR) {
+                        // Top-left → bottom-right diagonal
+                        shapeRenderer.line(x0, y1, x1, y0);
+                    } else if (cell.turnType == Cell.TurnType.BL_TR) {
+                        // Bottom-left → top-right diagonal
+                        shapeRenderer.line(x0, y0, x1, y1);
+                    }
+                } else {
+                    continue;
+                }
+
+                shapeRenderer.rect(cell.x, cell.y, world.cellSize, world.cellSize);
             }
         }
         shapeRenderer.end();
     }
 
-
-    public void spawnerAct(){
-        for (Spawner spawner : spawners) {
-            spawner.cooldown--;
-            if (spawner.cooldown < 1) {
-                enemies.add(spawner.spawn());
-                spawner.cooldown = 202020;
-            }
-        }
+    private void drawActors() {
+        batch.begin();
+        for (Enemy e : world.enemies) e.draw(batch);
+        for (Tower t : world.towers) t.draw(batch);
+        for (Bullet b : world.bullets) b.draw(batch);
+        for (Spawner s : world.spawners) s.draw(batch);
+        batch.end();
     }
 
-    public void drawActors(){
+    private void drawUI() {
+        uiViewport.apply();
+        shapeRenderer.setProjectionMatrix(uiCamera.combined);
+        batch.setProjectionMatrix(uiCamera.combined);
+
+        // --- UI bar ---
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(0.1f, 0.1f, 0.1f, 1f);
+        shapeRenderer.rect(0, 0, uiViewport.getWorldWidth(), UI_BAR_HEIGHT);
+        shapeRenderer.end();
+
+        // --- Tower button ---
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(towerManager.isPlacementActive() ? 0f : 0.3f, 0.6f, 0.3f, 1f);
+        shapeRenderer.rect(PLACE_TOWER_X, PLACE_TOWER_Y, PLACE_TOWER_WIDTH, PLACE_TOWER_HEIGHT);
+        shapeRenderer.end();
+
         batch.begin();
-        for (Enemy e : enemies) e.draw(batch);
-        for (Tower t : towers) t.draw(batch);
-        for (Bullet b : bullets) b.draw(batch);
-        for (Spawner s : spawners) s.draw(batch);
+        uiFont.draw(batch, "Place Tower", PLACE_TOWER_X + 10, PLACE_TOWER_Y + 25);
+        uiFont.draw(batch, "ESC = Pause", 20, UI_BAR_HEIGHT - 20);
+        uiFont.draw(batch, "Towers: " + world.towers.size(), 200, UI_BAR_HEIGHT - 20);
+        uiFont.draw(batch, "Enemies: " + world.enemies.size(), 400, UI_BAR_HEIGHT - 20);
+        uiFont.draw(batch, "gamespeed: " + gameSpeed, 400, UI_BAR_HEIGHT - 50);
+
+
+        if (paused) {
+            uiFont.getData().setScale(2.5f);
+            uiFont.draw(batch, "PAUSED", uiViewport.getWorldWidth() / 2f - 70, uiViewport.getWorldHeight() / 2f);
+            uiFont.getData().setScale(1.5f);
+        }
         batch.end();
+    }
+
+    private void setupWorldCamera() {
+        worldCamera = new OrthographicCamera();
+        worldViewport = new ScreenViewport(worldCamera);
+        worldViewport.setScreenBounds(
+            0,
+            UI_BAR_HEIGHT,
+            Gdx.graphics.getWidth(),
+            Gdx.graphics.getHeight() - UI_BAR_HEIGHT
+        );
+        worldCamera.position.set(
+            (world.gridWidth * world.cellSize) / 2f,
+            (world.gridHeight * world.cellSize) / 2f,
+            0
+        );
+        worldCamera.update();
+    }
+
+    private void setupUICamera() {
+        uiCamera = new OrthographicCamera();
+        uiViewport = new ScreenViewport(uiCamera);
+        uiCamera.position.set(uiViewport.getWorldWidth() / 2f, uiViewport.getWorldHeight() / 2f, 0);
+        uiCamera.update();
+    }
+
+    public void setGameSpeed(){
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) gameSpeed = 1f;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) gameSpeed = 2f;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) gameSpeed = 4f;
     }
 
     @Override
     public void resize(int width, int height) {
+        if (worldViewport != null) worldViewport.update(width, height, true);
+        if (uiViewport != null) uiViewport.update(width, height, true);
     }
 
     @Override
-    public void pause() {
-    }
-
+    public void pause() {}
     @Override
-    public void resume() {
-    }
-
+    public void resume() {}
     @Override
-    public void hide() {
-    }
-
+    public void hide() {}
     @Override
     public void dispose() {
         batch.dispose();
-    }
-
-    public void drawGrid(){
-        // Draw the grid overlay
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        // optional: draw white cell lines
-        shapeRenderer.setColor(1, 1, 1, 0.3f);
-        for (int i = 0; i <= gridWidth; i++) {
-            shapeRenderer.line(i * cellSize, 0, i * cellSize, gridHeight * cellSize);
-        }
-        for (int j = 0; j <= gridHeight; j++) {
-            shapeRenderer.line(0, j * cellSize, gridWidth * cellSize, j * cellSize);
-        }
-
-        // Draw colored cells for PATH / TOWER
-        for (int x = 0; x < gridWidth; x++) {
-            for (int y = 0; y < gridHeight; y++) {
-                Cell cell = grid[x][y];
-                if (cell.type == Cell.Type.PATH) shapeRenderer.setColor(1, 0, 0, 0.5f); // red
-                else shapeRenderer.setColor(0, 1, 0, 0.5f); // green
-                shapeRenderer.rect(cell.x, cell.y, cellSize, cellSize);
-            }
-        }
-        shapeRenderer.end();
+        shapeRenderer.dispose();
+        uiFont.dispose();
     }
 }
