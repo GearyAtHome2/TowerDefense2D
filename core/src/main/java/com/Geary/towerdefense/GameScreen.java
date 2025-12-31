@@ -28,9 +28,11 @@ public class GameScreen implements Screen {
 
     private static final int UI_BAR_HEIGHT = 90;
     private static final float PLACE_TOWER_X = 80;
-    private static final float PLACE_TOWER_Y = 20;
+    private static final float PLACE_TOWER_Y = 10;
     private static final float PLACE_TOWER_WIDTH = 150;
     private static final float PLACE_TOWER_HEIGHT = 40;
+
+    private int lastMouseX, lastMouseY;
 
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
@@ -53,6 +55,9 @@ public class GameScreen implements Screen {
     private boolean paused = false;
     private float gameSpeed = 1f; // normal speed
 
+    private Tower selectedTower = null;
+    private float popupScale = 1f;
+
     @Override
     public void show() {
         batch = new SpriteBatch();
@@ -73,12 +78,71 @@ public class GameScreen implements Screen {
 
         // --- Input ---
         Gdx.input.setInputProcessor(new InputAdapter() {
+
+            private Vector3 touchDownScreen = new Vector3();
+            private boolean isDraggingCamera = false;
+            private static final float DRAG_THRESHOLD = 5f;
+
+            @Override
+            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+                if (button == Input.Buttons.LEFT) {
+                    touchDownScreen.set(screenX, screenY, 0);
+                    isDraggingCamera = false;
+                }
+                if (button == Input.Buttons.RIGHT) {
+                    lastMouseX = screenX;
+                    lastMouseY = screenY;
+                }
+                return false;
+            }
+
+            @Override
+            public boolean touchDragged(int screenX, int screenY, int pointer) {
+                if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
+                    int dx = screenX - lastMouseX;
+                    int dy = screenY - lastMouseY;
+                    cameraController.dragBy(dx, dy);
+                    lastMouseX = screenX;
+                    lastMouseY = screenY;
+                }
+                // Check for accidental left-click drag
+                float dx = Math.abs(screenX - touchDownScreen.x);
+                float dy = Math.abs(screenY - touchDownScreen.y);
+                if (dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD) {
+                    isDraggingCamera = true;
+                }
+
+                return false;
+            }
+
+            @Override
+            public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+                if (button != Input.Buttons.LEFT) return false;
+                // Convert click to UI coordinates first
+                Vector3 uiClick = new Vector3(screenX, screenY, 0);
+                uiViewport.unproject(uiClick);
+                // --- 1️⃣ UI click check: Place Tower button ---
+                if (uiClick.x >= PLACE_TOWER_X && uiClick.x <= PLACE_TOWER_X + PLACE_TOWER_WIDTH &&
+                    uiClick.y >= PLACE_TOWER_Y && uiClick.y <= PLACE_TOWER_Y + PLACE_TOWER_HEIGHT) {
+
+                    towerManager.togglePlacementClick(uiClick, PLACE_TOWER_X, PLACE_TOWER_Y, PLACE_TOWER_WIDTH, PLACE_TOWER_HEIGHT);
+                    return true;
+                }
+                // --- 2️⃣ World click: only if not dragging and not placing a tower ---
+                if (!towerManager.isPlacementActive() && !isDraggingCamera) {
+                    handleWorldClickAt(screenX, screenY);
+                    return true;
+                }
+                return false;
+            }
+
             @Override
             public boolean scrolled(float amountX, float amountY) {
                 cameraController.scrolled(amountX, amountY);
                 return true;
             }
         });
+
     }
 
     @Override
@@ -101,11 +165,17 @@ public class GameScreen implements Screen {
         // Pause toggle
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) paused = !paused;
 
-        // Handle tower placement button toggle
-        if (Gdx.input.justTouched()) {
-            Vector3 uiClick = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-            uiViewport.unproject(uiClick);
-            towerManager.togglePlacement(uiClick, PLACE_TOWER_X, PLACE_TOWER_Y, PLACE_TOWER_WIDTH, PLACE_TOWER_HEIGHT);
+        towerManager.togglePlacementKp(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT));
+//        if (Gdx.input.justTouched()) {
+//            Vector3 uiClick = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+//            uiViewport.unproject(uiClick);
+//            towerManager.togglePlacementClick(uiClick, PLACE_TOWER_X, PLACE_TOWER_Y, PLACE_TOWER_WIDTH, PLACE_TOWER_HEIGHT);
+//        }
+//        if (Gdx.input.justTouched() && !towerManager.isPlacementActive()) {
+//            handleWorldClick();
+//        }
+        if (towerManager.isPlacementActive()) {
+            selectedTower = null;
         }
     }
 
@@ -122,6 +192,9 @@ public class GameScreen implements Screen {
 
         towerRenderer.drawTowerRanges(shapeRenderer);
         towerManager.updateTowers(world.bullets, delta);
+        if (selectedTower != null) {
+            drawTowerPopup(selectedTower);
+        }
         drawActors();
     }
 
@@ -145,6 +218,7 @@ public class GameScreen implements Screen {
 
         shapeRenderer.end();
     }
+
     private void drawBaseCells() {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
@@ -160,6 +234,7 @@ public class GameScreen implements Screen {
 
         shapeRenderer.end();
     }
+
     private void drawPathCells() {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 
@@ -220,7 +295,7 @@ public class GameScreen implements Screen {
         shapeRenderer.end();
 
         batch.begin();
-        uiFont.draw(batch, "Place Tower", PLACE_TOWER_X + 10, PLACE_TOWER_Y + 25);
+        uiFont.draw(batch, "Place Tower", PLACE_TOWER_X + 15, PLACE_TOWER_Y + 30);
         uiFont.draw(batch, "ESC = Pause", 20, UI_BAR_HEIGHT - 20);
         uiFont.draw(batch, "Towers: " + world.towers.size(), 200, UI_BAR_HEIGHT - 20);
         uiFont.draw(batch, "Enemies: " + world.enemies.size(), 400, UI_BAR_HEIGHT - 20);
@@ -259,10 +334,100 @@ public class GameScreen implements Screen {
         uiCamera.update();
     }
 
-    public void setGameSpeed(){
+    public void setGameSpeed() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) gameSpeed = 1f;
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) gameSpeed = 2f;
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) gameSpeed = 4f;
+    }
+
+    private void handleWorldClick() {
+        Vector3 worldClick = new Vector3(
+            Gdx.input.getX(),
+            Gdx.input.getY(),
+            0
+        );
+
+        worldViewport.unproject(worldClick);
+
+        selectedTower = null;
+
+        for (Tower tower : world.towers) {
+            if (towerContains(tower, worldClick.x, worldClick.y)) {
+                selectedTower = tower;
+                break;
+            }
+        }
+    }
+
+    private boolean towerContains(Tower tower, float x, float y) {
+        return x >= tower.xPos
+            && x <= tower.xPos + world.cellSize
+            && y >= tower.yPos
+            && y <= tower.yPos + world.cellSize;
+    }
+
+    private void drawTowerPopup(Tower tower) {
+        float baseWidth = 140;
+        float baseHeight = 80;
+        float padding = 8;
+
+        float scale = getPopupScale();
+
+        float scaledWidth = baseWidth * scale;
+        float scaledHeight = baseHeight * scale;
+
+        float x = tower.xPos + world.cellSize + 5;
+        float y = tower.yPos + world.cellSize;
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(1f, 1f, 0f, 1f);
+        shapeRenderer.rect(
+            selectedTower.xPos,
+            selectedTower.yPos,
+            world.cellSize,
+            world.cellSize
+        );
+        shapeRenderer.end();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(0f, 0f, 0f, 0.8f);
+        shapeRenderer.rect(x, y, scaledWidth, scaledHeight);
+        shapeRenderer.end();
+
+        batch.begin();
+        float originalScaleX = uiFont.getData().scaleX;
+        float originalScaleY = uiFont.getData().scaleY;
+        float fontScale = 1f + (scale - 1f) * 0.65f; // smaller response
+        uiFont.getData().setScale(originalScaleX * fontScale, originalScaleY * fontScale);
+
+        uiFont.draw(batch, "Tower", x + padding, y + scaledHeight);
+        uiFont.draw(batch, "Damage: " + tower.cooldown, x + padding, y + scaledHeight - 25 * scale);
+        uiFont.draw(batch, "Range: " + tower.range, x + padding, y + scaledHeight - 50 * scale);
+        batch.end();
+        uiFont.getData().setScale(originalScaleX, originalScaleY);//reset scale to prevent explosion
+    }
+
+    private float getPopupScale() {
+        float zoom = worldCamera.zoom;
+        float target = 1f + (zoom - 1f) * 0.65f;
+        target = Math.max(0.5f, Math.min(3f, target));
+        popupScale = com.badlogic.gdx.math.MathUtils.lerp(popupScale, target, 0.1f);
+        return popupScale;
+    }
+
+    private void handleWorldClickAt(int screenX, int screenY) {
+        Vector3 worldClick = new Vector3(screenX, screenY, 0);
+        worldViewport.unproject(worldClick);
+
+        Tower clicked = null;
+        for (Tower tower : world.towers) {
+            if (towerContains(tower, worldClick.x, worldClick.y)) {
+                clicked = tower;
+                break;
+            }
+        }
+
+        selectedTower = clicked;
     }
 
     @Override
@@ -272,11 +437,17 @@ public class GameScreen implements Screen {
     }
 
     @Override
-    public void pause() {}
+    public void pause() {
+    }
+
     @Override
-    public void resume() {}
+    public void resume() {
+    }
+
     @Override
-    public void hide() {}
+    public void hide() {
+    }
+
     @Override
     public void dispose() {
         batch.dispose();

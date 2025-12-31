@@ -3,7 +3,6 @@ package com.Geary.towerdefense.UI;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -19,14 +18,12 @@ public class CameraController {
     private boolean dragging = false;
     private int lastMouseX, lastMouseY;
     private float scrollAmount = 0f;
-    private float cameraSpeed = 1.2f; // drag sensitivity
+    private float cameraSpeed = 0.8f; // drag sensitivity
 
     public CameraController(OrthographicCamera camera, Viewport viewport, GameWorld world) {
         this.camera = camera;
         this.viewport = viewport;
         this.world = world;
-
-        registerInputProcessor();
     }
 
     /**
@@ -40,6 +37,12 @@ public class CameraController {
 
     public void scrolled(float amountX, float amountY) {
         scrollAmount += amountY; // scroll up = positive
+    }
+
+    public void dragBy(int dx, int dy) {
+        float worldDX = -dx * cameraSpeed * camera.zoom;
+        float worldDY = dy * cameraSpeed * camera.zoom;
+        camera.position.add(worldDX, worldDY, 0);
     }
 
     private void handleDrag() {
@@ -106,15 +109,5 @@ public class CameraController {
         } else {
             camera.position.y = Math.max(minY, Math.min(maxY, camera.position.y));
         }
-    }
-
-    private void registerInputProcessor() {
-        Gdx.input.setInputProcessor(new InputAdapter() {
-            @Override
-            public boolean scrolled(float amountX, float amountY) {
-                CameraController.this.scrolled(amountX, amountY);
-                return true;
-            }
-        });
     }
 }

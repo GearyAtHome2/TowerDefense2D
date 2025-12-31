@@ -13,7 +13,8 @@ import java.util.List;
 public class TowerManager {
     private final GameWorld world;
     private final OrthographicCamera camera;
-    private boolean towerPlacementActive = false;
+    private boolean towerPlacementButtonActive = false;
+    private boolean towerPlacementCtrlActive = false;
 
     public TowerManager(GameWorld world, OrthographicCamera camera) {
         this.world = world;
@@ -21,18 +22,23 @@ public class TowerManager {
     }
 
     public boolean isPlacementActive() {
-        return towerPlacementActive;
+        return towerPlacementButtonActive || towerPlacementCtrlActive;
     }
 
-    public void togglePlacement(Vector3 uiClick, float buttonX, float buttonY, float buttonW, float buttonH) {
+    public void togglePlacementClick(Vector3 uiClick, float buttonX, float buttonY, float buttonW, float buttonH) {
         if (uiClick.x >= buttonX && uiClick.x <= buttonX + buttonW &&
             uiClick.y >= buttonY && uiClick.y <= buttonY + buttonH) {
-            towerPlacementActive = !towerPlacementActive;
+            towerPlacementButtonActive = !towerPlacementButtonActive;
         }
     }
 
+    public void togglePlacementKp(boolean ctrlHeld) {
+        if (ctrlHeld) towerPlacementCtrlActive = true;
+        else towerPlacementCtrlActive = false;
+    }
+
     public void handlePlacement() {
-        if (!towerPlacementActive) return;
+        if (!towerPlacementButtonActive && !towerPlacementCtrlActive) return;
 
         if (com.badlogic.gdx.Gdx.input.isButtonJustPressed(com.badlogic.gdx.Input.Buttons.LEFT)) {
             Vector3 worldPos = new Vector3(com.badlogic.gdx.Gdx.input.getX(), com.badlogic.gdx.Gdx.input.getY(), 0);

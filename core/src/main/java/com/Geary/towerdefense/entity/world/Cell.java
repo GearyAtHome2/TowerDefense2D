@@ -25,6 +25,8 @@ public class Cell {
     public Direction nextDirection; // for turn tiles
     public TurnType turnType;
 
+    public Cell(){}
+
     public Cell(Type type, float x, float y, Direction direction) {
         this.type = type;
         this.x = x;

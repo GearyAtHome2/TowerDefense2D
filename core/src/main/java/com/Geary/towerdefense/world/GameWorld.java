@@ -57,7 +57,7 @@ public class GameWorld {
         PathGenerator generator =
             new PathGenerator(gridWidth, gridHeight, cellSize);
 
-        List<Cell> generatedPath = generator.generatePath();
+        List<Cell> generatedPath = generator.generatePathAttempts();
 
         for (int i = 0; i < generatedPath.size(); i++) {
             Cell cell = generatedPath.get(i);
