@@ -14,6 +14,7 @@ public class PathGenerator {
     private final int cellSize;
     private final Random random = new Random();
     private static final int PATH_LENGTH = 80;
+    private static final int ZONE_SIZE = 7;
 
     public PathGenerator(int gridWidth, int gridHeight, int cellSize) {
         this.gridWidth = gridWidth;
@@ -26,74 +27,129 @@ public class PathGenerator {
         int index = 1;
         List<Cell> path = new ArrayList<>();
         while (len < PATH_LENGTH && index < 80) {
-            System.out.println("attempt " + index + ", previous path length attempt: " + len + ", attempting to generate again");
-            path = generatePath();
+            path = generatePathFromHome();
             len = path.size();
             index++;
         }
-        return path;
+        // Flip directions so path visually flows from ENEMY_ZONE → HOME_ZONE
+        return flipPath(path);
     }
 
-    private List<Cell> generatePath() {
-        boolean init = true;//flag to ensure the first tile isn't a turn
+    private List<Cell> generatePathFromHome() {
+        boolean init = true;
         Cell[][] grid = new Cell[gridWidth][gridHeight];
         List<Cell> path = new ArrayList<>();
 
-        int x = random.nextInt(gridWidth);
-        int y = random.nextInt(gridHeight);
-
+        // Start at center of HOME_ZONE (bottom-left)
+        int x = ZONE_SIZE / 2;
+        int y = ZONE_SIZE / 2;
         Direction dir = Direction.RIGHT;
 
         int targetLength = PATH_LENGTH + random.nextInt(15);
 
-        Cell cell = new Cell();
         for (int i = 0; i < targetLength; i++) {
-            // Choose next direction
-            List<Direction> options = getValidDirections(grid, x, y, dir);
-            if (options.isEmpty()) break; // dead end
+            List<Direction> options = getValidDirections(grid, x, y, dir, i);
 
+            // First 4 tiles: only RIGHT or UP
             Direction nextDir;
+            if (i < 4) {
+                options.removeIf(d -> d != Direction.RIGHT && d != Direction.UP);
+                if (i>0){
+                    nextDir = dir;
+                }
+            }
+
+            if (options.isEmpty()) break;
+
             if (i > targetLength - 10) {
                 nextDir = chooseNextDirectionWithOpenness(options, dir, grid, x, y);
             } else {
-                nextDir = chooseNextDirection(options, dir); // normal straight bias
+                nextDir = chooseNextDirection(options, dir);
             }
+
+            // Create cell
+            Cell cell;
             if (init) {
-                if (x < 2) {
-                    x = 2;
-                }
-                if (x > gridWidth - 2) {
-                    x = gridWidth - 2;
-                }
-                if (y < 2) {
-                    y = 2;
-                }
-                if (y > gridHeight - 2) {
-                    y = gridHeight - 2;
-                }
                 cell = new Cell(Cell.Type.PATH, x * cellSize, y * cellSize, dir);
-                path.add(cell);
-                grid[x][y] = cell;
                 init = false;
+            } else if (nextDir != dir) {
+                cell = new Cell(Cell.Type.TURN, x * cellSize, y * cellSize, dir, nextDir);
             } else {
-                if (nextDir != dir) {
-                    cell = new Cell(Cell.Type.TURN, x * cellSize, y * cellSize, dir, nextDir);
-                    path.add(cell);
-                    grid[x][y] = cell;
-                } else {
-                    cell = new Cell(Cell.Type.PATH, x * cellSize, y * cellSize, dir);
-                    path.add(cell);
-                    grid[x][y] = cell;
-                }
+                cell = new Cell(Cell.Type.PATH, x * cellSize, y * cellSize, dir);
             }
+
+            path.add(cell);
+            grid[x][y] = cell;
+
             x += dx(nextDir);
             y += dy(nextDir);
             dir = nextDir;
         }
+
+        // --- Now route path to top-right END_ZONE ---
+        int endX = gridWidth - 1;
+        int endY = gridHeight - 1;
+
+        while (!(x == endX && y == endY)) {
+            List<Direction> options = new ArrayList<>();
+            if (x < endX) options.add(Direction.RIGHT);
+            if (x > endX) options.add(Direction.LEFT);
+            if (y < endY) options.add(Direction.UP);
+            if (y > endY) options.add(Direction.DOWN);
+
+            // Pick a direction that does not enter END_ZONE prematurely
+            Direction nextDir = options.get(random.nextInt(options.size()));
+
+            Cell cell;
+            if (nextDir != dir) {
+                cell = new Cell(Cell.Type.TURN, x * cellSize, y * cellSize, dir, nextDir);
+            } else {
+                cell = new Cell(Cell.Type.PATH, x * cellSize, y * cellSize, dir);
+            }
+
+            path.add(cell);
+            grid[x][y] = cell;
+
+            x += dx(nextDir);
+            y += dy(nextDir);
+            dir = nextDir;
+        }
+
         return path;
     }
 
-    // Convert direction to grid offset
+    /** Flip all directions in the path so it visually flows backward */
+    private List<Cell> flipPath(List<Cell> original) {
+        List<Cell> flipped = new ArrayList<>();
+        for (int i = original.size() - 1; i >= 0; i--) {
+            Cell cell = original.get(i);
+            Cell newCell;
+            if (cell.type == Cell.Type.TURN) {
+                newCell = new Cell(
+                    Cell.Type.TURN,
+                    cell.x,
+                    cell.y,
+                    opposite(cell.nextDirection),
+                    opposite(cell.direction)
+                );
+            } else {
+                newCell = new Cell(cell.type, cell.x, cell.y, opposite(cell.direction));
+            }
+            flipped.add(newCell);
+        }
+        return flipped;
+    }
+
+    private Direction opposite(Direction dir) {
+        return switch (dir) {
+            case UP -> Direction.DOWN;
+            case DOWN -> Direction.UP;
+            case LEFT -> Direction.RIGHT;
+            case RIGHT -> Direction.LEFT;
+            default -> dir;
+        };
+    }
+
     private int dx(Direction dir) {
         return switch (dir) {
             case LEFT -> -1;
@@ -110,29 +166,33 @@ public class PathGenerator {
         };
     }
 
-    // Return a list of valid next directions
-    private List<Direction> getValidDirections(Cell[][] grid, int x, int y, Direction current) {
+    private List<Direction> getValidDirections(Cell[][] grid, int x, int y, Direction current, int pathIndex) {
         List<Direction> candidates = new ArrayList<>();
-        // Straight
-        if (canPlace(x + dx(current), y + dy(current), grid)) candidates.add(current);
-        Direction left = turnLeft(current);
-        if (canPlace(x + dx(left), y + dy(left), grid)) candidates.add(left);
-        Direction right = turnRight(current);
-        if (canPlace(x + dx(right), y + dy(right), grid)) candidates.add(right);
+        Direction[] dirs = {current, turnLeft(current), turnRight(current)};
+        for (Direction d : dirs) {
+            int nx = x + dx(d);
+            int ny = y + dy(d);
+            if (!canPlace(nx, ny, grid)) continue;
+            if (pathIndex >= 4 && isInHomeZone(nx, ny)) continue;
+            if (isInEndZone(nx, ny)) continue; // prevent early entry
+            candidates.add(d);
+        }
         Collections.shuffle(candidates, random);
         return candidates;
+    }
+
+    private boolean isInHomeZone(int x, int y) {
+        return x < ZONE_SIZE && y < ZONE_SIZE;
+    }
+
+    private boolean isInEndZone(int x, int y) {
+        return x >= gridWidth - ZONE_SIZE && y >= gridHeight - ZONE_SIZE;
     }
 
     private boolean canPlace(int x, int y, Cell[][] grid) {
         if (x < 0 || x >= gridWidth || y < 0 || y >= gridHeight) return false;
         if (grid[x][y] != null) return false;
-
-        int[][] dirs = {
-            {1, 0},   // right
-            {-1, 0},   // left
-            {0, 1},   // up
-            {0, -1}    // down
-        };
+        int[][] dirs = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
         for (int[] d : dirs) {
             int nx = x + d[0];
             int ny = y + d[1];
@@ -144,10 +204,8 @@ public class PathGenerator {
     }
 
     private Direction chooseNextDirection(List<Direction> options, Direction current) {
-        // Assign weights
-        int straightWeight = 70;  // 70% chance to keep going straight
-        int turnWeight = 15;      // 15% chance for each turn
-
+        int straightWeight = 70;
+        int turnWeight = 15;
         List<Direction> weightedList = new ArrayList<>();
         for (Direction dir : options) {
             if (dir == current) {
@@ -156,28 +214,22 @@ public class PathGenerator {
                 for (int i = 0; i < turnWeight; i++) weightedList.add(dir);
             }
         }
-
-        // Pick random from weighted list
         return weightedList.get(random.nextInt(weightedList.size()));
     }
 
     private Direction chooseNextDirectionWithOpenness(List<Direction> options, Direction current, Cell[][] grid, int x, int y) {
-        // Bias toward straight movement
         Direction bestDir = current;
         int bestScore = -1;
         for (Direction dir : options) {
             int nx = x + dx(dir);
             int ny = y + dy(dir);
             int score = openness(grid, nx, ny);
-            // Slight bonus for straight movement
             if (dir == current) score += 2;
-
             if (score > bestScore) {
                 bestScore = score;
                 bestDir = dir;
             }
         }
-        System.out.println("score:"+bestScore);
         return bestDir;
     }
 
