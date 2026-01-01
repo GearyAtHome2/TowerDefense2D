@@ -187,7 +187,7 @@ public class GameScreen implements Screen {
         shapeRenderer.setProjectionMatrix(worldCamera.combined);
 
         drawGridLines();
-//        drawBaseCells();
+        drawBaseCells();
         drawPathCells();
 
         towerRenderer.drawTowerRanges(shapeRenderer);
@@ -221,19 +221,29 @@ public class GameScreen implements Screen {
 
     private void drawBaseCells() {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         for (int x = 0; x < world.gridWidth; x++) {
             for (int y = 0; y < world.gridHeight; y++) {
                 Cell cell = world.grid[x][y];
                 if (cell.type == Cell.Type.TOWER) {
-                    shapeRenderer.setColor(0, 1, 0, 0.35f);
+                    shapeRenderer.setColor(0f, 0.8f, 0f, 0.35f);
+                    shapeRenderer.rect(cell.x, cell.y, world.cellSize, world.cellSize);
+
+                } else if (cell.type == Cell.Type.HOME) {
+                    shapeRenderer.setColor(0f, 1f, 0f, 0.2f);
+                    shapeRenderer.rect(cell.x, cell.y, world.cellSize, world.cellSize);
+
+                } else if (cell.type == Cell.Type.ENEMY) {
+                    shapeRenderer.setColor(1f, 0f, 0f, 0.2f);
                     shapeRenderer.rect(cell.x, cell.y, world.cellSize, world.cellSize);
                 }
             }
         }
-
         shapeRenderer.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
     }
+
 
     private void drawPathCells() {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);

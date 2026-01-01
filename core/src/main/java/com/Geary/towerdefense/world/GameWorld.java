@@ -34,6 +34,7 @@ public class GameWorld {
 
     private void generateWorld() {
         clearWorld();
+        generateZones();
         populatePath();
         fillEmptyCells();
     }
@@ -49,6 +50,35 @@ public class GameWorld {
             }
         }
     }
+
+    private static final int ZONE_SIZE = 7;
+
+    private void generateZones() {
+        for (int x = 0; x < ZONE_SIZE; x++) {
+            for (int y = 0; y < ZONE_SIZE; y++) {
+                grid[x][y] = new Cell(
+                    Cell.Type.HOME,
+                    x * cellSize,
+                    y * cellSize,
+                    Direction.NONE
+                );
+                occupied[x][y] = true;
+            }
+        }
+
+        for (int x = gridWidth - ZONE_SIZE; x < gridWidth; x++) {
+            for (int y = gridHeight - ZONE_SIZE; y < gridHeight; y++) {
+                grid[x][y] = new Cell(
+                    Cell.Type.ENEMY,
+                    x * cellSize,
+                    y * cellSize,
+                    Direction.NONE
+                );
+                occupied[x][y] = true;
+            }
+        }
+    }
+
 
     private void populatePath() {
         path.clear();

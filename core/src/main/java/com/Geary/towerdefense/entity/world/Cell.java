@@ -11,7 +11,9 @@ public class Cell {
     public enum Type {
         TOWER,
         PATH,
-        TURN  // new type
+        TURN,
+        HOME,
+        ENEMY
     }
 
     public enum TurnType {
