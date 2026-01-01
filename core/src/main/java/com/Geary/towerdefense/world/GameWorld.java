@@ -18,7 +18,7 @@ public class GameWorld {
     public final int gridHeight = 15;
 
     public Cell[][] grid;
-    public boolean[][] occupied;
+    public boolean[][] occupied = new boolean[gridWidth][gridHeight];
 
     public List<Cell> path = new ArrayList<>();
     public List<Tower> towers = new ArrayList<>();
@@ -62,10 +62,9 @@ public class GameWorld {
                     y * cellSize,
                     Direction.NONE
                 );
-                occupied[x][y] = true;
+                occupied[x][y] = false;
             }
         }
-
         for (int x = gridWidth - ZONE_SIZE; x < gridWidth; x++) {
             for (int y = gridHeight - ZONE_SIZE; y < gridHeight; y++) {
                 grid[x][y] = new Cell(

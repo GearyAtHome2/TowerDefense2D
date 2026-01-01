@@ -166,14 +166,6 @@ public class GameScreen implements Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) paused = !paused;
 
         towerManager.togglePlacementKp(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT));
-//        if (Gdx.input.justTouched()) {
-//            Vector3 uiClick = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-//            uiViewport.unproject(uiClick);
-//            towerManager.togglePlacementClick(uiClick, PLACE_TOWER_X, PLACE_TOWER_Y, PLACE_TOWER_WIDTH, PLACE_TOWER_HEIGHT);
-//        }
-//        if (Gdx.input.justTouched() && !towerManager.isPlacementActive()) {
-//            handleWorldClick();
-//        }
         if (towerManager.isPlacementActive()) {
             selectedTower = null;
         }
@@ -346,8 +338,8 @@ public class GameScreen implements Screen {
 
     public void setGameSpeed() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) gameSpeed = 1f;
-        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) gameSpeed = 2f;
-        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) gameSpeed = 4f;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) gameSpeed = 3f;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) gameSpeed = 9f;
     }
 
     private void handleWorldClick() {

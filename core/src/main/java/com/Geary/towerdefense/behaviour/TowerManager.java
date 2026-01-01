@@ -49,8 +49,8 @@ public class TowerManager {
             if (x >= 0 && x < world.gridWidth &&
                 y >= 0 && y < world.gridHeight &&
                 !world.occupied[x][y] &&
-                world.grid[x][y].type == Cell.Type.TOWER) {
-
+                (world.grid[x][y].type == Cell.Type.TOWER
+                    || world.grid[x][y].type == Cell.Type.HOME)) {
                 world.towers.add(new Tower(x * world.cellSize, y * world.cellSize));
                 world.occupied[x][y] = true;
             }
@@ -63,7 +63,7 @@ public class TowerManager {
             if (tower.cooldown <= 0) {
                 Enemy target = tower.findTarget(world.enemies);
                 if (target != null) bullets.add(tower.shoot(target));
-                tower.cooldown = tower.maxCooldown; // reset using tower's cooldown in seconds
+                tower.cooldown = tower.maxCooldown;
             }
         }
     }

@@ -2,10 +2,7 @@ package com.Geary.towerdefense.entity.world;
 
 import com.Geary.towerdefense.Direction;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class PathGenerator {
 
@@ -15,6 +12,7 @@ public class PathGenerator {
     private final Random random = new Random();
     private static final int PATH_LENGTH = 80;
     private static final int ZONE_SIZE = 7;
+    private static boolean correctEnd;
 
     public PathGenerator(int gridWidth, int gridHeight, int cellSize) {
         this.gridWidth = gridWidth;
@@ -24,50 +22,52 @@ public class PathGenerator {
 
     public List<Cell> generatePathAttempts() {
         int len = 0;
-        int index = 1;
+        int index = 0;
         List<Cell> path = new ArrayList<>();
-        while (len < PATH_LENGTH && index < 80) {
+        while (index < 2500 && (len < PATH_LENGTH || !correctEnd)) {
+            System.out.println("attempt: "+index+", previous path lenght: "+len+", previous correct end: "+correctEnd);
             path = generatePathFromHome();
             len = path.size();
             index++;
         }
+        System.out.println("SUCCESS! attempt: "+index+", path lenght: "+len+", correct end: "+correctEnd);
         // Flip directions so path visually flows from ENEMY_ZONE → HOME_ZONE
         return flipPath(path);
     }
 
     private List<Cell> generatePathFromHome() {
+        correctEnd = false;
         boolean init = true;
+        boolean leftHomeZone = false; // <-- track leaving HOME_ZONE
         Cell[][] grid = new Cell[gridWidth][gridHeight];
         List<Cell> path = new ArrayList<>();
 
-        // Start at center of HOME_ZONE (bottom-left)
         int x = ZONE_SIZE / 2;
         int y = ZONE_SIZE / 2;
         Direction dir = Direction.RIGHT;
 
-        int targetLength = PATH_LENGTH + random.nextInt(15);
+        int forcedEndX = gridWidth - 1;
+        int forcedEndY = gridHeight - 1;
 
-        for (int i = 0; i < targetLength; i++) {
-            List<Direction> options = getValidDirections(grid, x, y, dir, i);
+        int maxInitialSteps = PATH_LENGTH - manhattanDistance(x, y, forcedEndX, forcedEndY);
+
+        for (int i = 0; i < maxInitialSteps; i++) {
+            List<Direction> options = getValidDirections(grid, x, y, dir, i, false, leftHomeZone);
 
             // First 4 tiles: only RIGHT or UP
-            Direction nextDir;
             if (i < 4) {
                 options.removeIf(d -> d != Direction.RIGHT && d != Direction.UP);
-                if (i>0){
-                    nextDir = dir;
-                }
             }
 
             if (options.isEmpty()) break;
 
-            if (i > targetLength - 10) {
+            Direction nextDir;
+            if (i > maxInitialSteps - 10) {
                 nextDir = chooseNextDirectionWithOpenness(options, dir, grid, x, y);
             } else {
                 nextDir = chooseNextDirection(options, dir);
             }
 
-            // Create cell
             Cell cell;
             if (init) {
                 cell = new Cell(Cell.Type.PATH, x * cellSize, y * cellSize, dir);
@@ -81,24 +81,33 @@ public class PathGenerator {
             path.add(cell);
             grid[x][y] = cell;
 
+            // Check if we have left HOME_ZONE
+            if (!leftHomeZone && !isInHomeZone(x, y)) leftHomeZone = true;
+
             x += dx(nextDir);
             y += dy(nextDir);
             dir = nextDir;
         }
 
-        // --- Now route path to top-right END_ZONE ---
-        int endX = gridWidth - 1;
-        int endY = gridHeight - 1;
-
-        while (!(x == endX && y == endY)) {
+        // --- Forcefully route to END_ZONE (top-right) ---
+        while (x != forcedEndX || y != forcedEndY) {
             List<Direction> options = new ArrayList<>();
-            if (x < endX) options.add(Direction.RIGHT);
-            if (x > endX) options.add(Direction.LEFT);
-            if (y < endY) options.add(Direction.UP);
-            if (y > endY) options.add(Direction.DOWN);
+            for (Direction d : new Direction[]{dir, turnLeft(dir), turnRight(dir)}) {
+                int nx = x + dx(d);
+                int ny = y + dy(d);
 
-            // Pick a direction that does not enter END_ZONE prematurely
-            Direction nextDir = options.get(random.nextInt(options.size()));
+                if (nx < 0 || nx >= gridWidth || ny < 0 || ny >= gridHeight) continue;
+                if (grid[nx][ny] != null) continue;
+
+                // Never re-enter HOME_ZONE once we've left
+                if (leftHomeZone && isInHomeZone(nx, ny)) continue;
+
+                options.add(d);
+            }
+
+            if (options.isEmpty()) break;
+
+            Direction nextDir = directionTowards(x, y, forcedEndX, forcedEndY, options);
 
             Cell cell;
             if (nextDir != dir) {
@@ -115,7 +124,13 @@ public class PathGenerator {
             dir = nextDir;
         }
 
+        if (x == forcedEndX && y == forcedEndY) correctEnd = true;
+
         return path;
+    }
+
+    private int manhattanDistance(int x1, int y1, int x2, int y2) {
+        return Math.abs(x2 - x1) + Math.abs(y2 - y1);
     }
 
     /** Flip all directions in the path so it visually flows backward */
@@ -125,13 +140,11 @@ public class PathGenerator {
             Cell cell = original.get(i);
             Cell newCell;
             if (cell.type == Cell.Type.TURN) {
-                newCell = new Cell(
-                    Cell.Type.TURN,
+                newCell = new Cell(Cell.Type.TURN,
                     cell.x,
                     cell.y,
                     opposite(cell.nextDirection),
-                    opposite(cell.direction)
-                );
+                    opposite(cell.direction));
             } else {
                 newCell = new Cell(cell.type, cell.x, cell.y, opposite(cell.direction));
             }
@@ -166,15 +179,17 @@ public class PathGenerator {
         };
     }
 
-    private List<Direction> getValidDirections(Cell[][] grid, int x, int y, Direction current, int pathIndex) {
+    private List<Direction> getValidDirections(Cell[][] grid, int x, int y, Direction current, int pathIndex, boolean allowEndZone, boolean leftHomeZone) {
         List<Direction> candidates = new ArrayList<>();
         Direction[] dirs = {current, turnLeft(current), turnRight(current)};
         for (Direction d : dirs) {
             int nx = x + dx(d);
             int ny = y + dy(d);
-            if (!canPlace(nx, ny, grid)) continue;
-            if (pathIndex >= 4 && isInHomeZone(nx, ny)) continue;
-            if (isInEndZone(nx, ny)) continue; // prevent early entry
+            if (nx < 0 || nx >= gridWidth || ny < 0 || ny >= gridHeight) continue;
+            if (!allowEndZone && isInEndZone(nx, ny)) continue;
+            if (!leftHomeZone && pathIndex >= 4 && isInHomeZone(nx, ny)) continue;
+            if (leftHomeZone && isInHomeZone(nx, ny)) continue; // <-- forbid re-entry
+            if (grid[nx][ny] != null) continue;
             candidates.add(d);
         }
         Collections.shuffle(candidates, random);
@@ -187,20 +202,6 @@ public class PathGenerator {
 
     private boolean isInEndZone(int x, int y) {
         return x >= gridWidth - ZONE_SIZE && y >= gridHeight - ZONE_SIZE;
-    }
-
-    private boolean canPlace(int x, int y, Cell[][] grid) {
-        if (x < 0 || x >= gridWidth || y < 0 || y >= gridHeight) return false;
-        if (grid[x][y] != null) return false;
-        int[][] dirs = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-        for (int[] d : dirs) {
-            int nx = x + d[0];
-            int ny = y + d[1];
-            if (nx >= 0 && nx < gridWidth && ny >= 0 && ny < gridHeight) {
-                if (grid[nx][ny] != null) return false;
-            }
-        }
-        return true;
     }
 
     private Direction chooseNextDirection(List<Direction> options, Direction current) {
@@ -244,6 +245,21 @@ public class PathGenerator {
             }
         }
         return emptyCount;
+    }
+
+    private Direction directionTowards(int x, int y, int targetX, int targetY, List<Direction> options) {
+        List<Direction> valid = new ArrayList<>();
+        int oldDist = Math.abs(x - targetX) + Math.abs(y - targetY);
+
+        for (Direction d : options) {
+            int nx = x + dx(d);
+            int ny = y + dy(d);
+            int newDist = Math.abs(nx - targetX) + Math.abs(ny - targetY);
+            if (newDist < oldDist) valid.add(d);
+        }
+
+        if (!valid.isEmpty()) return valid.get(random.nextInt(valid.size()));
+        return options.get(random.nextInt(options.size()));
     }
 
     private Direction turnLeft(Direction dir) {

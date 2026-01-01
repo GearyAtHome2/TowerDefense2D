@@ -8,9 +8,7 @@ import java.util.List;
 public class Tower {
     public float xPos, yPos;
     public Texture texture;
-
     public float range = 207f; // pixels
-
     public float maxCooldown = 2f;
     public float cooldown = maxCooldown;
 
