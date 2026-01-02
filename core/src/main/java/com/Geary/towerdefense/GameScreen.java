@@ -2,13 +2,15 @@ package com.Geary.towerdefense;
 
 import com.Geary.towerdefense.UI.CameraController;
 import com.Geary.towerdefense.UI.TowerRenderer;
-import com.Geary.towerdefense.behaviour.EnemyManager;
+import com.Geary.towerdefense.behaviour.MobManager;
 import com.Geary.towerdefense.behaviour.SpawnerManager;
 import com.Geary.towerdefense.behaviour.TowerManager;
 import com.Geary.towerdefense.entity.Bullet;
-import com.Geary.towerdefense.entity.Enemy;
-import com.Geary.towerdefense.entity.Spawner;
 import com.Geary.towerdefense.entity.Tower;
+import com.Geary.towerdefense.entity.mob.Enemy;
+import com.Geary.towerdefense.entity.mob.Friendly;
+import com.Geary.towerdefense.entity.spawner.EnemySpawner;
+import com.Geary.towerdefense.entity.spawner.FriendlySpawner;
 import com.Geary.towerdefense.entity.world.Cell;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.Gdx;
@@ -41,7 +43,7 @@ public class GameScreen implements Screen {
     private GameWorld world;
     private CameraController cameraController;
     private TowerManager towerManager;
-    private EnemyManager enemyManager;
+    private MobManager mobManager;
     private SpawnerManager spawnerManager;
 
     private OrthographicCamera uiCamera;
@@ -73,7 +75,7 @@ public class GameScreen implements Screen {
 
         cameraController = new CameraController(worldCamera, worldViewport, world);
         towerManager = new TowerManager(world, worldCamera);
-        enemyManager = new EnemyManager(world);
+        mobManager = new MobManager(world);
         spawnerManager = new SpawnerManager(world);
 
         // --- Input ---
@@ -155,7 +157,7 @@ public class GameScreen implements Screen {
         if (!paused) {
             cameraController.update();
             towerManager.handlePlacement();
-            enemyManager.update(delta);
+            mobManager.update(delta);
             spawnerManager.update(delta);
         }
 
@@ -172,7 +174,6 @@ public class GameScreen implements Screen {
     }
 
     private void drawWorld(float delta) {
-        // --- World viewport ---
         worldViewport.apply();
         worldCamera.update();
         batch.setProjectionMatrix(worldCamera.combined);
@@ -183,11 +184,16 @@ public class GameScreen implements Screen {
         drawPathCells();
 
         towerRenderer.drawTowerRanges(shapeRenderer);
-        towerManager.updateTowers(world.bullets, delta);
+
+        if (!paused) {
+            towerManager.updateTowers(world.bullets, delta);
+        }
+
+        drawActors();
+
         if (selectedTower != null) {
             drawTowerPopup(selectedTower);
         }
-        drawActors();
     }
 
     private void drawGridLines() {
@@ -236,7 +242,6 @@ public class GameScreen implements Screen {
         Gdx.gl.glDisable(GL20.GL_BLEND);
     }
 
-
     private void drawPathCells() {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 
@@ -271,12 +276,20 @@ public class GameScreen implements Screen {
     }
 
     private void drawActors() {
+        // --- Draw enemies and bullets with SpriteBatch ---
         batch.begin();
         for (Enemy e : world.enemies) e.draw(batch);
-        for (Tower t : world.towers) t.draw(batch);
+        for (Friendly f : world.friends) f.draw(batch);
         for (Bullet b : world.bullets) b.draw(batch);
-        for (Spawner s : world.spawners) s.draw(batch);
         batch.end();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        for (EnemySpawner es : world.enemySpawners) es.draw(shapeRenderer);
+        for (FriendlySpawner fs : world.friendlySpawners) fs.draw(shapeRenderer);
+        shapeRenderer.end();
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        towerRenderer.drawTowers(shapeRenderer);
+        shapeRenderer.end();
     }
 
     private void drawUI() {
@@ -342,25 +355,6 @@ public class GameScreen implements Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) gameSpeed = 9f;
     }
 
-    private void handleWorldClick() {
-        Vector3 worldClick = new Vector3(
-            Gdx.input.getX(),
-            Gdx.input.getY(),
-            0
-        );
-
-        worldViewport.unproject(worldClick);
-
-        selectedTower = null;
-
-        for (Tower tower : world.towers) {
-            if (towerContains(tower, worldClick.x, worldClick.y)) {
-                selectedTower = tower;
-                break;
-            }
-        }
-    }
-
     private boolean towerContains(Tower tower, float x, float y) {
         return x >= tower.xPos
             && x <= tower.xPos + world.cellSize
@@ -403,7 +397,7 @@ public class GameScreen implements Screen {
         uiFont.getData().setScale(originalScaleX * fontScale, originalScaleY * fontScale);
 
         uiFont.draw(batch, "Tower", x + padding, y + scaledHeight);
-        uiFont.draw(batch, "Damage: " + tower.cooldown, x + padding, y + scaledHeight - 25 * scale);
+        uiFont.draw(batch, "Cooldown: " + tower.cooldown, x + padding, y + scaledHeight - 25 * scale);
         uiFont.draw(batch, "Range: " + tower.range, x + padding, y + scaledHeight - 50 * scale);
         batch.end();
         uiFont.getData().setScale(originalScaleX, originalScaleY);//reset scale to prevent explosion

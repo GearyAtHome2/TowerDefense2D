@@ -1,7 +1,7 @@
-package com.Geary.towerdefense.entity.world;
+package com.Geary.towerdefense.pathGeneration;
 
 import com.Geary.towerdefense.Direction;
-import com.Geary.towerdefense.pathGeneration.PathRules;
+import com.Geary.towerdefense.entity.world.Cell;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,31 +12,57 @@ import static com.Geary.towerdefense.pathGeneration.ZoneUtil.isInHomeZone;
 
 public class PathGenerator {
 
-    private static final int PATH_LENGTH = 80;
+    private static final int PATH_LENGTH = 85;
     private static final int ZONE_SIZE = 7;
 
     private final int gridW;
     private final int gridH;
     private final int cellSize;
-    private final Random random = new Random();
+    private final Random random;
     private final PathRules rules;
 
     private boolean correctEnd;
 
     public PathGenerator(int gridW, int gridH, int cellSize) {
+        random = new Random();
         this.gridW = gridW;
         this.gridH = gridH;
         this.cellSize = cellSize;
         this.rules = new PathRules(gridW, gridH, ZONE_SIZE, random);
+
     }
 
     public List<Cell> generatePathAttempts() {
+        long startTimeNs = System.nanoTime();
+
+        int attempts = 0;
+
         for (int i = 0; i < 2500; i++) {
+            attempts++;
+
             List<Cell> path = generatePathFromHome();
+
             if (path.size() >= PATH_LENGTH && correctEnd) {
+                long endTimeNs = System.nanoTime();
+                logTiming(startTimeNs, endTimeNs, attempts, true);
+
+                System.out.println(
+                    "Success! Attempt " + i +
+                        ": length: " + path.size() +
+                        ", end: " + correctEnd
+                );
                 return flipPath(path);
             }
+
+            System.out.println(
+                "attempt " + i +
+                    ": length: " + path.size() +
+                    ", end: " + correctEnd
+            );
         }
+        long endTimeNs = System.nanoTime();
+        logTiming(startTimeNs, endTimeNs, attempts, false);
+
         return List.of();
     }
 
@@ -58,6 +84,14 @@ public class PathGenerator {
             PATH_LENGTH - Math.abs(endX - c.x) - Math.abs(endY - c.y);
 
         for (int i = 0; i < maxInitialSteps; i++) {
+            int remainingSteps = maxInitialSteps - i;
+            int manhattanToEnd =
+                Math.abs(endX - c.x) + Math.abs(endY - c.y);
+
+            if (manhattanToEnd > remainingSteps) {
+                break; // This path is doomed, stop early
+            }
+
             List<Direction> options =
                 rules.getValidDirections(grid, c.x, c.y, c.dir, i, leftHomeZone, false);
 
@@ -66,7 +100,7 @@ public class PathGenerator {
             Direction nextDir;
 
             if (!leftHomeZone) {
-                nextDir = chooseHomeExitDirection(options, exitDirection);
+                nextDir = Direction.RIGHT;//todo: for now, update this to be ruight or up later
                 if (nextDir == null) break;
                 exitDirection = nextDir;
             } else {
@@ -168,6 +202,22 @@ public class PathGenerator {
 
             c.move(nextDir);
         }
+    }
+    private void logTiming(
+        long startTimeNs,
+        long endTimeNs,
+        int attempts,
+        boolean success
+    ) {
+        double totalMs = (endTimeNs - startTimeNs) / 1_000_000.0;
+        double avgMs = totalMs / Math.max(attempts, 1);
+
+        System.out.println("---- Path generation stats ----");
+        System.out.println("Success: " + success);
+        System.out.println("Attempts: " + attempts);
+        System.out.printf("Total time: %.3f ms%n", totalMs);
+        System.out.printf("Avg per attempt: %.5f ms%n", avgMs);
+        System.out.println("--------------------------------");
     }
 
 

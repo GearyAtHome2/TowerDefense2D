@@ -1,10 +1,10 @@
 package com.Geary.towerdefense.entity.world;
 
 import com.Geary.towerdefense.Direction;
-import com.Geary.towerdefense.entity.Enemy;
+import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.world.GameWorld;
 
-import java.util.Random;
+import static com.Geary.towerdefense.pathGeneration.DirectionUtil.opposite;
 
 
 public class Cell {
@@ -23,11 +23,12 @@ public class Cell {
 
     public float x, y;
     public Type type;
-    public Direction direction; // initial movement
-    public Direction nextDirection; // for turn tiles
+    public Direction direction;
+    public Direction nextDirection;
+    public Direction reverseDirection;
+    public Direction reverseNextDirection;
     public TurnType turnType;
 
-    public Cell(){}
 
     public Cell(Type type, float x, float y, Direction direction) {
         this.type = type;
@@ -35,6 +36,8 @@ public class Cell {
         this.y = y;
         this.direction = direction;
         this.nextDirection = direction;
+        this.reverseDirection = opposite(direction);
+        this.reverseNextDirection = opposite(direction);
     }
 
     public Cell(Type type, float x, float y, Direction startDir, Direction nextDir) {
@@ -43,13 +46,14 @@ public class Cell {
         this.y = y;
         this.direction = startDir;
         this.nextDirection = nextDir;
+        this.reverseDirection = opposite(startDir);
+        this.reverseNextDirection = opposite(nextDir);
         if (type == Type.TURN) {
             this.turnType = computeTurnType(startDir, nextDir);
         }
     }
 
     private TurnType computeTurnType(Direction from, Direction to) {
-        // BL → TR diagonal
         if ((from == Direction.RIGHT && to == Direction.UP) ||
             (from == Direction.UP && to == Direction.LEFT) ||
             (from == Direction.LEFT && to == Direction.DOWN) ||
@@ -57,55 +61,45 @@ public class Cell {
             return TurnType.TL_BR;
         }
 
-        // TL → BR diagonal
         return TurnType.BL_TR;
     }
 
-    public Direction calculateTurnDirection(Enemy enemy) {
-        float localX = (enemy.getCenterX() - x);
-        float localY = (enemy.getCenterY() - y);
-        float chanceNewDir = 0;
-        float reducedCellSizeDenominator = (GameWorld.cellSize * 0.9F);//0.9 is there to make sure it doesn't go near the far wall
-        switch (direction) {
-            case RIGHT:
-                chanceNewDir = localX / reducedCellSizeDenominator;
-                break;
-            case LEFT:
-                chanceNewDir = (GameWorld.cellSize - localX) / reducedCellSizeDenominator;
-                break;
-            case UP:
-                chanceNewDir = localY / reducedCellSizeDenominator;
-                break;
-            case DOWN:
-                chanceNewDir = (GameWorld.cellSize - localY) / reducedCellSizeDenominator;
-                break;
-            default:
-                throw new RuntimeException("impossible tile type");
-        }
-        double ran = new Random().nextDouble();//todo: re-enable this once working
-        return chanceNewDir > ran ? nextDirection : direction;
+    public Direction calculateTurnDirection(Mob mob, boolean reverse) {
+        Direction entryDir = reverse ? opposite(direction) : direction;
+        Direction exitDir  = reverse ? opposite(nextDirection) : nextDirection;
+
+        float centerX = mob.getCenterX();
+        float centerY = mob.getCenterY();
+
+        float half = GameWorld.cellSize / 2f;
+
+        // Determine turning switch point based on entry and exit direction
+        return switch (entryDir) {
+            case RIGHT -> (centerX - x >= half) ? exitDir : entryDir;
+            case LEFT  -> (x + GameWorld.cellSize - centerX >= half) ? exitDir : entryDir;
+            case UP    -> (centerY - y >= half) ? exitDir : entryDir;
+            case DOWN  -> (y + GameWorld.cellSize - centerY >= half) ? exitDir : entryDir;
+            default -> throw new RuntimeException("impossible");
+        };
     }
 
-    public boolean diagonalTriggered(Enemy enemy) {
-        // Enemy local coordinates relative to tile
-        float localX = enemy.getCenterX() - x;
-        float localY = enemy.getCenterY() - y;
+    public Direction calculateReverseTurnDirection(Mob mob) {
+        float localX = GameWorld.cellSize - (mob.getCenterX() - x);
+        float localY = GameWorld.cellSize - (mob.getCenterY() - y);
 
-        // Clamp inside tile
-        localX = Math.max(0, Math.min(GameWorld.cellSize, localX));
-        localY = Math.max(0, Math.min(GameWorld.cellSize, localY));
+        float chanceNewDir;
+        float denom = GameWorld.cellSize * 0.9f;
 
-
-        switch (direction) {
-            case LEFT, RIGHT: // top-left → bottom-right
-                return localY <= GameWorld.cellSize - localX;
-
-            case UP, DOWN: // bottom-left → top-right
-                // Trigger only after passing the line y = x
-                return localY >= localX;
-
-            default:
-                return false;
+        switch (reverseDirection) {
+            case RIGHT: chanceNewDir = localX / denom; break;
+            case LEFT:  chanceNewDir = (GameWorld.cellSize - localX) / denom; break;
+            case UP:    chanceNewDir = localY / denom; break;
+            case DOWN:  chanceNewDir = (GameWorld.cellSize - localY) / denom; break;
+            default: throw new RuntimeException("impossible");
         }
+
+        return chanceNewDir > 0.5
+            ? reverseNextDirection
+            : reverseDirection;
     }
 }
