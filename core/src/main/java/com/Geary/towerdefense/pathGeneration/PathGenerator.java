@@ -24,45 +24,31 @@ public class PathGenerator {
     private boolean correctEnd;
 
     public PathGenerator(int gridW, int gridH, int cellSize) {
-        random = new Random();
+        this.random = new Random();
         this.gridW = gridW;
         this.gridH = gridH;
         this.cellSize = cellSize;
         this.rules = new PathRules(gridW, gridH, ZONE_SIZE, random);
-
     }
 
     public List<Cell> generatePathAttempts() {
         long startTimeNs = System.nanoTime();
-
         int attempts = 0;
 
-        for (int i = 0; i < 2500; i++) {
-            attempts++;
-
+        for (int i = 0; i < 2500; i++, attempts++) {
             List<Cell> path = generatePathFromHome();
 
             if (path.size() >= PATH_LENGTH && correctEnd) {
-                long endTimeNs = System.nanoTime();
-                logTiming(startTimeNs, endTimeNs, attempts, true);
-
-                System.out.println(
-                    "Success! Attempt " + i +
-                        ": length: " + path.size() +
-                        ", end: " + correctEnd
-                );
+                logTiming(startTimeNs, System.nanoTime(), attempts + 1, true);
+                System.out.println("Success! Attempt " + i +
+                    ": length: " + path.size() + ", end: " + correctEnd);
                 return flipPath(path);
             }
 
-            System.out.println(
-                "attempt " + i +
-                    ": length: " + path.size() +
-                    ", end: " + correctEnd
-            );
+            System.out.println("Attempt " + i + ": length: " + path.size() + ", end: " + correctEnd);
         }
-        long endTimeNs = System.nanoTime();
-        logTiming(startTimeNs, endTimeNs, attempts, false);
 
+        logTiming(startTimeNs, System.nanoTime(), attempts, false);
         return List.of();
     }
 
@@ -72,125 +58,54 @@ public class PathGenerator {
         boolean leftHomeZone = false;
 
         Cell[][] grid = new Cell[gridW][gridH];
-        List<Cell> path = new ArrayList<>();
+        List<Cell> path = new ArrayList<>(PATH_LENGTH);
 
         Cursor c = new Cursor(ZONE_SIZE / 2, ZONE_SIZE / 2, Direction.RIGHT);
-        Direction exitDirection = null;
+        int endX = gridW - 1, endY = gridH - 1;
 
-        int endX = gridW - 1;
-        int endY = gridH - 1;
-
-        int maxInitialSteps =
-            PATH_LENGTH - Math.abs(endX - c.x) - Math.abs(endY - c.y);
-
-        for (int i = 0; i < maxInitialSteps; i++) {
-            int remainingSteps = maxInitialSteps - i;
-            int manhattanToEnd =
-                Math.abs(endX - c.x) + Math.abs(endY - c.y);
-
-            if (manhattanToEnd > remainingSteps) {
-                break; // This path is doomed, stop early
-            }
-
-            List<Direction> options =
-                rules.getValidDirections(grid, c.x, c.y, c.dir, i, leftHomeZone, false);
-
+        // Generate main path until end zone or maximum PATH_LENGTH
+        for (int step = 0; step < 1000; step++) { // high upper bound, break early if needed
+            List<Direction> options = rules.getValidDirections(grid, c.x, c.y, c.dir, step, leftHomeZone, false);
             if (options.isEmpty()) break;
 
-            Direction nextDir;
+            Direction nextDir = !leftHomeZone ? Direction.RIGHT
+                : (step > PATH_LENGTH - 10
+                ? rules.opennessDirection(options, c.dir, grid, c.x, c.y)
+                : rules.weightedDirection(options, c.dir));
 
-            if (!leftHomeZone) {
-                nextDir = Direction.RIGHT;//todo: for now, update this to be ruight or up later
-                if (nextDir == null) break;
-            } else {
-                nextDir = chooseNormalDirection(
-                    options, c.dir, grid, c.x, c.y, i, maxInitialSteps
-                );
-            }
+            if (nextDir == null) break;
 
-            Cell cell = init
+            // Create cell
+            Cell cell = (init || nextDir == c.dir)
                 ? new Cell(Cell.Type.PATH, c.x * cellSize, c.y * cellSize, c.dir)
-                : (nextDir != c.dir)
-                ? new Cell(Cell.Type.TURN, c.x * cellSize, c.y * cellSize, c.dir, nextDir)
-                : new Cell(Cell.Type.PATH, c.x * cellSize, c.y * cellSize, c.dir);
+                : new Cell(Cell.Type.TURN, c.x * cellSize, c.y * cellSize, c.dir, nextDir);
 
             init = false;
             path.add(cell);
             grid[c.x][c.y] = cell;
 
-            if (!leftHomeZone &&
-                !isInHomeZone(c.x + dx(nextDir), c.y + dy(nextDir), ZONE_SIZE)) {
-                leftHomeZone = true;
-            }
-
             c.move(nextDir);
+
+            if (!leftHomeZone && !isInHomeZone(c.x, c.y, ZONE_SIZE)) leftHomeZone = true;
+
+            if (c.x == endX && c.y == endY) {
+                correctEnd = true;
+                break;
+            }
         }
 
         routeToEndZone(grid, path, c, endX, endY);
-
         if (c.x == endX && c.y == endY) correctEnd = true;
 
         return path;
     }
 
-    private List<Cell> flipPath(List<Cell> original) {
-        List<Cell> flipped = new ArrayList<>();
-        for (int i = original.size() - 1; i >= 0; i--) {
-            Cell c = original.get(i);
-            flipped.add(
-                c.type == Cell.Type.TURN
-                    ? new Cell(Cell.Type.TURN, c.x, c.y,
-                    opposite(c.nextDirection), opposite(c.direction))
-                    : new Cell(c.type, c.x, c.y, opposite(c.direction))
-            );
-        }
-        return flipped;
-    }
-
-    private Direction chooseHomeExitDirection(
-        List<Direction> options,
-        Direction exitDirection
-    ) {
-        if (exitDirection != null) {
-            return exitDirection;
-        }
-
-        options.removeIf(d -> d != Direction.RIGHT && d != Direction.UP);
-        if (options.isEmpty()) return null;
-
-        return options.get(random.nextInt(options.size()));
-    }
-
-    private Direction chooseNormalDirection(
-        List<Direction> options,
-        Direction current,
-        Cell[][] grid,
-        int x,
-        int y,
-        int step,
-        int maxInitialSteps
-    ) {
-        return (step > maxInitialSteps - 10)
-            ? rules.opennessDirection(options, current, grid, x, y)
-            : rules.weightedDirection(options, current);
-    }
-
-    private void routeToEndZone(
-        Cell[][] grid,
-        List<Cell> path,
-        Cursor c,
-        int endX,
-        int endY
-    ) {
+    private void routeToEndZone(Cell[][] grid, List<Cell> path, Cursor c, int endX, int endY) {
         while (c.x != endX || c.y != endY) {
-            List<Direction> options = rules.getValidDirections(
-                grid, c.x, c.y, c.dir, PATH_LENGTH, true, true
-            );
-
+            List<Direction> options = rules.getValidDirections(grid, c.x, c.y, c.dir, PATH_LENGTH, true, true);
             if (options.isEmpty()) return;
 
-            Direction nextDir =
-                rules.directionTowards(c.x, c.y, endX, endY, options);
+            Direction nextDir = rules.directionTowards(c.x, c.y, endX, endY, options);
 
             Cell cell = (nextDir != c.dir)
                 ? new Cell(Cell.Type.TURN, c.x * cellSize, c.y * cellSize, c.dir, nextDir)
@@ -198,17 +113,23 @@ public class PathGenerator {
 
             path.add(cell);
             grid[c.x][c.y] = cell;
-
             c.move(nextDir);
         }
     }
-    private void logTiming(
-        long startTimeNs,
-        long endTimeNs,
-        int attempts,
-        boolean success
-    ) {
-        double totalMs = (endTimeNs - startTimeNs) / 1_000_000.0;
+
+    private List<Cell> flipPath(List<Cell> original) {
+        List<Cell> flipped = new ArrayList<>(original.size());
+        for (int i = original.size() - 1; i >= 0; i--) {
+            Cell c = original.get(i);
+            flipped.add(c.type == Cell.Type.TURN
+                ? new Cell(Cell.Type.TURN, c.x, c.y, opposite(c.nextDirection), opposite(c.direction))
+                : new Cell(c.type, c.x, c.y, opposite(c.direction)));
+        }
+        return flipped;
+    }
+
+    private void logTiming(long startNs, long endNs, int attempts, boolean success) {
+        double totalMs = (endNs - startNs) / 1_000_000.0;
         double avgMs = totalMs / Math.max(attempts, 1);
 
         System.out.println("---- Path generation stats ----");
@@ -219,21 +140,10 @@ public class PathGenerator {
         System.out.println("--------------------------------");
     }
 
-
     private static final class Cursor {
         int x, y;
         Direction dir;
-
-        Cursor(int x, int y, Direction dir) {
-            this.x = x;
-            this.y = y;
-            this.dir = dir;
-        }
-
-        void move(Direction next) {
-            x += dx(next);
-            y += dy(next);
-            dir = next;
-        }
+        Cursor(int x, int y, Direction dir) { this.x = x; this.y = y; this.dir = dir; }
+        void move(Direction d) { x += dx(d); y += dy(d); dir = d; }
     }
 }
