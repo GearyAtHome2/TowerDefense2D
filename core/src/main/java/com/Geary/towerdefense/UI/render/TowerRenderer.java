@@ -1,4 +1,4 @@
-package com.Geary.towerdefense.UI;
+package com.Geary.towerdefense.UI.render;
 
 import com.Geary.towerdefense.entity.Tower;
 import com.Geary.towerdefense.world.GameWorld;

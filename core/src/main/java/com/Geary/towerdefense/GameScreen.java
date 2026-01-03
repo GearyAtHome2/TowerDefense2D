@@ -1,22 +1,19 @@
 package com.Geary.towerdefense;
 
 import com.Geary.towerdefense.UI.CameraController;
-import com.Geary.towerdefense.UI.TowerRenderer;
+import com.Geary.towerdefense.UI.GameUI;
+import com.Geary.towerdefense.UI.TowerUI;
+import com.Geary.towerdefense.UI.render.TowerRenderer;
+import com.Geary.towerdefense.UI.render.WorldRenderer;
 import com.Geary.towerdefense.behaviour.MobManager;
 import com.Geary.towerdefense.behaviour.SparkManager;
 import com.Geary.towerdefense.behaviour.SpawnerManager;
 import com.Geary.towerdefense.behaviour.TowerManager;
-import com.Geary.towerdefense.entity.Bullet;
 import com.Geary.towerdefense.entity.Tower;
-import com.Geary.towerdefense.entity.mob.Enemy;
-import com.Geary.towerdefense.entity.mob.Friendly;
-import com.Geary.towerdefense.entity.spawner.EnemySpawner;
-import com.Geary.towerdefense.entity.spawner.FriendlySpawner;
-import com.Geary.towerdefense.entity.world.Cell;
+import com.Geary.towerdefense.world.GameStateManager;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -30,20 +27,15 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 public class GameScreen implements Screen {
 
     private static final int UI_BAR_HEIGHT = 90;
-    private static final float PLACE_TOWER_X = 80;
-    private static final float PLACE_TOWER_Y = 10;
-    private static final float PLACE_TOWER_WIDTH = 150;
-    private static final float PLACE_TOWER_HEIGHT = 40;
 
     private static final int SPARK_POOLSIZE = 100;
-
-
-
-    private int lastMouseX, lastMouseY;
 
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
     private BitmapFont uiFont;
+
+    private GameUI gameUI;
+    private WorldRenderer worldRenderer;
 
     private GameWorld world;
     private CameraController cameraController;
@@ -59,17 +51,19 @@ public class GameScreen implements Screen {
     private Viewport worldViewport;
 
     private TowerRenderer towerRenderer;
+    private TowerUI towerUI;
 
-    private boolean paused = false;
-    private float gameSpeed = 1f; // normal speed
+    private GameInputProcessor inputProcessor;
+    private GameStateManager gameStateManager;
 
     private Tower selectedTower = null;
-    private float popupScale = 1f;
 
     @Override
     public void show() {
+
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
+
         uiFont = new BitmapFont();
         uiFont.getData().setScale(1.5f);
 
@@ -85,83 +79,23 @@ public class GameScreen implements Screen {
         mobManager = new MobManager(world, sparkManager);
         spawnerManager = new SpawnerManager(world);
 
-        // --- Input ---
-        Gdx.input.setInputProcessor(new InputAdapter() {
-
-            private Vector3 touchDownScreen = new Vector3();
-            private boolean isDraggingCamera = false;
-            private static final float DRAG_THRESHOLD = 5f;
-
-            @Override
-            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-                if (button == Input.Buttons.LEFT) {
-                    touchDownScreen.set(screenX, screenY, 0);
-                    isDraggingCamera = false;
-                }
-                if (button == Input.Buttons.RIGHT) {
-                    lastMouseX = screenX;
-                    lastMouseY = screenY;
-                }
-                return false;
-            }
-
-            @Override
-            public boolean touchDragged(int screenX, int screenY, int pointer) {
-                if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
-                    int dx = screenX - lastMouseX;
-                    int dy = screenY - lastMouseY;
-                    cameraController.dragBy(dx, dy);
-                    lastMouseX = screenX;
-                    lastMouseY = screenY;
-                }
-                // Check for accidental left-click drag
-                float dx = Math.abs(screenX - touchDownScreen.x);
-                float dy = Math.abs(screenY - touchDownScreen.y);
-                if (dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD) {
-                    isDraggingCamera = true;
-                }
-
-                return false;
-            }
-
-            @Override
-            public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-                if (button != Input.Buttons.LEFT) return false;
-                // Convert click to UI coordinates first
-                Vector3 uiClick = new Vector3(screenX, screenY, 0);
-                uiViewport.unproject(uiClick);
-                // --- 1️⃣ UI click check: Place Tower button ---
-                if (uiClick.x >= PLACE_TOWER_X && uiClick.x <= PLACE_TOWER_X + PLACE_TOWER_WIDTH &&
-                    uiClick.y >= PLACE_TOWER_Y && uiClick.y <= PLACE_TOWER_Y + PLACE_TOWER_HEIGHT) {
-
-                    towerManager.togglePlacementClick(uiClick, PLACE_TOWER_X, PLACE_TOWER_Y, PLACE_TOWER_WIDTH, PLACE_TOWER_HEIGHT);
-                    return true;
-                }
-                // --- 2️⃣ World click: only if not dragging and not placing a tower ---
-                if (!towerManager.isPlacementActive() && !isDraggingCamera) {
-                    handleWorldClickAt(screenX, screenY);
-                    return true;
-                }
-                return false;
-            }
-
-            @Override
-            public boolean scrolled(float amountX, float amountY) {
-                cameraController.scrolled(amountX, amountY);
-                return true;
-            }
-        });
-
+        gameUI = new GameUI(shapeRenderer, batch, uiFont, uiViewport, world, towerManager);
+        gameStateManager = new GameStateManager();
+        worldRenderer = new WorldRenderer(world, shapeRenderer);
+        towerUI = new TowerUI(world, shapeRenderer, batch, uiFont);
+        inputProcessor = new GameInputProcessor(towerManager, cameraController, uiViewport);
+        inputProcessor.setTowerClickListener(this::handleWorldClickAt); // pass your existing method
+        Gdx.input.setInputProcessor(inputProcessor);
     }
 
     @Override
     public void render(float delta) {
-        setGameSpeed();
-        delta = delta * gameSpeed;
+        gameStateManager.updateGameSpeedKeys();
+        delta *= gameStateManager.gameSpeed;
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        if (!paused) {
+        if (!gameStateManager.paused) {
             cameraController.update();
             towerManager.handlePlacement();
             mobManager.update(delta);
@@ -170,10 +104,9 @@ public class GameScreen implements Screen {
         }
 
         drawWorld(delta);
-        drawUI();
+        gameUI.drawUI(gameStateManager.paused, gameStateManager.gameSpeed);
 
-        // Pause toggle
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) paused = !paused;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) gameStateManager.togglePause();
 
         towerManager.togglePlacementKp(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT));
         if (towerManager.isPlacementActive()) {
@@ -186,153 +119,18 @@ public class GameScreen implements Screen {
         worldCamera.update();
         batch.setProjectionMatrix(worldCamera.combined);
         shapeRenderer.setProjectionMatrix(worldCamera.combined);
-
-        drawGridLines();
-        drawBaseCells();
-        drawPathCells();
-
+        worldRenderer.drawGridLines();
+        worldRenderer.drawCells();
         towerRenderer.drawTowerRanges(shapeRenderer);
-
-        if (!paused) {
+        if (!gameStateManager.paused) {
             towerManager.updateTowers(world.bullets, delta);
         }
 
-        drawActors();
+        worldRenderer.drawActors(batch, sparkManager, towerRenderer);
 
         if (selectedTower != null) {
-            drawTowerPopup(selectedTower);
+            towerUI.drawTowerPopup(selectedTower, worldCamera.zoom);
         }
-    }
-
-    private void drawGridLines() {
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(1, 1, 1, 0.3f);
-
-        for (int x = 0; x <= world.gridWidth; x++) {
-            shapeRenderer.line(
-                x * world.cellSize, 0,
-                x * world.cellSize, world.gridHeight * world.cellSize
-            );
-        }
-
-        for (int y = 0; y <= world.gridHeight; y++) {
-            shapeRenderer.line(
-                0, y * world.cellSize,
-                world.gridWidth * world.cellSize, y * world.cellSize
-            );
-        }
-
-        shapeRenderer.end();
-    }
-
-    private void drawBaseCells() {
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        for (int x = 0; x < world.gridWidth; x++) {
-            for (int y = 0; y < world.gridHeight; y++) {
-                Cell cell = world.grid[x][y];
-                if (cell.type == Cell.Type.TOWER) {
-                    shapeRenderer.setColor(0f, 0.8f, 0f, 0.35f);
-                    shapeRenderer.rect(cell.x, cell.y, world.cellSize, world.cellSize);
-
-                } else if (cell.type == Cell.Type.HOME) {
-                    shapeRenderer.setColor(0f, 1f, 0f, 0.2f);
-                    shapeRenderer.rect(cell.x, cell.y, world.cellSize, world.cellSize);
-
-                } else if (cell.type == Cell.Type.ENEMY) {
-                    shapeRenderer.setColor(1f, 0f, 0f, 0.2f);
-                    shapeRenderer.rect(cell.x, cell.y, world.cellSize, world.cellSize);
-                }
-            }
-        }
-        shapeRenderer.end();
-        Gdx.gl.glDisable(GL20.GL_BLEND);
-    }
-
-    private void drawPathCells() {
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-
-        for (int x = 0; x < world.gridWidth; x++) {
-            for (int y = 0; y < world.gridHeight; y++) {
-                Cell cell = world.grid[x][y];
-
-                if (cell.type == Cell.Type.PATH) {
-                    shapeRenderer.setColor(1f, 0f, 0f, 0.5f);
-
-                } else if (cell.type == Cell.Type.TURN) {
-                    shapeRenderer.setColor(0.9f, 0.6f, 0.3f, 0.6f);
-                    float x0 = cell.x;
-                    float y0 = cell.y;
-                    float x1 = cell.x + GameWorld.cellSize;
-                    float y1 = cell.y + GameWorld.cellSize;
-                    if (cell.turnType == Cell.TurnType.TL_BR) {
-                        // Top-left → bottom-right diagonal
-                        shapeRenderer.line(x0, y1, x1, y0);
-                    } else if (cell.turnType == Cell.TurnType.BL_TR) {
-                        // Bottom-left → top-right diagonal
-                        shapeRenderer.line(x0, y0, x1, y1);
-                    }
-                } else {
-                    continue;
-                }
-
-                shapeRenderer.rect(cell.x, cell.y, world.cellSize, world.cellSize);
-            }
-        }
-        shapeRenderer.end();
-    }
-
-    private void drawActors() {
-        // --- Draw enemies and bullets with SpriteBatch ---
-        batch.begin();
-        for (Enemy e : world.enemies) e.draw(batch);
-        for (Friendly f : world.friends) f.draw(batch);
-        for (Bullet b : world.bullets) b.draw(batch);
-        batch.end();
-
-        sparkManager.draw(shapeRenderer);
-
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        for (EnemySpawner es : world.enemySpawners) es.draw(shapeRenderer);
-        for (FriendlySpawner fs : world.friendlySpawners) fs.draw(shapeRenderer);
-        shapeRenderer.end();
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        towerRenderer.drawTowers(shapeRenderer);
-        shapeRenderer.end();
-    }
-
-    private void drawUI() {
-        uiViewport.apply();
-        shapeRenderer.setProjectionMatrix(uiCamera.combined);
-        batch.setProjectionMatrix(uiCamera.combined);
-
-        // --- UI bar ---
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(0.1f, 0.1f, 0.1f, 1f);
-        shapeRenderer.rect(0, 0, uiViewport.getWorldWidth(), UI_BAR_HEIGHT);
-        shapeRenderer.end();
-
-        // --- Tower button ---
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(towerManager.isPlacementActive() ? 0f : 0.3f, 0.6f, 0.3f, 1f);
-        shapeRenderer.rect(PLACE_TOWER_X, PLACE_TOWER_Y, PLACE_TOWER_WIDTH, PLACE_TOWER_HEIGHT);
-        shapeRenderer.end();
-
-        batch.begin();
-        uiFont.draw(batch, "Place Tower", PLACE_TOWER_X + 15, PLACE_TOWER_Y + 30);
-        uiFont.draw(batch, "ESC = Pause", 20, UI_BAR_HEIGHT - 20);
-        uiFont.draw(batch, "Towers: " + world.towers.size(), 200, UI_BAR_HEIGHT - 20);
-        uiFont.draw(batch, "Enemies: " + world.enemies.size(), 400, UI_BAR_HEIGHT - 20);
-        uiFont.draw(batch, "gamespeed: " + gameSpeed, 400, UI_BAR_HEIGHT - 50);
-
-
-        if (paused) {
-            uiFont.getData().setScale(2.5f);
-            uiFont.draw(batch, "PAUSED", uiViewport.getWorldWidth() / 2f - 70, uiViewport.getWorldHeight() / 2f);
-            uiFont.getData().setScale(1.5f);
-        }
-        batch.end();
     }
 
     private void setupWorldCamera() {
@@ -359,66 +157,11 @@ public class GameScreen implements Screen {
         uiCamera.update();
     }
 
-    public void setGameSpeed() {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) gameSpeed = 1f;
-        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) gameSpeed = 3f;
-        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) gameSpeed = 9f;
-    }
-
     private boolean towerContains(Tower tower, float x, float y) {
         return x >= tower.xPos
             && x <= tower.xPos + world.cellSize
             && y >= tower.yPos
             && y <= tower.yPos + world.cellSize;
-    }
-
-    private void drawTowerPopup(Tower tower) {
-        float baseWidth = 140;
-        float baseHeight = 80;
-        float padding = 8;
-
-        float scale = getPopupScale();
-
-        float scaledWidth = baseWidth * scale;
-        float scaledHeight = baseHeight * scale;
-
-        float x = tower.xPos + world.cellSize + 5;
-        float y = tower.yPos + world.cellSize;
-
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(1f, 1f, 0f, 1f);
-        shapeRenderer.rect(
-            selectedTower.xPos,
-            selectedTower.yPos,
-            world.cellSize,
-            world.cellSize
-        );
-        shapeRenderer.end();
-
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(0f, 0f, 0f, 0.8f);
-        shapeRenderer.rect(x, y, scaledWidth, scaledHeight);
-        shapeRenderer.end();
-
-        batch.begin();
-        float originalScaleX = uiFont.getData().scaleX;
-        float originalScaleY = uiFont.getData().scaleY;
-        float fontScale = 1f + (scale - 1f) * 0.65f; // smaller response
-        uiFont.getData().setScale(originalScaleX * fontScale, originalScaleY * fontScale);
-
-        uiFont.draw(batch, "Tower", x + padding, y + scaledHeight);
-        uiFont.draw(batch, "Cooldown: " + tower.cooldown, x + padding, y + scaledHeight - 25 * scale);
-        uiFont.draw(batch, "Range: " + tower.range, x + padding, y + scaledHeight - 50 * scale);
-        batch.end();
-        uiFont.getData().setScale(originalScaleX, originalScaleY);//reset scale to prevent explosion
-    }
-
-    private float getPopupScale() {
-        float zoom = worldCamera.zoom;
-        float target = 1f + (zoom - 1f) * 0.65f;
-        target = Math.max(0.5f, Math.min(3f, target));
-        popupScale = com.badlogic.gdx.math.MathUtils.lerp(popupScale, target, 0.1f);
-        return popupScale;
     }
 
     private void handleWorldClickAt(int screenX, int screenY) {

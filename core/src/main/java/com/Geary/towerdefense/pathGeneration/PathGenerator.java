@@ -102,7 +102,6 @@ public class PathGenerator {
             if (!leftHomeZone) {
                 nextDir = Direction.RIGHT;//todo: for now, update this to be ruight or up later
                 if (nextDir == null) break;
-                exitDirection = nextDir;
             } else {
                 nextDir = chooseNormalDirection(
                     options, c.dir, grid, c.x, c.y, i, maxInitialSteps
