@@ -5,31 +5,63 @@ import com.Geary.towerdefense.entity.mob.Friendly;
 import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.world.GameWorld;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MobManager {
-    private final GameWorld world;
 
-    public MobManager(GameWorld world) {
+    private final GameWorld world;
+    private final SparkManager sparkManager;
+
+    public MobManager(GameWorld world, SparkManager sparkManager) {
         this.world = world;
+        this.sparkManager = sparkManager;
     }
 
     public void update(float delta) {
-        List<Mob> mobs = new ArrayList<>();
-        mobs.addAll(world.friends);
-        mobs.addAll(world.enemies);
-        for (Enemy e : world.enemies) {
-            e.update(delta);
-        }
-        for (Friendly f : world.friends) {
-            f.update(delta);
-        }
+        for (Enemy e : world.enemies) e.update(delta);
+        for (Friendly f : world.friends) f.update(delta);
 
-        world.enemies.removeIf(e -> e.health <= 0);
-        world.friends.removeIf(e -> e.health <= 0);
+        handleCollisions();
 
-        // Update bullets and remove finished ones
+        removeDeadMobs(world.enemies);
+        removeDeadMobs(world.friends);
+
         world.bullets.removeIf(b -> !b.update(delta, world.enemies));
+    }
+
+    private void handleCollisions() {
+        for (Enemy enemy : world.enemies) {
+            if (enemy.health <= 0) continue;
+
+            for (Friendly friendly : world.friends) {
+                if (friendly.health <= 0) continue;
+
+                if (overlaps(enemy, friendly)) {
+                    int tmpEnemyHealth = enemy.health;
+                    enemy.health -= friendly.health;
+                    friendly.health -= tmpEnemyHealth;
+                }
+            }
+        }
+    }
+
+    private void removeDeadMobs(java.util.List<? extends Mob> mobs) {
+        mobs.removeIf(m -> {
+            if (m.health <= 0) {
+                sparkManager.spawn(m.getCenterX(), m.getCenterY());
+                return true;
+            }
+            return false;
+        });
+    }
+
+    /** Checks if two mobs are overlapping */
+    private boolean overlaps(Mob a, Mob b) {
+        float ax = a.x + a.collisionRadius;
+        float ay = a.y + a.collisionRadius;
+        float bx = b.x + b.collisionRadius;
+        float by = b.y + b.collisionRadius;
+        float dx = ax - bx;
+        float dy = ay - by;
+        float r = a.collisionRadius + b.collisionRadius;
+        return dx * dx + dy * dy <= r * r;
     }
 }

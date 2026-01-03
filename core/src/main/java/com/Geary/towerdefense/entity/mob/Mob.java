@@ -26,20 +26,33 @@ public abstract class Mob {
     public float tileProgress = 0f;
     protected boolean reachedEnd = false;
     protected boolean reversed = false;
-
+    public float collisionRadius;
     // Per-tile state
     protected boolean turnedThisTile = false;
     private int lastPathIndex = -1;
 
     protected float speed;
+    protected Faction faction;
 
     protected Mob(float startX, float startY, Texture texture) {
         this.texture = texture;
         this.x = startX;
         this.y = startY;
-
+        this.collisionRadius = texture.getWidth() * 0.5f;
         double ran = random.nextDouble();
         speed = (float) (0.5f + ran / 8f);
+    }
+
+    public boolean isHostileTo(Mob other) {
+        return this.faction != other.faction;
+    }
+
+    public boolean isAlive() {
+        return health > 0;
+    }
+
+    public void applyDamage(int amount) {
+        health -= amount;
     }
 
     public void setPath(List<Cell> path, int cellSize, boolean reverse) {
@@ -50,9 +63,6 @@ public abstract class Mob {
         this.lastPathIndex = -1;
     }
 
-    // ───────────────────────────────
-    // Update pipeline (DO NOT OVERRIDE)
-    // ───────────────────────────────
     public void update(float delta) {
         if (health <= 0 || reachedEnd) return;
         if (pathIndex < 0 || pathIndex >= path.size()) {
@@ -94,25 +104,11 @@ public abstract class Mob {
         }
     }
 
-    // ───────────────────────────────
-    // Hooks for subclasses
-    // ───────────────────────────────
-
-    /**
-     * Called exactly once when entering a new cell.
-     */
     protected void onEnterCell(Cell cell) {
         // default: nothing
     }
 
-    /**
-     * Must return the direction the mob wants to move *right now*.
-     */
     protected abstract Direction resolveMoveDirection(Cell cell);
-
-    // ───────────────────────────────
-    // Shared helpers
-    // ───────────────────────────────
 
     protected float computeTileProgress(Cell cell, Direction moveDir) {
         float localX = getCenterX() - cell.x;
@@ -153,5 +149,10 @@ public abstract class Mob {
 
     public void draw(SpriteBatch batch) {
         batch.draw(texture, x, y);
+    }
+
+    public enum Faction {
+        FRIENDLY,
+        ENEMY
     }
 }

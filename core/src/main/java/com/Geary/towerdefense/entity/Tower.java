@@ -2,7 +2,6 @@ package com.Geary.towerdefense.entity;
 
 import com.Geary.towerdefense.entity.mob.Enemy;
 import com.Geary.towerdefense.world.GameWorld;
-import com.badlogic.gdx.graphics.Texture;
 
 import java.util.List;
 
@@ -20,13 +19,9 @@ public class Tower {
     // NEW: current gun angle in radians
     public float gunAngle = 0f;
 
-    // Optional: tower texture (for non-ShapeRenderer towers)
-    public Texture texture;
-
     public Tower(float x, float y) {
         this.xPos = x;
         this.yPos = y;
-        texture = new Texture("tower.png"); // you can remove this if drawing purely with ShapeRenderer
     }
 
     // --- Find the closest enemy in range ---

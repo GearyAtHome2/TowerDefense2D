@@ -3,6 +3,7 @@ package com.Geary.towerdefense;
 import com.Geary.towerdefense.UI.CameraController;
 import com.Geary.towerdefense.UI.TowerRenderer;
 import com.Geary.towerdefense.behaviour.MobManager;
+import com.Geary.towerdefense.behaviour.SparkManager;
 import com.Geary.towerdefense.behaviour.SpawnerManager;
 import com.Geary.towerdefense.behaviour.TowerManager;
 import com.Geary.towerdefense.entity.Bullet;
@@ -34,6 +35,10 @@ public class GameScreen implements Screen {
     private static final float PLACE_TOWER_WIDTH = 150;
     private static final float PLACE_TOWER_HEIGHT = 40;
 
+    private static final int SPARK_POOLSIZE = 100;
+
+
+
     private int lastMouseX, lastMouseY;
 
     private SpriteBatch batch;
@@ -43,6 +48,7 @@ public class GameScreen implements Screen {
     private GameWorld world;
     private CameraController cameraController;
     private TowerManager towerManager;
+    private SparkManager sparkManager;
     private MobManager mobManager;
     private SpawnerManager spawnerManager;
 
@@ -75,7 +81,8 @@ public class GameScreen implements Screen {
 
         cameraController = new CameraController(worldCamera, worldViewport, world);
         towerManager = new TowerManager(world, worldCamera);
-        mobManager = new MobManager(world);
+        sparkManager = new SparkManager(SPARK_POOLSIZE);
+        mobManager = new MobManager(world, sparkManager);
         spawnerManager = new SpawnerManager(world);
 
         // --- Input ---
@@ -159,6 +166,7 @@ public class GameScreen implements Screen {
             towerManager.handlePlacement();
             mobManager.update(delta);
             spawnerManager.update(delta);
+            sparkManager.update(delta);
         }
 
         drawWorld(delta);
@@ -282,6 +290,8 @@ public class GameScreen implements Screen {
         for (Friendly f : world.friends) f.draw(batch);
         for (Bullet b : world.bullets) b.draw(batch);
         batch.end();
+
+        sparkManager.draw(shapeRenderer);
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         for (EnemySpawner es : world.enemySpawners) es.draw(shapeRenderer);

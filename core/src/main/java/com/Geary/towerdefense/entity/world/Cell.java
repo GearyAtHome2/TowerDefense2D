@@ -82,24 +82,4 @@ public class Cell {
             default -> throw new RuntimeException("impossible");
         };
     }
-
-    public Direction calculateReverseTurnDirection(Mob mob) {
-        float localX = GameWorld.cellSize - (mob.getCenterX() - x);
-        float localY = GameWorld.cellSize - (mob.getCenterY() - y);
-
-        float chanceNewDir;
-        float denom = GameWorld.cellSize * 0.9f;
-
-        switch (reverseDirection) {
-            case RIGHT: chanceNewDir = localX / denom; break;
-            case LEFT:  chanceNewDir = (GameWorld.cellSize - localX) / denom; break;
-            case UP:    chanceNewDir = localY / denom; break;
-            case DOWN:  chanceNewDir = (GameWorld.cellSize - localY) / denom; break;
-            default: throw new RuntimeException("impossible");
-        }
-
-        return chanceNewDir > 0.5
-            ? reverseNextDirection
-            : reverseDirection;
-    }
 }
