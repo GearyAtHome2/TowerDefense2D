@@ -8,13 +8,11 @@ public class Enemy extends Mob {
 
     public Enemy(float startX, float startY) {
         super(startX, startY, new Texture("enemy.png"));
+        this.useCustomTurnLogic = true;
     }
 
     @Override
-    protected Direction resolveMoveDirection(Cell cell) {
-        if (cell.type == Cell.Type.TURN) {
-            return cell.calculateTurnDirection(this, false);
-        }
-        return cell.direction;
+    protected Direction resolveTurnDirection(Cell cell) {
+        return cell.calculateTurnDirection(this, false);
     }
 }

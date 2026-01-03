@@ -27,11 +27,16 @@ public abstract class Mob {
     protected boolean reachedEnd = false;
     protected boolean reversed = false;
     public float collisionRadius;
+
     // Per-tile state
+    protected Direction turnEntryDir;
+    protected Direction turnExitDir;
     protected boolean turnedThisTile = false;
     private int lastPathIndex = -1;
 
     protected float speed;
+    protected boolean useCustomTurnLogic = false; // default false
+    protected int turnMultiplier = 1; // 1 = normal, -1 = reversed
     protected Faction faction;
 
     protected Mob(float startX, float startY, Texture texture) {
@@ -107,10 +112,48 @@ public abstract class Mob {
     }
 
     protected void onEnterCell(Cell cell) {
-        // default: nothing
+        if (cell.type == Cell.Type.TURN) {
+            // Apply multiplier to both entry and exit directions
+            turnEntryDir = multiplyDirection(cell.nextDirection, turnMultiplier);
+            turnExitDir  = multiplyDirection(cell.direction, turnMultiplier);
+        } else {
+            turnEntryDir = null;
+            turnExitDir  = null;
+        }
     }
 
-    protected abstract Direction resolveMoveDirection(Cell cell);
+    protected Direction resolveMoveDirection(Cell cell) {
+        if (cell.type == Cell.Type.TURN) {
+            if (useCustomTurnLogic) {
+                // Let the subclass handle it (e.g., Enemy)
+                return resolveTurnDirection(cell);
+            }
+
+            // Default centralized turn logic for "Friendly-like" mobs
+            if (!turnedThisTile && tileProgress >= 0.5f) {
+                turnedThisTile = true;
+            }
+            return turnedThisTile ? turnExitDir : turnEntryDir;
+        }
+
+        // Straight movement
+        return reversed ? cell.reverseDirection : cell.direction;
+    }
+
+    protected Direction resolveTurnDirection(Cell cell) {
+        return cell.direction; // default fallback (won't be used)
+    }
+
+    private Direction multiplyDirection(Direction dir, int multiplier) {
+        if (multiplier == 1) return dir;
+        return switch (dir) {
+            case UP -> Direction.DOWN;
+            case DOWN -> Direction.UP;
+            case LEFT -> Direction.RIGHT;
+            case RIGHT -> Direction.LEFT;
+            default -> Direction.NONE;
+        };
+    }
 
     protected float computeTileProgress(Cell cell, Direction moveDir) {
         float localX = getCenterX() - cell.x;
