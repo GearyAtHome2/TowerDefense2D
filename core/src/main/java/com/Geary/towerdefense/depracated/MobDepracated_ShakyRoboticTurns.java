@@ -1,4 +1,4 @@
-package com.Geary.towerdefense.entity.mob;
+package com.Geary.towerdefense.depracated;
 
 import com.Geary.towerdefense.Direction;
 import com.Geary.towerdefense.entity.world.Cell;
@@ -7,11 +7,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.List;
 
-import static com.Geary.towerdefense.Direction.*;
 import static com.badlogic.gdx.math.MathUtils.random;
-import static java.lang.Math.PI;
 
-public abstract class Mob {
+public abstract class MobDepracated_ShakyRoboticTurns {
 
     protected List<Cell> path;
     protected int cellSize;
@@ -41,17 +39,7 @@ public abstract class Mob {
     protected int turnMultiplier = 1; // 1 = normal, -1 = reversed
     protected Faction faction;
 
-    // Turn-arc state
-    protected boolean inArcTurn = false;
-    protected float arcRadius;
-    protected float arcAngle;        // current angle
-    protected float arcStartAngle;   // entry angle
-    protected float arcEndAngle;     // exit angle
-    protected float arcCenterX;
-    protected float arcCenterY;
-    protected float arcProgress = 0f; // distance travelled along arc (0..arcLength)
-
-    protected Mob(float startX, float startY, Texture texture) {
+    protected MobDepracated_ShakyRoboticTurns(float startX, float startY, Texture texture) {
         this.texture = texture;
         this.x = startX;
         this.y = startY;
@@ -60,7 +48,7 @@ public abstract class Mob {
         speed = (float) (0.5f + ran / 8f);
     }
 
-    public boolean isHostileTo(Mob other) {
+    public boolean isHostileTo(MobDepracated_ShakyRoboticTurns other) {
         return this.faction != other.faction;
     }
 
@@ -97,32 +85,6 @@ public abstract class Mob {
             onEnterCell(cell);
         }
 
-        if (inArcTurn) {
-            float arcLength = arcRadius * Math.abs(arcEndAngle - arcStartAngle);
-
-            arcProgress += speed * delta * cellSize;
-
-            if (arcProgress >= arcLength) {
-                arcProgress = arcLength;
-            }
-
-            float t = arcProgress / arcLength;
-            arcAngle = arcStartAngle + t * (arcEndAngle - arcStartAngle);
-
-            if (arcProgress >= arcLength - 0.001f) {
-                arcProgress = arcLength;
-                arcAngle = arcEndAngle;
-                inArcTurn = false;
-                advancePathIndex();
-                return;
-            }
-
-            // Update position
-            x = arcCenterX + (float)Math.cos(arcAngle) * arcRadius - texture.getWidth()  / 2f;
-            y = arcCenterY + (float)Math.sin(arcAngle) * arcRadius - texture.getHeight() / 2f;
-            return;
-        }
-
         Direction moveDir = resolveMoveDirection(cell);
         if (moveDir == null) return;
 
@@ -150,107 +112,65 @@ public abstract class Mob {
     }
 
     protected void onEnterCell(Cell cell) {
-        if (cell.type != Cell.Type.TURN) {
-            inArcTurn = false;
-            return;
-        }
-
-        Direction entry;
-        Direction exit;
-
-        if (turnMultiplier < 0){
-            entry = multiplyDirection(cell.nextDirection, turnMultiplier);
-            exit  = multiplyDirection(cell.direction, turnMultiplier);
+        if (cell.type == Cell.Type.TURN) {
+            // Apply multiplier to both entry and exit directions
+            turnEntryDir = multiplyDirection(cell.nextDirection, turnMultiplier);
+            turnExitDir  = multiplyDirection(cell.direction, turnMultiplier);
         } else {
-            entry = multiplyDirection(cell.direction, turnMultiplier);
-            exit  = multiplyDirection(cell.nextDirection, turnMultiplier);
+            turnEntryDir = null;
+            turnExitDir  = null;
         }
-
-
-        setupTurnArc(cell, entry, exit);
-    }
-
-    private void setupTurnArc(Cell cell, Direction from, Direction to) {
-        inArcTurn = true;
-
-        float cx = cell.x;
-        float cy = cell.y;
-        float size = cellSize;
-
-        // Determine arc center based on entry/exit
-        // Idea: top-left of tile is (cx, cy)
-        if (from == RIGHT && to == UP) {
-            arcCenterX = cx;
-            arcCenterY = cy + size;
-        } else if (from == RIGHT && to == DOWN) {
-            arcCenterX = cx;
-            arcCenterY = cy;
-        } else if (from == LEFT && to == UP) {
-            arcCenterX = cx + size;
-            arcCenterY = cy + size;
-        } else if (from == LEFT && to == DOWN) {
-            arcCenterX = cx + size;
-            arcCenterY = cy;
-        } else if (from == UP && to == RIGHT) {
-            arcCenterX = cx + size;
-            arcCenterY = cy;
-        } else if (from == UP && to == LEFT) {
-            arcCenterX = cx;
-            arcCenterY = cy;
-        } else if (from == DOWN && to == RIGHT) {
-            arcCenterX = cx + size;
-            arcCenterY = cy + size;
-        } else if (from == DOWN && to == LEFT) {
-            arcCenterX = cx;
-            arcCenterY = cy + size;
-        } else {
-            // fallback (should never happen)
-            arcCenterX = cx + size / 2f;
-            arcCenterY = cy + size / 2f;
-        }
-
-        // Compute start angle based on current mob position
-        arcRadius = (float) Math.hypot(getCenterX() - arcCenterX, getCenterY() - arcCenterY);
-        arcRadius = Math.max(arcRadius, 0.001f);
-
-        arcStartAngle = (float) Math.atan2(getCenterY() - arcCenterY, getCenterX() - arcCenterX);
-
-        // Determine if the turn should go clockwise or counter-clockwise
-        // Formula: CCW if cross product > 0, CW if < 0
-        float dxEntry = 0, dyEntry = 0;
-        switch (from) {
-            case RIGHT -> dxEntry = 1;
-            case LEFT -> dxEntry = -1;
-            case UP -> dyEntry = 1;
-            case DOWN -> dyEntry = -1;
-        }
-
-        float dxExit = 0, dyExit = 0;
-        switch (to) {
-            case RIGHT -> dxExit = 1;
-            case LEFT -> dxExit = -1;
-            case UP -> dyExit = 1;
-            case DOWN -> dyExit = -1;
-        }
-
-        // 2D cross product: determines rotation direction
-        float cross = dxEntry * dyExit - dyEntry * dxExit;
-        arcEndAngle = (float) (arcStartAngle + (cross > 0 ? PI / 2f : - PI / 2f));
-
-        arcAngle = arcStartAngle;
-        arcProgress = 0f;
     }
 
     protected Direction resolveMoveDirection(Cell cell) {
+        if (cell.type == Cell.Type.TURN) {
+            if (useCustomTurnLogic) {
+                return smoothEnemyTurn(cell);
+            }
+            return smoothTurnDirection(tileProgress);
+        }
+
         return reversed ? cell.reverseDirection : cell.direction;
+    }
+
+    private Direction smoothEnemyTurn(Cell cell) {
+        // Entry direction is where we were heading when entering the tile
+        Direction entry = turnEntryDir;
+
+        // Exit direction is calculated dynamically (Enemy-specific logic)
+        Direction exit = resolveTurnDirection(cell);
+
+        if (entry == null || exit == null) return exit;
+
+        float exitProb = exitProbability(tileProgress);
+        return random() < exitProb ? exit : entry;
+    }
+
+    private Direction smoothTurnDirection(float progress) {
+        if (turnEntryDir == null || turnExitDir == null) return null;
+
+        // Probability of choosing exit direction grows with progress
+        float exitProb = exitProbability(progress); // 10% at start, 100% at end
+        float r = random();
+
+        return r < exitProb ? turnExitDir : turnEntryDir;
+    }
+
+    private float exitProbability(float progress) {
+        float p = progress / 0.9f;   // reaches 1.0 at 80%
+        return clamp(p);
+    }
+
+    protected Direction resolveTurnDirection(Cell cell) {
+        return cell.direction; // default fallback (won't be used)
     }
 
     private Direction multiplyDirection(Direction dir, int multiplier) {
         if (multiplier == 1) return dir;
         return switch (dir) {
-            case UP -> DOWN;
-            case DOWN -> UP;
-            case LEFT -> RIGHT;
+            case UP -> Direction.DOWN;
+            case DOWN -> Direction.UP;
+            case LEFT -> Direction.RIGHT;
             case RIGHT -> Direction.LEFT;
             default -> Direction.NONE;
         };
@@ -283,7 +203,7 @@ public abstract class Mob {
 
     private void moveRandomly(Direction dir, Cell cell, float delta) {
         if (cell.type == Cell.Type.TURN) return; // disable random wandering during turns
-        if (dir == UP || dir == DOWN) {
+        if (dir == Direction.UP || dir == Direction.DOWN) {
             float localX = getCenterX() - cell.x;
             x += weightedRandomMovement(localX, delta);
         } else {
@@ -292,6 +212,13 @@ public abstract class Mob {
         }
     }
 
+    /**
+     * Weighted random movement perpendicular to main axis, with gentle center shepherding.
+     *
+     * @param axisValue Local position along the perpendicular axis (pixels from tile start)
+     * @param delta     Frame delta (for smooth, framerate-independent movement)
+     * @return float offset to apply perpendicular to movement
+     */
     private float weightedRandomMovement(float axisValue, float delta) {
         float minBound = 0.05f * cellSize;
         float maxBound = 0.95f * cellSize;

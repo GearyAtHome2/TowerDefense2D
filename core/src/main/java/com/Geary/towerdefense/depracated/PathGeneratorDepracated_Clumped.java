@@ -1,4 +1,4 @@
-package com.Geary.towerdefense.pathGeneration.depracated;
+package com.Geary.towerdefense.depracated;
 
 import com.Geary.towerdefense.Direction;
 import com.Geary.towerdefense.entity.world.Cell;
