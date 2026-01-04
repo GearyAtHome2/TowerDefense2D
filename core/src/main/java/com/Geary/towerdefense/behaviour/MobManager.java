@@ -29,15 +29,15 @@ public class MobManager {
 
     private void handleCollisions() {
         for (Enemy enemy : world.enemies) {
-            if (enemy.health <= 0) continue;
+            if (!enemy.isAlive()) continue;
 
             for (Friendly friendly : world.friends) {
-                if (friendly.health <= 0) continue;
+                if (!friendly.isAlive()) continue;
 
                 if (overlaps(enemy, friendly)) {
                     int tmpEnemyHealth = enemy.health;
-                    enemy.health -= friendly.health;
-                    friendly.health -= tmpEnemyHealth;
+                    enemy.applyDamage(friendly.health);
+                    friendly.applyDamage(tmpEnemyHealth);
                 }
             }
         }

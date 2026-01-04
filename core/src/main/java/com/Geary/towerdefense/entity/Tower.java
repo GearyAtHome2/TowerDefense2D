@@ -57,9 +57,9 @@ public class Tower {
             float dy = e.getCenterY() - centerY;
             float distSqu = dx * dx + dy * dy; // squared distance
 
-            float totalProgress = e.pathIndex+e.tileProgress;
+            float totalProgress = e.getPathIndex()+e.getTileProgress();
 
-            if (distSqu <= (range * range) && totalProgress < mostProgressed) {
+            if (distSqu <= (range * range) && totalProgress > mostProgressed) {
                 mostProgressed = totalProgress;
                 best = e;
             }
@@ -89,15 +89,12 @@ public class Tower {
         return new Bullet(centerX, centerY, angle, damage);
     }
 
-
-    // --- Distance helper ---
     public float getDistanceTo(Enemy enemy) {
         float dx = (xPos + GameWorld.cellSize / 2f) - enemy.getCenterX();
         float dy = (yPos + GameWorld.cellSize / 2f) - enemy.getCenterY();
         return (float) Math.sqrt(dx * dx + dy * dy);
     }
 
-    // Check if tower is aligned enough to fire at the target
     public boolean canShoot() {
         if (currentTarget == null) return false;
 

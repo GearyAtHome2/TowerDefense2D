@@ -1,6 +1,9 @@
 package com.Geary.towerdefense.entity.mob;
 
 import com.Geary.towerdefense.Direction;
+import com.Geary.towerdefense.entity.mob.navigation.ArcTurnHandler;
+import com.Geary.towerdefense.entity.mob.navigation.MobPathNavigator;
+import com.Geary.towerdefense.entity.mob.navigation.TileRandomMover;
 import com.Geary.towerdefense.entity.world.Cell;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -8,125 +11,66 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import java.util.List;
 
 import static com.Geary.towerdefense.Direction.*;
-import static com.badlogic.gdx.math.MathUtils.random;
-import static java.lang.Math.PI;
 
 public abstract class Mob {
 
-    protected List<Cell> path;
-    protected int cellSize;
+    public Texture texture;
+    public float collisionRadius;
+    public int health = 18;
 
     public float x, y;
     public float vx, vy;
 
-    public Texture texture;
-
-    public int health = 18;
-
-    // Path state
-    public int pathIndex;
-    public float tileProgress = 0f;
-    protected boolean reachedEnd = false;
+    protected Faction faction;
+    protected boolean useCustomTurnLogic = false;
     protected boolean reversed = false;
-    public float collisionRadius;
+    protected int turnMultiplier = 1;
 
-    // Per-tile state
-    protected Direction turnEntryDir;
-    protected Direction turnExitDir;
-    protected boolean turnedThisTile = false;
-    private int lastPathIndex = -1;
+    protected MobPathNavigator pathNavigator;
+    protected ArcTurnHandler arcHandler = new ArcTurnHandler();
+    protected TileRandomMover randomMover;
 
     protected float speed;
-    protected boolean useCustomTurnLogic = false; // default false
-    protected int turnMultiplier = 1; // 1 = normal, -1 = reversed
-    protected Faction faction;
-
-    // Turn-arc state
-    protected boolean inArcTurn = false;
-    protected float arcRadius;
-    protected float arcAngle;        // current angle
-    protected float arcStartAngle;   // entry angle
-    protected float arcEndAngle;     // exit angle
-    protected float arcCenterX;
-    protected float arcCenterY;
-    protected float arcProgress = 0f; // distance travelled along arc (0..arcLength)
 
     protected Mob(float startX, float startY, Texture texture) {
         this.texture = texture;
         this.x = startX;
         this.y = startY;
         this.collisionRadius = texture.getWidth() * 0.5f;
-        double ran = random.nextDouble();
+        double ran = (float) Math.random();
         speed = (float) (0.5f + ran / 8f);
     }
 
-    public boolean isHostileTo(Mob other) {
-        return this.faction != other.faction;
-    }
-
-    public boolean isAlive() {
-        return health > 0;
-    }
-
-    public void applyDamage(int amount) {
-        health -= amount;
-    }
-
     public void setPath(List<Cell> path, int cellSize, boolean reverse) {
-        this.path = path;
-        this.cellSize = cellSize;
-        this.reversed = reverse;
-        this.pathIndex = reverse ? path.size() - 1 : 0;
-        this.lastPathIndex = -1;
+        pathNavigator = new MobPathNavigator(path, cellSize, reverse);
+        randomMover = new TileRandomMover(cellSize);
     }
+
+    public boolean isAlive() { return health > 0; }
+
+    public boolean isHostileTo(Mob other) { return faction != other.faction; }
+
+    public void applyDamage(int amount) { health -= amount; }
 
     public void update(float delta) {
-        if (health <= 0 || reachedEnd) return;
-        if (pathIndex < 0 || pathIndex >= path.size()) {
-            reachedEnd = true;
-            return;
-        }
+        if (!isAlive() || pathNavigator.reachedEnd()) return;
 
-        Cell cell = path.get(pathIndex);
+        Cell cell = pathNavigator.getCurrentCell();
+        if (cell == null) return;
 
-        // Tile entry detection
-        if (pathIndex != lastPathIndex) {
-            lastPathIndex = pathIndex;
-            tileProgress = 0f;
-            turnedThisTile = false;
-            onEnterCell(cell);
-        }
+        if (pathNavigator.hasEnteredNewTile()) onEnterCell(cell);
 
-        if (inArcTurn) {
-            float arcLength = arcRadius * Math.abs(arcEndAngle - arcStartAngle);
-
-            arcProgress += speed * delta * cellSize;
-
-            if (arcProgress >= arcLength) {
-                arcProgress = arcLength;
-            }
-
-            float t = arcProgress / arcLength;
-            arcAngle = arcStartAngle + t * (arcEndAngle - arcStartAngle);
-
-            if (arcProgress >= arcLength - 0.001f) {
-                arcProgress = arcLength;
-                arcAngle = arcEndAngle;
-                inArcTurn = false;
-                advancePathIndex();
-                return;
-            }
-
-            // Update position
-            x = arcCenterX + (float)Math.cos(arcAngle) * arcRadius - texture.getWidth()  / 2f;
-            y = arcCenterY + (float)Math.sin(arcAngle) * arcRadius - texture.getHeight() / 2f;
+        if (arcHandler.isInArcTurn()) {
+            float[] pos = arcHandler.updateArc(delta, speed, pathNavigator.getCellSize());
+            if (pos != null) { x = pos[0] - texture.getWidth()/2f; y = pos[1] - texture.getHeight()/2f; }
+            if (!arcHandler.isInArcTurn()) pathNavigator.advance();
             return;
         }
 
         Direction moveDir = resolveMoveDirection(cell);
         if (moveDir == null) return;
 
-        float move = speed * delta * cellSize;
+        float move = speed * delta * pathNavigator.getCellSize();
         float oldX = x;
         float oldY = y;
 
@@ -137,108 +81,29 @@ public abstract class Mob {
             case DOWN -> y -= move;
         }
 
-        moveRandomly(moveDir, cell, delta);
+        if (moveDir == UP || moveDir == DOWN) x += randomMover.computeMovement(getCenterX() - cell.x, delta);
+        else y += randomMover.computeMovement(getCenterY() - cell.y, delta);
 
         vx = (x - oldX) / delta;
         vy = (y - oldY) / delta;
 
-        tileProgress = computeTileProgress(cell, moveDir);
-
-        if (tileProgress >= 1f) {
-            advancePathIndex();
-        }
+        pathNavigator.updateTileProgress(computeTileProgress(cell, moveDir));
+        if (pathNavigator.getTileProgress() >= 1f) pathNavigator.advance();
     }
 
     protected void onEnterCell(Cell cell) {
-        if (cell.type != Cell.Type.TURN) {
-            inArcTurn = false;
-            return;
-        }
+        if (cell.type != Cell.Type.TURN) return;
 
-        Direction entry;
-        Direction exit;
-
-        if (turnMultiplier < 0){
+        Direction entry, exit;
+        if (turnMultiplier < 0) {
             entry = multiplyDirection(cell.nextDirection, turnMultiplier);
-            exit  = multiplyDirection(cell.direction, turnMultiplier);
+            exit = multiplyDirection(cell.direction, turnMultiplier);
         } else {
             entry = multiplyDirection(cell.direction, turnMultiplier);
-            exit  = multiplyDirection(cell.nextDirection, turnMultiplier);
+            exit = multiplyDirection(cell.nextDirection, turnMultiplier);
         }
 
-
-        setupTurnArc(cell, entry, exit);
-    }
-
-    private void setupTurnArc(Cell cell, Direction from, Direction to) {
-        inArcTurn = true;
-
-        float cx = cell.x;
-        float cy = cell.y;
-        float size = cellSize;
-
-        // Determine arc center based on entry/exit
-        // Idea: top-left of tile is (cx, cy)
-        if (from == RIGHT && to == UP) {
-            arcCenterX = cx;
-            arcCenterY = cy + size;
-        } else if (from == RIGHT && to == DOWN) {
-            arcCenterX = cx;
-            arcCenterY = cy;
-        } else if (from == LEFT && to == UP) {
-            arcCenterX = cx + size;
-            arcCenterY = cy + size;
-        } else if (from == LEFT && to == DOWN) {
-            arcCenterX = cx + size;
-            arcCenterY = cy;
-        } else if (from == UP && to == RIGHT) {
-            arcCenterX = cx + size;
-            arcCenterY = cy;
-        } else if (from == UP && to == LEFT) {
-            arcCenterX = cx;
-            arcCenterY = cy;
-        } else if (from == DOWN && to == RIGHT) {
-            arcCenterX = cx + size;
-            arcCenterY = cy + size;
-        } else if (from == DOWN && to == LEFT) {
-            arcCenterX = cx;
-            arcCenterY = cy + size;
-        } else {
-            // fallback (should never happen)
-            arcCenterX = cx + size / 2f;
-            arcCenterY = cy + size / 2f;
-        }
-
-        // Compute start angle based on current mob position
-        arcRadius = (float) Math.hypot(getCenterX() - arcCenterX, getCenterY() - arcCenterY);
-        arcRadius = Math.max(arcRadius, 0.001f);
-
-        arcStartAngle = (float) Math.atan2(getCenterY() - arcCenterY, getCenterX() - arcCenterX);
-
-        // Determine if the turn should go clockwise or counter-clockwise
-        // Formula: CCW if cross product > 0, CW if < 0
-        float dxEntry = 0, dyEntry = 0;
-        switch (from) {
-            case RIGHT -> dxEntry = 1;
-            case LEFT -> dxEntry = -1;
-            case UP -> dyEntry = 1;
-            case DOWN -> dyEntry = -1;
-        }
-
-        float dxExit = 0, dyExit = 0;
-        switch (to) {
-            case RIGHT -> dxExit = 1;
-            case LEFT -> dxExit = -1;
-            case UP -> dyExit = 1;
-            case DOWN -> dyExit = -1;
-        }
-
-        // 2D cross product: determines rotation direction
-        float cross = dxEntry * dyExit - dyEntry * dxExit;
-        arcEndAngle = (float) (arcStartAngle + (cross > 0 ? PI / 2f : - PI / 2f));
-
-        arcAngle = arcStartAngle;
-        arcProgress = 0f;
+        arcHandler.setupArc(cell, entry, exit, getCenterX(), getCenterY(), pathNavigator.getCellSize());
     }
 
     protected Direction resolveMoveDirection(Cell cell) {
@@ -251,8 +116,8 @@ public abstract class Mob {
             case UP -> DOWN;
             case DOWN -> UP;
             case LEFT -> RIGHT;
-            case RIGHT -> Direction.LEFT;
-            default -> Direction.NONE;
+            case RIGHT -> LEFT;
+            default -> NONE;
         };
     }
 
@@ -261,106 +126,33 @@ public abstract class Mob {
         float localY = getCenterY() - cell.y;
 
         return switch (moveDir) {
-            case RIGHT -> clamp(localX / cellSize);
-            case LEFT -> clamp(1f - (localX / cellSize));
-            case UP -> clamp(localY / cellSize);
-            case DOWN -> clamp(1f - (localY / cellSize));
+            case RIGHT -> clamp(localX / pathNavigator.getCellSize());
+            case LEFT -> clamp(1f - (localX / pathNavigator.getCellSize()));
+            case UP -> clamp(localY / pathNavigator.getCellSize());
+            case DOWN -> clamp(1f - (localY / pathNavigator.getCellSize()));
             default -> 0f;
         };
     }
 
-    protected void advancePathIndex() {
-        tileProgress = 0f;
-        turnedThisTile = false;
+    protected float clamp(float v) { return Math.max(0f, Math.min(1f, v)); }
 
-        if (reversed) pathIndex--;
-        else pathIndex++;
+    public float getCenterX() { return x + texture.getWidth() / 2f; }
 
-        if (pathIndex < 0 || pathIndex >= path.size()) {
-            reachedEnd = true;
-        }
+    public float getCenterY() { return y + texture.getHeight() / 2f; }
+
+    public void draw(SpriteBatch batch) { batch.draw(texture, x, y); }
+
+    public enum Faction { FRIENDLY, ENEMY }
+
+    public int getPathIndex() {
+        return pathNavigator != null ? pathNavigator.getPathIndex() : -1;
     }
 
-    private void moveRandomly(Direction dir, Cell cell, float delta) {
-        if (cell.type == Cell.Type.TURN) return; // disable random wandering during turns
-        if (dir == UP || dir == DOWN) {
-            float localX = getCenterX() - cell.x;
-            x += weightedRandomMovement(localX, delta);
-        } else {
-            float localY = getCenterY() - cell.y;
-            y += weightedRandomMovement(localY, delta);
-        }
+    public float getTileProgress() {
+        return pathNavigator != null ? pathNavigator.getTileProgress() : 0f;
     }
 
-    private float weightedRandomMovement(float axisValue, float delta) {
-        float minBound = 0.05f * cellSize;
-        float maxBound = 0.95f * cellSize;
-        float center = 0.5f * cellSize;
-
-        // Hard clamp to prevent leaving the tile
-        axisValue = Math.max(minBound, Math.min(maxBound, axisValue));
-
-        float totalWidth = maxBound - minBound;
-        float offsetFromCenter = axisValue - center; // negative = above/left, positive = below/right
-
-        // Compute probabilities to move left/right (negative/positive)
-        // Mobs far from center have higher probability to move back toward center
-        float baseMoveProb = 0.35f; // base chance to move in one direction
-        float distanceFactor = Math.abs(offsetFromCenter) / (totalWidth / 2f); // 0 at center, 1 at far edges
-        float moveTowardCenterProb = baseMoveProb + distanceFactor * (1f - baseMoveProb);
-
-        float probLeft, probRight;
-
-        if (offsetFromCenter > 0) {
-            // Mob below center → move left/back toward center
-            probLeft = moveTowardCenterProb;
-            probRight = baseMoveProb * (1f - distanceFactor);
-        } else if (offsetFromCenter < 0) {
-            // Mob above center → move right/back toward center
-            probRight = moveTowardCenterProb;
-            probLeft = baseMoveProb * (1f - distanceFactor);
-        } else {
-            // At center → equal chance left/right
-            probLeft = probRight = baseMoveProb;
-        }
-
-        // Remaining probability to stay still
-        float stayProb = 1f - (probLeft + probRight);
-        stayProb = Math.max(stayProb, 0f); // clamp in case sum > 1
-
-        // Random choice
-        float r = random();
-        float moveDir;
-        if (r < probLeft) moveDir = -1f;
-        else if (r < probLeft + probRight) moveDir = 1f;
-        else moveDir = 0f;
-
-        // Scale movement by distance to nearest wall to prevent overshoot
-        float maxMove = moveDir < 0 ? axisValue - minBound : maxBound - axisValue;
-        float moveAmount = moveDir * Math.min(Math.abs(moveDir), maxMove) * delta * 10f; // tweak factor for natural wandering
-
-        return moveAmount;
-    }
-
-    protected float clamp(float v) {
-        return Math.max(0f, Math.min(1f, v));
-    }
-
-    public float getCenterX() {
-        return x + texture.getWidth() / 2f;
-    }
-
-    public float getCenterY() {
-        return y + texture.getHeight() / 2f;
-    }
-
-    public void draw(SpriteBatch batch) {
-        batch.draw(texture, x, y);
-    }
-
-    //center-random
-    public enum Faction {
-        FRIENDLY,
-        ENEMY
+    public void setTileProgress(float progress) {
+        if (pathNavigator != null) pathNavigator.setTileProgress(progress);
     }
 }

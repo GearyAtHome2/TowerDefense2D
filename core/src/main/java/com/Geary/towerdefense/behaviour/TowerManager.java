@@ -66,7 +66,9 @@ public class TowerManager {
             // Acquire or refresh target
             if (tower.currentTarget == null || tower.currentTarget.health <= 0 ||
                 tower.getDistanceTo(tower.currentTarget) > tower.range) {
-                tower.currentTarget = tower.findTarget(world.enemies);
+                //todo: tower behaviour switch here - maybe this is an unlockable tech?
+//                tower.currentTarget = tower.findTarget(world.enemies);
+                tower.currentTarget = tower.findTargetFurthestProgressed(world.enemies);
             }
 
             // Rotate gun toward target
