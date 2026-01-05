@@ -1,10 +1,14 @@
 package com.Geary.towerdefense.world;
 
 import com.Geary.towerdefense.Direction;
-import com.Geary.towerdefense.entity.Bullet;
-import com.Geary.towerdefense.entity.Tower;
+import com.Geary.towerdefense.behaviour.ResourceManager;
+import com.Geary.towerdefense.entity.buildings.Mine;
+import com.Geary.towerdefense.entity.buildings.Tower;
+import com.Geary.towerdefense.entity.buildings.Transport;
+import com.Geary.towerdefense.entity.mob.Bullet;
 import com.Geary.towerdefense.entity.mob.Enemy;
 import com.Geary.towerdefense.entity.mob.Friendly;
+import com.Geary.towerdefense.entity.resources.Resource;
 import com.Geary.towerdefense.entity.spawner.EnemySpawner;
 import com.Geary.towerdefense.entity.spawner.FriendlySpawner;
 import com.Geary.towerdefense.entity.world.Cell;
@@ -12,9 +16,13 @@ import com.Geary.towerdefense.pathGeneration.PathGenerator;
 import com.badlogic.gdx.math.MathUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GameWorld {
+    private static final int ZONE_SIZE = 7;
+
     public static final int cellSize = 100;
     public final int gridWidth = 20;
     public final int gridHeight = 20;
@@ -22,25 +30,38 @@ public class GameWorld {
     public Cell[][] grid;
     public boolean[][] occupied = new boolean[gridWidth][gridHeight];
 
+    Map<Resource.ResourceType, Integer> resourceAllocation = new HashMap<>();
     public List<Cell> path = new ArrayList<>();
+
     public List<Tower> towers = new ArrayList<>();
+    public Tower ghostTower = null;
+    public List<Transport> transports = new ArrayList<>();
+    public Transport ghostTransport = null;
+    public List<Mine> mines = new ArrayList<>();
+    public Mine ghostMine = null;
+
     public List<Enemy> enemies = new ArrayList<>();
     public List<Friendly> friends = new ArrayList<>();
     public List<Bullet> bullets = new ArrayList<>();
     public List<EnemySpawner> enemySpawners = new ArrayList<>();
     public List<FriendlySpawner> friendlySpawners = new ArrayList<>();
 
+    private ResourceManager resourceManager;
+
     public GameWorld() {
         grid = new Cell[gridWidth][gridHeight];
         occupied = new boolean[gridWidth][gridHeight];
-        generateWorld();
+        this.resourceManager = new ResourceManager(this);
+        resourceAllocation.put(Resource.ResourceType.IRON, 4);
+        generateWorld(resourceAllocation);
     }
 
-    private void generateWorld() {
+    private void generateWorld(Map<Resource.ResourceType, Integer> resourceAllocation) {
         clearWorld();
         generateZones();
         populatePath();
         fillEmptyCells();
+        resourceManager.populate(resourceAllocation);
     }
 
     private void clearWorld() {
@@ -55,8 +76,6 @@ public class GameWorld {
             }
         }
     }
-
-    private static final int ZONE_SIZE = 7;
 
     private void generateZones() {
         for (int x = 0; x < ZONE_SIZE; x++) {
@@ -106,9 +125,28 @@ public class GameWorld {
                 enemySpawners.add(new EnemySpawner(cell.x, cell.y));
             }
             if (i == (generatedPath.size()-1)) {
-                friendlySpawners.add(new FriendlySpawner(cell.x, cell.y));
+                FriendlySpawner spawner = new FriendlySpawner(cell.x, cell.y);
+                friendlySpawners.add(spawner);
+                grid[gx][gy].building = spawner;
             }
         }
+    }
+
+    public List<Cell> getFreeCells() {
+        List<Cell> freeCells = new ArrayList<>();
+
+        for (int x = 0; x < gridWidth; x++) {
+            for (int y = 0; y < gridHeight; y++) {
+                Cell cell = grid[x][y];
+
+                if ((cell.type == Cell.Type.EMPTY || cell.type == Cell.Type.HOME)
+                    && !occupied[x][y]
+                    && cell.resource == null) {
+                    freeCells.add(cell);
+                }
+            }
+        }
+        return freeCells;
     }
 
     private void fillEmptyCells() {
@@ -116,7 +154,7 @@ public class GameWorld {
             for (int y = 0; y < gridHeight; y++) {
                 if (grid[x][y] == null) {
                     grid[x][y] = new Cell(
-                        Cell.Type.TOWER,
+                        Cell.Type.EMPTY,
                         x * cellSize,
                         y * cellSize,
                         Direction.NONE

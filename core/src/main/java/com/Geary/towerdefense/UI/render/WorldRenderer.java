@@ -1,7 +1,7 @@
 package com.Geary.towerdefense.UI.render;
 
 import com.Geary.towerdefense.behaviour.SparkManager;
-import com.Geary.towerdefense.entity.Bullet;
+import com.Geary.towerdefense.entity.mob.Bullet;
 import com.Geary.towerdefense.entity.mob.Enemy;
 import com.Geary.towerdefense.entity.mob.Friendly;
 import com.Geary.towerdefense.entity.spawner.EnemySpawner;
@@ -59,7 +59,7 @@ public class WorldRenderer {
                 Cell cell = world.grid[x][y];
 
                 switch (cell.type) {
-                    case TOWER -> {
+                    case EMPTY -> {
                         shapeRenderer.setColor(0f, 0.8f, 0f, 0.35f);
                         shapeRenderer.rect(cell.x, cell.y, world.cellSize, world.cellSize);
                     }
@@ -90,18 +90,17 @@ public class WorldRenderer {
                     case PATH -> shapeRenderer.setColor(1f, 0f, 0f, 0.5f);
                     case TURN -> {
                         shapeRenderer.setColor(0.9f, 0.6f, 0.3f, 0.6f);
-                        float x0 = cell.x;
-                        float y0 = cell.y;
-                        float x1 = cell.x + GameWorld.cellSize;
-                        float y1 = cell.y + GameWorld.cellSize;
-
-                        if (cell.turnType == Cell.TurnType.TL_BR) {
-                            shapeRenderer.line(x0, y1, x1, y0);
-                        } else if (cell.turnType == Cell.TurnType.BL_TR) {
-                            shapeRenderer.line(x0, y0, x1, y1);
-                        }
                     }
-                    default -> {continue;}
+                    default -> {
+                        continue;
+                    }
+                }
+                if (!cell.bridgable) {
+                    float x0 = cell.x;
+                    float y0 = cell.y;
+                    float x1 = cell.x + GameWorld.cellSize;
+                    float y1 = cell.y + GameWorld.cellSize;
+                    shapeRenderer.line(x0, y1, x1, y0);
                 }
 
                 shapeRenderer.rect(cell.x, cell.y, world.cellSize, world.cellSize);
@@ -111,7 +110,8 @@ public class WorldRenderer {
         shapeRenderer.end();
     }
 
-    public void drawActors(SpriteBatch batch, SparkManager sparkManager, TowerRenderer towerRenderer) {
+    public void drawActors(SpriteBatch batch, SparkManager sparkManager, TowerRenderer towerRenderer,
+                           TransportRenderer transportRenderer, MineRenderer mineRenderer) {
         // Draw enemies, friends, bullets with SpriteBatch
         batch.begin();
         for (Enemy e : world.enemies) e.draw(batch);
@@ -123,10 +123,18 @@ public class WorldRenderer {
         sparkManager.draw(shapeRenderer);
 
         // Draw spawners and towers
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        transportRenderer.drawTransports(shapeRenderer);
+        shapeRenderer.end();
+        mineRenderer.drawMines();
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         for (EnemySpawner es : world.enemySpawners) es.draw(shapeRenderer);
         for (FriendlySpawner fs : world.friendlySpawners) fs.draw(shapeRenderer);
         towerRenderer.drawTowers(shapeRenderer);
+        shapeRenderer.end();
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        towerRenderer.drawTowerRanges(shapeRenderer);
         shapeRenderer.end();
     }
 }

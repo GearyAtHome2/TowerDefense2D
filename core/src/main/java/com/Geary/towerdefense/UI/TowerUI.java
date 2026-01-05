@@ -1,6 +1,6 @@
 package com.Geary.towerdefense.UI;
 
-import com.Geary.towerdefense.entity.Tower;
+import com.Geary.towerdefense.entity.buildings.Tower;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;

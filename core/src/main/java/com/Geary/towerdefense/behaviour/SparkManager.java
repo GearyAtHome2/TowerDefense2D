@@ -15,7 +15,7 @@ public class SparkManager {
     public SparkManager(int maxSparks) {
         this.maxSparks = maxSparks;
         for (int i = 0; i < maxSparks; i++) {
-            sparks.add(new Spark(0, 0, 0)); // initially invisible
+            sparks.add(new Spark(0, 0, 0));
         }
     }
 

@@ -4,7 +4,6 @@ import com.Geary.towerdefense.entity.mob.Friendly;
 import com.badlogic.gdx.graphics.Color;
 
 public class FriendlySpawner extends Spawner {
-
     //to be removed
     public float maxCooldown = 3f;
     public float cooldown = maxCooldown;

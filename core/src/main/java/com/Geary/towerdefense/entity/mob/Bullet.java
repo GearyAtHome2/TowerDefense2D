@@ -1,6 +1,5 @@
-package com.Geary.towerdefense.entity;
+package com.Geary.towerdefense.entity.mob;
 
-import com.Geary.towerdefense.entity.mob.Enemy;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 

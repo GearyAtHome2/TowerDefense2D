@@ -1,19 +1,17 @@
 package com.Geary.towerdefense.entity.spawner;
 
+import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-public abstract class Spawner {
-
-    protected float xPos, yPos;
-
+public abstract class Spawner extends Building {
     // Visual inset from tile edges
     protected static final float BUFFER = 8f;
 
     protected Spawner(float x, float y) {
-        this.xPos = x;
-        this.yPos = y;
+        super(x,y);
+        this.isConnectedToNetwork = true;
     }
 
     public void draw(ShapeRenderer sr) {

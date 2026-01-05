@@ -1,7 +1,7 @@
 package com.Geary.towerdefense;
 
 import com.Geary.towerdefense.UI.CameraController;
-import com.Geary.towerdefense.behaviour.TowerManager;
+import com.Geary.towerdefense.behaviour.buildings.manager.TowerManager;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.Viewport;

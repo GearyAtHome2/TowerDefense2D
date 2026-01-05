@@ -1,6 +1,7 @@
 package com.Geary.towerdefense.UI;
 
-import com.Geary.towerdefense.behaviour.TowerManager;
+import com.Geary.towerdefense.behaviour.buildings.manager.TowerManager;
+import com.Geary.towerdefense.behaviour.buildings.manager.TransportManager;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -21,15 +22,17 @@ public class GameUI {
     private final Viewport uiViewport;
     private final GameWorld world;
     private final TowerManager towerManager;
+    private final TransportManager transportManager;
 
     public GameUI(ShapeRenderer shapeRenderer, SpriteBatch batch, BitmapFont font,
-                  Viewport uiViewport, GameWorld world, TowerManager towerManager) {
+                  Viewport uiViewport, GameWorld world, TowerManager towerManager, TransportManager transportManager) {
         this.shapeRenderer = shapeRenderer;
         this.batch = batch;
         this.font = font;
         this.uiViewport = uiViewport;
         this.world = world;
         this.towerManager = towerManager;
+        this.transportManager = transportManager;
     }
 
     public void drawUI(boolean paused, float gameSpeed) {
@@ -50,8 +53,15 @@ public class GameUI {
         shapeRenderer.rect(PLACE_TOWER_X, PLACE_TOWER_Y, PLACE_TOWER_WIDTH, PLACE_TOWER_HEIGHT);
         shapeRenderer.end();
 
+        // --- Transport active sign ---
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(transportManager.isPlacementActive() ? 0f : 0.3f, 0.6f, 0.3f, 1f);
+        shapeRenderer.rect(PLACE_TOWER_X + PLACE_TOWER_WIDTH + 20, PLACE_TOWER_Y, PLACE_TOWER_WIDTH/2, PLACE_TOWER_HEIGHT);
+        shapeRenderer.end();
+
         batch.begin();
         font.draw(batch, "Place Tower", PLACE_TOWER_X + 15, PLACE_TOWER_Y + 30);
+        font.draw(batch, "Transport", PLACE_TOWER_X + PLACE_TOWER_WIDTH + 35, PLACE_TOWER_Y + 30);
         font.draw(batch, "ESC = Pause", 20, UI_BAR_HEIGHT - 20);
         font.draw(batch, "Towers: " + world.towers.size(), 200, UI_BAR_HEIGHT - 20);
         font.draw(batch, "Enemies: " + world.enemies.size(), 400, UI_BAR_HEIGHT - 20);

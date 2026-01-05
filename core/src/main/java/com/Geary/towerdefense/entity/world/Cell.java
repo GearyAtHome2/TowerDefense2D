@@ -1,7 +1,9 @@
 package com.Geary.towerdefense.entity.world;
 
 import com.Geary.towerdefense.Direction;
+import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.entity.mob.Mob;
+import com.Geary.towerdefense.entity.resources.Resource;
 import com.Geary.towerdefense.world.GameWorld;
 
 import static com.Geary.towerdefense.pathGeneration.DirectionUtil.opposite;
@@ -9,7 +11,7 @@ import static com.Geary.towerdefense.pathGeneration.DirectionUtil.opposite;
 
 public class Cell {
     public enum Type {
-        TOWER,
+        EMPTY,
         PATH,
         TURN,
         HOME,
@@ -28,7 +30,9 @@ public class Cell {
     public Direction reverseDirection;
     public Direction reverseNextDirection;
     public TurnType turnType;
-
+    public Building building;
+    public Resource resource;
+    public boolean bridgable = true;
 
     public Cell(Type type, float x, float y, Direction direction) {
         this.type = type;

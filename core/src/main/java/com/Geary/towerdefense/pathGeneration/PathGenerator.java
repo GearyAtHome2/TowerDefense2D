@@ -75,10 +75,11 @@ public class PathGenerator {
 
             if (nextDir == null) break;
 
-            // Create cell
             Cell cell = (init || nextDir == c.dir)
                 ? new Cell(Cell.Type.PATH, c.x * cellSize, c.y * cellSize, c.dir)
                 : new Cell(Cell.Type.TURN, c.x * cellSize, c.y * cellSize, c.dir, nextDir);
+
+            //randomly decide if the path cell can have a bridge built on it - make it hard to simply bridge over all cells.
 
             init = false;
             path.add(cell);
@@ -110,7 +111,6 @@ public class PathGenerator {
             Cell cell = (nextDir != c.dir)
                 ? new Cell(Cell.Type.TURN, c.x * cellSize, c.y * cellSize, c.dir, nextDir)
                 : new Cell(Cell.Type.PATH, c.x * cellSize, c.y * cellSize, c.dir);
-
             path.add(cell);
             grid[c.x][c.y] = cell;
             c.move(nextDir);
@@ -121,9 +121,11 @@ public class PathGenerator {
         List<Cell> flipped = new ArrayList<>(original.size());
         for (int i = original.size() - 1; i >= 0; i--) {
             Cell c = original.get(i);
-            flipped.add(c.type == Cell.Type.TURN
+            Cell flippedCell = c.type == Cell.Type.TURN
                 ? new Cell(Cell.Type.TURN, c.x, c.y, opposite(c.nextDirection), opposite(c.direction))
-                : new Cell(c.type, c.x, c.y, opposite(c.direction)));
+                : new Cell(c.type, c.x, c.y, opposite(c.direction));
+            flippedCell.bridgable = random.nextDouble() > 0.5;
+            flipped.add(flippedCell);
         }
         return flipped;
     }
