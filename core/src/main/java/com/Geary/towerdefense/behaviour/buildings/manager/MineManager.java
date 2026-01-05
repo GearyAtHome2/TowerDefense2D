@@ -2,6 +2,7 @@ package com.Geary.towerdefense.behaviour.buildings.manager;
 
 import com.Geary.towerdefense.Direction;
 import com.Geary.towerdefense.entity.buildings.Mine;
+import com.Geary.towerdefense.entity.resources.Resource;
 import com.Geary.towerdefense.entity.world.Cell;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.Gdx;
@@ -59,14 +60,14 @@ public class MineManager {
         }
 
         Cell cell = world.grid[x][y];
-        boolean canPlace = cell.resource != null;
+        boolean canPlace = cell.resource != null && cell.building == null;
 
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && canPlace) {
             Mine mine = new Mine(x * GameWorld.cellSize, y * GameWorld.cellSize, cell.resource);
             world.mines.add(mine);
             cell.building = mine;
             world.occupied[x][y] = true;//todo: maybe not this? Would like to be able to override transports in future
-            world.ghostMine = null; // clear ghost after placement
+            world.ghostMine = null;
             return true;
         } else if (canPlace) {
             if (world.ghostMine == null) {
@@ -81,6 +82,17 @@ public class MineManager {
         return false;
     }
 
+    public float calculateResourcesGeneratedForMines(float delta, Resource.ResourceType type){
+        float resourceGenerated = 0f;
+        for (Mine mine : world.mines) {
+            if (mine.resource.type == type) {
+                resourceGenerated += mine.resource.resourceAbundance * delta;
+            }
+        }
+        return resourceGenerated;
+    }
+
+    //keeping this in case we decide to add a UI for it
     public EnumSet<Direction> checkAdjacentTiles(int x, int y) {
         EnumSet<Direction> adjacent = EnumSet.noneOf(Direction.class);
         if (x > 0 && world.occupied[x - 1][y]) {

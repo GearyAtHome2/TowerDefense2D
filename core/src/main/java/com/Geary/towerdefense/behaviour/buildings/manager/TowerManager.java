@@ -111,4 +111,22 @@ public class TowerManager {
             }
         }
     }
+
+    public void deleteTower(Tower tower){
+        if (tower == null) return;
+
+        int x = (int) tower.xPos / world.cellSize;
+        int y = (int) tower.yPos / world.cellSize;
+
+        // Remove from tower list
+        world.towers.remove(tower);
+
+        // Clear grid reference
+        if (x >= 0 && x < world.gridWidth && y >= 0 && y < world.gridHeight) {
+            if (world.grid[x][y].building == tower) {
+                world.grid[x][y].building = null;
+            }
+            world.occupied[x][y] = false;
+        }
+    }
 }

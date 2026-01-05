@@ -1,7 +1,13 @@
 package com.Geary.towerdefense.world;
 
 import com.Geary.towerdefense.Direction;
+import com.Geary.towerdefense.behaviour.MobManager;
 import com.Geary.towerdefense.behaviour.ResourceManager;
+import com.Geary.towerdefense.behaviour.SparkManager;
+import com.Geary.towerdefense.behaviour.SpawnerManager;
+import com.Geary.towerdefense.behaviour.buildings.manager.MineManager;
+import com.Geary.towerdefense.behaviour.buildings.manager.TowerManager;
+import com.Geary.towerdefense.behaviour.buildings.manager.TransportManager;
 import com.Geary.towerdefense.entity.buildings.Mine;
 import com.Geary.towerdefense.entity.buildings.Tower;
 import com.Geary.towerdefense.entity.buildings.Transport;
@@ -13,6 +19,7 @@ import com.Geary.towerdefense.entity.spawner.EnemySpawner;
 import com.Geary.towerdefense.entity.spawner.FriendlySpawner;
 import com.Geary.towerdefense.entity.world.Cell;
 import com.Geary.towerdefense.pathGeneration.PathGenerator;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 
 import java.util.ArrayList;
@@ -47,6 +54,12 @@ public class GameWorld {
     public List<FriendlySpawner> friendlySpawners = new ArrayList<>();
 
     private ResourceManager resourceManager;
+    private TowerManager towerManager;
+    private TransportManager transportManager;
+    private MineManager mineManager;
+    private MobManager mobManager;
+    private SparkManager sparkManager;
+    private SpawnerManager spawnerManager;
 
     public GameWorld() {
         grid = new Cell[gridWidth][gridHeight];
@@ -163,4 +176,35 @@ public class GameWorld {
             }
         }
     }
+
+    public void initManagers(OrthographicCamera worldCamera) {
+        // SparkManager doesn’t need a camera
+        sparkManager = new SparkManager(100);
+
+        // Pass the camera to managers that need it
+        towerManager = new TowerManager(this, worldCamera);
+        transportManager = new TransportManager(this, worldCamera);
+        mineManager = new MineManager(this, worldCamera);
+
+        mobManager = new MobManager(this, sparkManager); // no camera
+        spawnerManager = new SpawnerManager(this);       // no camera
+    }
+    public TowerManager getTowerManager() { return towerManager; }
+    public TransportManager getTransportManager() { return transportManager; }
+    public MineManager getMineManager() { return mineManager; }
+    public MobManager getMobManager() { return mobManager; }
+    public SparkManager getSparkManager() { return sparkManager; }
+    public SpawnerManager getSpawnerManager() { return spawnerManager; }
+
+    /** Update all in-world events; called from GameScreen */
+    public void update(float delta) {
+        towerManager.updateTowers(this.bullets, delta);
+        transportManager.updateTransports(delta);
+        mobManager.update(delta);
+        spawnerManager.update(delta);
+        sparkManager.update(delta);
+        mineManager.animateMines(delta);
+    }
+
+
 }

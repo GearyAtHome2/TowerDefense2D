@@ -2,9 +2,11 @@ package com.Geary.towerdefense.UI;
 
 import com.Geary.towerdefense.entity.buildings.Tower;
 import com.Geary.towerdefense.world.GameWorld;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 
 public class TowerUI {
 
@@ -14,6 +16,10 @@ public class TowerUI {
     private final BitmapFont font;
 
     private float popupScale = 1f;
+    private Rectangle deleteButtonBounds = new Rectangle();
+
+    private boolean deleteClickedThisFrame = false;
+    private float clickX, clickY;
 
     public TowerUI(GameWorld world, ShapeRenderer shapeRenderer, SpriteBatch batch, BitmapFont font) {
         this.world = world;
@@ -26,7 +32,7 @@ public class TowerUI {
         if (tower == null) return;
 
         float baseWidth = 140;
-        float baseHeight = 80;
+        float baseHeight = 120;
         float padding = 8;
 
         float scale = getPopupScale(worldCameraZoom);
@@ -34,6 +40,7 @@ public class TowerUI {
         float scaledWidth = baseWidth * scale;
         float scaledHeight = baseHeight * scale;
 
+        float rowHeight = 24;
         float x = tower.xPos + world.cellSize + 5;
         float y = tower.yPos + world.cellSize;
 
@@ -53,13 +60,26 @@ public class TowerUI {
         batch.begin();
         float originalScaleX = font.getData().scaleX;
         float originalScaleY = font.getData().scaleY;
-        float fontScale = 1f + (scale - 1f) * 0.65f; // smaller response
+        float fontScale = 0.8f + (scale - 1f) * 0.9f; // smaller response
         font.getData().setScale(originalScaleX * fontScale, originalScaleY * fontScale);
 
-        font.draw(batch, "Tower", x + padding, y + scaledHeight);
-        font.draw(batch, "Cooldown: " + tower.cooldown, x + padding, y + scaledHeight - 25 * scale);
-        font.draw(batch, "Range: " + tower.range, x + padding, y + scaledHeight - 50 * scale);
+        font.draw(batch, "Tower", x + padding, y + scaledHeight - rowHeight * scale);
+        font.draw(batch, "Cooldown: " + (int) Math.ceil(tower.cooldown * 10), x + padding, y + scaledHeight - 2 * rowHeight * scale);
+        font.draw(batch, "Range: " + tower.range, x + padding, y + scaledHeight - 3 * rowHeight * scale);
         batch.end();
+
+        // Draw Delete button
+        float buttonHeight = 20 * scale;
+        float buttonWidth = scaledWidth - padding * 2;
+        float buttonX = x + padding;
+        float buttonY = y + padding;
+
+        deleteButtonBounds.set(buttonX, buttonY, buttonWidth, buttonHeight);
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(0.8f, 0f, 0f, 1f); // red button
+        shapeRenderer.rect(buttonX, buttonY, buttonWidth, buttonHeight);
+        shapeRenderer.end();
 
         font.getData().setScale(originalScaleX, originalScaleY); // Reset font scale
     }
@@ -69,5 +89,20 @@ public class TowerUI {
         target = Math.max(0.5f, Math.min(3f, target));
         popupScale = com.badlogic.gdx.math.MathUtils.lerp(popupScale, target, 0.1f);
         return popupScale;
+    }
+
+    public void handleClick(float screenX, float screenY) {
+        float yFlipped = Gdx.graphics.getHeight() - screenY;
+        if (deleteButtonBounds.contains(screenX, yFlipped)) {
+            deleteClickedThisFrame = true;
+        }
+    }
+
+    public boolean consumeDeleteRequest() {
+        if (deleteClickedThisFrame) {
+            deleteClickedThisFrame = false;
+            return true;
+        }
+        return false;
     }
 }

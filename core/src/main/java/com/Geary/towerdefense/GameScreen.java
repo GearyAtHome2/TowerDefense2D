@@ -5,12 +5,6 @@ import com.Geary.towerdefense.UI.GameUI;
 import com.Geary.towerdefense.UI.TowerUI;
 import com.Geary.towerdefense.UI.displays.TowerSelectionHandler;
 import com.Geary.towerdefense.UI.render.*;
-import com.Geary.towerdefense.behaviour.MobManager;
-import com.Geary.towerdefense.behaviour.SparkManager;
-import com.Geary.towerdefense.behaviour.SpawnerManager;
-import com.Geary.towerdefense.behaviour.buildings.manager.MineManager;
-import com.Geary.towerdefense.behaviour.buildings.manager.TowerManager;
-import com.Geary.towerdefense.behaviour.buildings.manager.TransportManager;
 import com.Geary.towerdefense.entity.buildings.Tower;
 import com.Geary.towerdefense.world.GameStateManager;
 import com.Geary.towerdefense.world.GameWorld;
@@ -41,12 +35,12 @@ public class GameScreen implements Screen {
 
     private GameWorld world;
     private CameraController cameraController;
-    private TowerManager towerManager;
-    private TransportManager transportManager;
-    private MineManager mineManager;
-    private SparkManager sparkManager;
-    private MobManager mobManager;
-    private SpawnerManager spawnerManager;
+//    private TowerManager towerManager;
+//    private TransportManager transportManager;
+//    private MineManager mineManager;
+//    private SparkManager sparkManager;
+//    private MobManager mobManager;
+//    private SpawnerManager spawnerManager;
 
     private PlacementHandler placementHandler;
     private TowerSelectionHandler towerSelectionHandler;
@@ -77,6 +71,7 @@ public class GameScreen implements Screen {
         uiFont.getData().setScale(1.5f);
         world = new GameWorld();
         setupWorldCamera();
+        world.initManagers(worldCamera);
         setupUICamera();
         initManagers();
         initHandlers();
@@ -88,16 +83,10 @@ public class GameScreen implements Screen {
     private void initManagers() {
         gameStateManager = new GameStateManager();
         cameraController = new CameraController(worldCamera, worldViewport, world);
-        towerManager = new TowerManager(world, worldCamera);
-        transportManager = new TransportManager(world, worldCamera);
-        mineManager = new MineManager(world, worldCamera);
-        sparkManager = new SparkManager(SPARK_POOLSIZE);
-        mobManager = new MobManager(world, sparkManager);
-        spawnerManager = new SpawnerManager(world);
     }
 
-    public void initHandlers(){
-        placementHandler = new PlacementHandler(towerManager, transportManager, mineManager);
+    public void initHandlers() {
+        placementHandler = new PlacementHandler(world.getTowerManager(), world.getTransportManager(), world.getMineManager());
         towerSelectionHandler = new TowerSelectionHandler(world, worldViewport);
     }
 
@@ -110,14 +99,19 @@ public class GameScreen implements Screen {
     }
 
     private void initUI() {
-        gameUI = new GameUI(shapeRenderer, batch, uiFont, uiViewport, world, towerManager, transportManager);
+        gameUI = new GameUI(shapeRenderer, batch, uiFont, uiViewport, world, world.getTowerManager(), world.getTransportManager());
         towerUI = new TowerUI(world, shapeRenderer, batch, uiFont);
     }
 
     private void initInputProcessor() {
-        inputProcessor = new GameInputProcessor(towerManager, cameraController, uiViewport);
+        inputProcessor = new GameInputProcessor(world.getTowerManager(), cameraController, uiViewport);
         inputProcessor.setTowerClickListener((x, y) -> {
-            selectedTower = towerSelectionHandler.getTowerAtScreen(x, y);
+            Tower clicked = towerSelectionHandler.getTowerAtScreen(x, y);
+            if (selectedTower != null) {
+                towerUI.handleClick(x, y);
+            } else {
+                selectedTower = clicked;
+            }
         });
         Gdx.input.setInputProcessor(inputProcessor);
     }
@@ -129,10 +123,16 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        if (selectedTower != null && towerUI.consumeDeleteRequest()) {
+            world.getTowerManager().deleteTower(selectedTower);
+            selectedTower = null;
+            return;
+        }
+
         if (!gameStateManager.paused) {
             cameraController.update();
             placementHandler.handlePlacements();
-            updateManagers(delta);
+            world.update(delta);
         }
         placementHandler.handleKeyboardInput(
             Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT),
@@ -160,10 +160,7 @@ public class GameScreen implements Screen {
     }
 
     private void drawWorldActors(float delta) {
-        if (!gameStateManager.paused) {
-            towerManager.updateTowers(world.bullets, delta);
-        }
-        worldRenderer.drawActors(batch, sparkManager, towerRenderer, transportRenderer, mineRenderer);
+        worldRenderer.drawActors(batch, world.getSparkManager(), towerRenderer, transportRenderer, mineRenderer);
         if (selectedTower != null) {
             towerUI.drawTowerPopup(selectedTower, worldCamera.zoom);
         }
@@ -190,13 +187,6 @@ public class GameScreen implements Screen {
         uiCamera = new OrthographicCamera();
         uiViewport = new ScreenViewport(uiCamera);
         uiCamera = createCamera(uiViewport, uiViewport.getWorldWidth() / 2f, uiViewport.getWorldHeight() / 2f);
-    }
-
-    private void updateManagers(float delta) {
-        mobManager.update(delta);
-        spawnerManager.update(delta);
-        sparkManager.update(delta);
-        mineManager.animateMines(delta);
     }
 
     private OrthographicCamera createCamera(Viewport viewport, float posX, float posY) {

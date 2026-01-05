@@ -13,14 +13,15 @@ public class Mine extends Building {
     public Mine(float x, float y, Resource resource) {
         super(x, y);
         this.resource = resource;
-        System.out.println("created mine with rotation speed corresponding to: "+resource.resourceAbundance);
     }
 
     public void updateAnimationState(float delta) {
-        float rotationSpeed = resource.resourceAbundance;
-        animationState += delta * rotationSpeed;
-        if (animationState > 1f) {
-            animationState -= 1f;
+        if (isConnectedToNetwork) {
+            float rotationSpeed = resource.resourceAbundance;
+            animationState += delta * rotationSpeed * 0.3f;
+            if (animationState > 1f) {
+                animationState -= 1f;
+            }
         }
     }
 }

@@ -54,7 +54,15 @@ public class TowerRenderer {
     }
 
     private void drawTower(Tower t, boolean ghost) {
-        sr.setColor(ghost ? new Color(0.2f, 0.4f, 0.2f, 0.4f) : Color.GREEN);
+        // Determine tower color
+        if (ghost) {
+            sr.setColor(new Color(0.2f, 0.4f, 0.2f, 0.4f));
+        } else if (t.isConnectedToNetwork) {
+            sr.setColor(Color.GREEN); // fully solid green
+        } else {
+            sr.setColor(new Color(0.1f, 0.5f, 0.1f, 0.7f));
+        }
+
         float centerX = t.xPos + CELL_MARGIN + CELL_SIZE / 2;
         float centerY = t.yPos + CELL_MARGIN + CELL_SIZE / 2;
         sr.circle(centerX, centerY, CELL_SIZE / 2);
@@ -74,5 +82,6 @@ public class TowerRenderer {
             angleDeg
         );
     }
+
 }
 

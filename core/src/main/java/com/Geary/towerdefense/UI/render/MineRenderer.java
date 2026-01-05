@@ -56,7 +56,6 @@ public class MineRenderer {
         float armLength = squareSize * 0.4f;
         float armWidth  = 4f;
 
-        // --- Use Mine's animationState directly ---
         float angleDeg = mine.animationState * 360f;
 
         for (int i = 0; i < 4; i++) {
