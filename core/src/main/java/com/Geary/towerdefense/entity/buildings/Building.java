@@ -9,4 +9,8 @@ public class Building {
         this.xPos = x;
         this.yPos = y;
     }
+
+    public boolean contains(float x, float y, float cellSize) {
+        return x >= xPos && x <= xPos + cellSize && y >= yPos && y <= yPos + cellSize;
+    }
 }
