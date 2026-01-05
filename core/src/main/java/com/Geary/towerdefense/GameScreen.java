@@ -74,8 +74,8 @@ public class GameScreen implements Screen {
         uiFont.getData().setScale(1.5f);
 
         world = new GameWorld();
-        towerRenderer = new TowerRenderer(world);
-        transportRenderer = new TransportRenderer(world);
+        towerRenderer = new TowerRenderer(world, shapeRenderer);
+        transportRenderer = new TransportRenderer(world, shapeRenderer);
         setupWorldCamera();
         setupUICamera();
 

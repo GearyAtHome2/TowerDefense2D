@@ -124,17 +124,11 @@ public class WorldRenderer {
 
         // Draw spawners and towers
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        transportRenderer.drawTransports(shapeRenderer);
-        shapeRenderer.end();
+        transportRenderer.drawTransports();
         mineRenderer.drawMines();
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         for (EnemySpawner es : world.enemySpawners) es.draw(shapeRenderer);
         for (FriendlySpawner fs : world.friendlySpawners) fs.draw(shapeRenderer);
-        towerRenderer.drawTowers(shapeRenderer);
-        shapeRenderer.end();
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        towerRenderer.drawTowerRanges(shapeRenderer);
-        shapeRenderer.end();
+        towerRenderer.drawTowers();
+        towerRenderer.drawTowerRanges();
     }
 }

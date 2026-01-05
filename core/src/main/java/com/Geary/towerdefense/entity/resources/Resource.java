@@ -2,7 +2,7 @@ package com.Geary.towerdefense.entity.resources;
 
 public class Resource {
     public float xPos, yPos;
-    public float resourceAbundance = 0;
+    public float resourceAbundance;
     public ResourceType type;
 
     public Resource(ResourceType type, float resourceAbundance){

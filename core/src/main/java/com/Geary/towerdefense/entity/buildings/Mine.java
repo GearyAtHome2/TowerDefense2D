@@ -13,6 +13,7 @@ public class Mine extends Building {
     public Mine(float x, float y, Resource resource) {
         super(x, y);
         this.resource = resource;
+        System.out.println("created mine with rotation speed corresponding to: "+resource.resourceAbundance);
     }
 
     public void updateAnimationState(float delta) {

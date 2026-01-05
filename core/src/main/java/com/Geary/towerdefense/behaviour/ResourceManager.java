@@ -38,6 +38,30 @@ public class ResourceManager {
     }
 
     private void placeResource(Cell cell, Resource.ResourceType resourceType) {
-        cell.resource = new Resource(resourceType, 0.5f);
+        float abundance;
+        switch (cell.type) {
+            case HOME -> {
+                // Low, random between 0.3 and 0.6
+                abundance = MathUtils.random(0.3f, 0.6f);
+            }
+            case EMPTY -> {
+                // Weighted by distance from bottom-left (0,0)
+                // Simple approach: normalized distance = (x + y) / (maxX + maxY)
+                float maxX = world.gridWidth  * GameWorld.cellSize;
+                float maxY = world.gridHeight * GameWorld.cellSize;
+
+                float normalizedDistance = (cell.x + cell.y) / (maxX + maxY);
+                // Add a small random variation
+                abundance = 0.3f + normalizedDistance * 0.7f * MathUtils.random(0.8f, 1.2f);
+                abundance = Math.min(1f, abundance); // clamp to 1.0
+            }
+            default -> {
+                // default value for other types
+                abundance = 0.5f;
+            }
+        }
+        System.out.println("placed mine of abundance: "+abundance);
+        cell.resource = new Resource(resourceType, abundance);
     }
+
 }

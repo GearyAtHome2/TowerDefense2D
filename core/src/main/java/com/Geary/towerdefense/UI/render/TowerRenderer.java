@@ -12,21 +12,27 @@ public class TowerRenderer {
     public static final float CELL_MARGIN = 8f;
     public static final float CELL_SIZE = GameWorld.cellSize - 2 * CELL_MARGIN;
 
-    public TowerRenderer(GameWorld world) {
+    private final ShapeRenderer sr;
+
+    public TowerRenderer(GameWorld world, ShapeRenderer sr) {
         this.world = world;
+        this.sr = sr;
     }
 
-    public void drawTowers(ShapeRenderer sr) {
+    public void drawTowers() {
+        sr.begin(ShapeRenderer.ShapeType.Filled);
         for (Tower t : world.towers) {
-            drawTower(sr, t, false); // real tower
+            drawTower(t, false); // real tower
         }
 
         if (world.ghostTower != null) {
-            drawTower(sr, world.ghostTower, true); // ghost tower
+            drawTower(world.ghostTower, true); // ghost tower
         }
+        sr.end();
     }
 
-    public void drawTowerRanges(ShapeRenderer sr) {
+    public void drawTowerRanges() {
+        sr.begin(ShapeRenderer.ShapeType.Line);
         sr.setColor(0f, 1f, 0f, 0.3f);
         for (Tower t : world.towers) {
             sr.circle(
@@ -44,9 +50,10 @@ public class TowerRenderer {
                 ghost.range
             );
         }
+        sr.end();
     }
 
-    private void drawTower(ShapeRenderer sr, Tower t, boolean ghost) {
+    private void drawTower(Tower t, boolean ghost) {
         sr.setColor(ghost ? new Color(0.2f, 0.4f, 0.2f, 0.4f) : Color.GREEN);
         float centerX = t.xPos + CELL_MARGIN + CELL_SIZE / 2;
         float centerY = t.yPos + CELL_MARGIN + CELL_SIZE / 2;

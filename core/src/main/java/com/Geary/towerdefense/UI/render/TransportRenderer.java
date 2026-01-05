@@ -10,63 +10,76 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 public class TransportRenderer {
 
     private final GameWorld world;
-
     public static final float CELL_MARGIN = 8f;
     public static final float CELL_SIZE = GameWorld.cellSize - 2 * CELL_MARGIN;
 
-    public TransportRenderer(GameWorld world) {
+    private final ShapeRenderer sr;
+
+    public TransportRenderer(GameWorld world, ShapeRenderer sr) {
         this.world = world;
+        this.sr = sr;
+        sr.setAutoShapeType(true); // allow multiple shape types in one batch
     }
 
-    public void drawTransports(ShapeRenderer sr) {
+    /** Draw all transports (real + ghost) */
+    public void drawTransports() {
+        sr.begin(ShapeRenderer.ShapeType.Filled); // start batch
+        // Draw all real transports
         for (Transport t : world.transports) {
-            drawTransports(sr, t, false); // real tower
+            drawTransport(t, false);
         }
-
+        // Draw ghost transport if present
         if (world.ghostTransport != null) {
-            drawTransports(sr, world.ghostTransport, true); // ghost tower
+            drawTransport(world.ghostTransport, true);
         }
+        sr.end(); // finish batch
     }
 
-    /**
-     * Helper to draw a single tower
-     */
-    private void drawTransports(ShapeRenderer sr, Transport t, boolean ghost) {
-        float centerX = t.xPos + CELL_MARGIN + CELL_SIZE / 2;
-        float centerY = t.yPos + CELL_MARGIN + CELL_SIZE / 2;
-        float width = CELL_SIZE / 8;
+    /** Draw a single transport (filled or line automatically handled) */
+    private void drawTransport(Transport t, boolean ghost) {
+        float centerX = t.xPos + CELL_MARGIN + CELL_SIZE / 2f;
+        float centerY = t.yPos + CELL_MARGIN + CELL_SIZE / 2f;
+        float width = CELL_SIZE / 8f;
 
+        // Set color based on type
+        if (t instanceof Bridge) {
+            sr.setColor(ghost ? new Color(0.2f, 0.6f, 0.4f, 0.4f) : Color.YELLOW);
+        } else {
+            sr.setColor(ghost ? new Color(0.2f, 0.2f, 0.5f, 0.4f) : Color.BLUE);
+        }
 
-        if (t.getClass().equals(Bridge.class)) sr.setColor(ghost ? new Color(0.2f, 0.6f, 0.4f, 0.4f) : Color.YELLOW);
-        else sr.setColor(ghost ? new Color(0.2f, 0.2f, 0.5f, 0.4f) : Color.BLUE);
-        ShapeRenderer.ShapeType type = t.isConnectedToNetwork ? ShapeRenderer.ShapeType.Filled : ShapeRenderer.ShapeType.Line;
-        sr.set(type);
+        boolean connectedToNetwork = t.isConnectedToNetwork;
+        // Set shape type automatically
+        sr.set(connectedToNetwork ? ShapeRenderer.ShapeType.Filled : ShapeRenderer.ShapeType.Line);
         sr.circle(centerX, centerY, width);
-        if (t.isConnectedToNetwork) {
-        }
-        if (t.directions != null && t.directions.contains(Direction.UP)) {
-            drawTransportRail(sr, centerX - width / 2, centerY, width, CELL_SIZE / 2f, ghost);
-        }
-        if (t.directions != null && t.directions.contains(Direction.DOWN)) {
-            drawTransportRail(sr, centerX - width / 2, centerY, width, -CELL_SIZE / 2f, ghost);
-        }
-        if (t.directions != null && t.directions.contains(Direction.LEFT)) {
-            drawTransportRail(sr, centerX, centerY - width / 2, -CELL_SIZE / 2f, width, ghost);
-        }
-        if (t.directions != null && t.directions.contains(Direction.RIGHT)) {
-            drawTransportRail(sr, centerX, centerY - width / 2, CELL_SIZE / 2f, width, ghost);
+
+        // Draw rails
+        if (t.directions != null) {
+            if (t.directions.contains(Direction.UP)) {
+                drawTransportRail(centerX - width / 2f, centerY, width, CELL_SIZE / 2f, ghost, connectedToNetwork);
+            }
+            if (t.directions.contains(Direction.DOWN)) {
+                drawTransportRail(centerX - width / 2f, centerY, width, -CELL_SIZE / 2f, ghost, connectedToNetwork);
+            }
+            if (t.directions.contains(Direction.LEFT)) {
+                drawTransportRail(centerX, centerY - width / 2f, -CELL_SIZE / 2f, width, ghost, connectedToNetwork);
+            }
+            if (t.directions.contains(Direction.RIGHT)) {
+                drawTransportRail(centerX, centerY - width / 2f, CELL_SIZE / 2f, width, ghost, connectedToNetwork);
+            }
         }
     }
 
-    public void drawTransportRail(ShapeRenderer sr, float x, float y, float xLen, float yLen, boolean ghost) {
+    private void drawTransportRail(float x, float y, float xLen, float yLen, boolean ghost, boolean connected) {
+        // Outer rail
+        sr.set(connected ? ShapeRenderer.ShapeType.Filled : ShapeRenderer.ShapeType.Line);
         sr.setColor(ghost ? new Color(0.3f, 0f, 0f, 0.4f) : Color.BLUE);
-        rect(sr, x, y, xLen, yLen);
-        sr.setColor(ghost ? new Color(0.8f, 0.8f, 0.8f, 0.4f) : Color.WHITE);
-        rect(sr, x + 2, y + 2, xLen - 4, yLen - 4);
-    }
+        sr.rect(x, y, xLen, yLen);
 
-    public void rect(ShapeRenderer sr, float x, float y, float width, float height) {
-        sr.rect(x, y, width, height);
+        // Inner highlight: only for filled rails
+        if (connected) {
+            sr.setColor(ghost ? new Color(0.8f, 0.8f, 0.8f, 0.4f) : Color.WHITE);
+            sr.rect(x + 2f, y + 2f, xLen - 4f, yLen - 4f);
+        }
     }
 }
-

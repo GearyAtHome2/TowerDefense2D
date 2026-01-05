@@ -30,55 +30,44 @@ public class MineRenderer {
     }
 
     private void drawMine(Mine mine, boolean ghost) {
-        Color frameColor = ghost
-            ? new Color(0.2f, 0.4f, 0.2f, 0.4f)
-            : Color.GREEN;
+        if (mine.resource == null) return;
 
-        Color fanColor = ghost
-            ? new Color(0.3f, 0f, 0f, 0.4f)
-            : Color.RED;
+        // --- Colors ---
+        Color frameColor = ghost ? new Color(0.2f, 0.4f, 0.2f, 0.4f) : Color.GREEN;
+        Color fanColor   = ghost ? new Color(0.3f, 0f, 0f, 0.4f) : Color.RED;
 
         float centerX = mine.xPos + CELL_MARGIN + CELL_SIZE / 2f;
         float centerY = mine.yPos + CELL_MARGIN + CELL_SIZE / 2f;
 
         float squareSize = CELL_SIZE * 0.8f;
-        float frameSize = (squareSize / 2f);
+        float frameSize  = squareSize / 2f;
 
+        // --- Draw frame ---
         sr.begin(ShapeRenderer.ShapeType.Line);
-
         sr.setColor(frameColor);
-        sr.rect(
-            centerX - frameSize,
-            centerY - frameSize,
-            squareSize,
-            squareSize
-        );
-        sr.rect(
-            centerX - frameSize + 2,
-            centerY - frameSize + 2,
-            squareSize - 4,
-            squareSize - 4
-        );
+        sr.rect(centerX - frameSize, centerY - frameSize, squareSize, squareSize);
+        sr.rect(centerX - frameSize + 2, centerY - frameSize + 2, squareSize - 4, squareSize - 4);
+        sr.end();
 
+        // --- Draw fan ---
+        sr.begin(ShapeRenderer.ShapeType.Filled);
         sr.setColor(fanColor);
-        sr.set(ShapeRenderer.ShapeType.Filled);
+
         float armLength = squareSize * 0.4f;
-        float armWidth = 4f;
+        float armWidth  = 4f;
 
-        float rotationSpeed = mine.resource.resourceAbundance;
+        // --- Use Mine's animationState directly ---
         float angleDeg = mine.animationState * 360f;
-
 
         for (int i = 0; i < 4; i++) {
             sr.rect(
                 centerX - armWidth / 2f,
                 centerY,
-                armWidth / 2f,   // origin X
-                0,               // origin Y
+                armWidth / 2f,   // originX
+                0f,              // originY
                 armWidth,
                 armLength,
-                1f,
-                1f,
+                1f, 1f,         // scaleX, scaleY
                 angleDeg + i * 90f
             );
         }

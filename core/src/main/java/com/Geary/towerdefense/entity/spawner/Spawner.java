@@ -15,6 +15,7 @@ public abstract class Spawner extends Building {
     }
 
     public void draw(ShapeRenderer sr) {
+        sr.begin(ShapeRenderer.ShapeType.Filled);
         sr.setColor(getColor());
 
         float size = GameWorld.cellSize - (2 * BUFFER);
@@ -24,6 +25,7 @@ public abstract class Spawner extends Building {
             size,
             size
         );
+        sr.end();
     }
 
     /** Override for visual distinction */

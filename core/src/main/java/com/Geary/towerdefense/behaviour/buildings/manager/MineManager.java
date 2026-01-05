@@ -62,7 +62,7 @@ public class MineManager {
         boolean canPlace = cell.resource != null;
 
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && canPlace) {
-            Mine mine = new Mine(x * GameWorld.cellSize, y * GameWorld.cellSize);
+            Mine mine = new Mine(x * GameWorld.cellSize, y * GameWorld.cellSize, cell.resource);
             world.mines.add(mine);
             cell.building = mine;
             world.occupied[x][y] = true;//todo: maybe not this? Would like to be able to override transports in future
