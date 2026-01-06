@@ -318,7 +318,11 @@ public class GameUI {
         }
 
         if (transportButtonBounds.contains(uiClick.x, uiClick.y)) {
-            transportManager.togglePlacementClick();
+            transportManager.togglePlacementClick(uiClick,
+                placeTowerButtonBounds.x,
+                placeTowerButtonBounds.y,
+                placeTowerButtonBounds.width,
+                placeTowerButtonBounds.height);
             return true;
         }
         return false;

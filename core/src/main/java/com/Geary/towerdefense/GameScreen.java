@@ -129,10 +129,12 @@ public class GameScreen implements Screen {
         delta *= gameStateManager.gameSpeed;
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            gameStateManager.togglePause();
+        }
+        cameraController.update();
+        placementHandler.handlePlacements();
         if (!gameStateManager.paused) {
-            cameraController.update();
-            placementHandler.handlePlacements();
             world.update(delta);
         }
         placementHandler.handleKeyboardInput(

@@ -209,7 +209,7 @@ public class GameWorld {
         spawnerManager.update(delta);
         sparkManager.update(delta);
         mineManager.animateMines(delta);
-        gameStateManager.addResources(mineManager.calculateResourcesGeneratedForMines(delta));
+        gameStateManager.addResources(mineManager.calculateResourcesGenerated(delta));
     }
 
     public void handleResourceGeneration(){
@@ -228,7 +228,7 @@ public class GameWorld {
             transportManager.deleteTransport(transport);
         } else if (building instanceof Mine mine) {
             mines.remove(mine);
-            mineManager.deleteMine(mine);
+            mineManager.deleteBuilding(mine, mines);
         }
 
         // Clear grid cell

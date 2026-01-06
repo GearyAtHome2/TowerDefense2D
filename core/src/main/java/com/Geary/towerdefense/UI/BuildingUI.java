@@ -102,7 +102,6 @@ public class BuildingUI {
 
         if (deleteButtonBounds.contains(worldClick.x, worldClick.y)) {
             deleteClickedThisFrame = true;
-            System.out.println("Delete click recognised in world coords");
         }
     }
 
