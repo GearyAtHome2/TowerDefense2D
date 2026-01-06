@@ -80,36 +80,33 @@ public class TransportManager {
 
         EnumSet<Direction> adjacentTransports = checkAdjacentTiles(x, y);
 
-        // --- Start drag ---
+        // --- Ghost update (always runs) ---
+        if (canPlace) {
+            if (world.ghostTransport == null) {
+                world.ghostTransport = new Transport(x * GameWorld.cellSize, y * GameWorld.cellSize, adjacentTransports);
+            } else {
+                world.ghostTransport.directions = adjacentTransports;
+                world.ghostTransport.xPos = x * GameWorld.cellSize;
+                world.ghostTransport.yPos = y * GameWorld.cellSize;
+            }
+        } else {
+            world.ghostTransport = null;
+        }
+
+        // --- Drag / placement logic ---
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
             if (!isDragging) {
                 isDragging = true;
-                dragStartX = x;
-                dragStartY = y;
                 draggedCells.clear();
             }
 
-            // Place transport if tile is valid and not already placed in this drag
             if (canPlace && !draggedCells.contains(cell)) {
                 Transport transport = bridge ? new Bridge(x * GameWorld.cellSize, y * GameWorld.cellSize, adjacentTransports) :
                     new Transport(x * GameWorld.cellSize, y * GameWorld.cellSize, adjacentTransports);
                 world.transports.add(transport);
                 world.grid[x][y].building = transport;
-                world.occupied[x][y] = true; // TODO: consider allowing override
+                world.occupied[x][y] = true; // TODO: allow override if desired
                 draggedCells.add(cell);
-            }
-
-            // Update ghost transport at current cursor
-            if (canPlace) {
-                if (world.ghostTransport == null) {
-                    world.ghostTransport = new Transport(x * GameWorld.cellSize, y * GameWorld.cellSize, adjacentTransports);
-                } else {
-                    world.ghostTransport.directions = adjacentTransports;
-                    world.ghostTransport.xPos = x * GameWorld.cellSize;
-                    world.ghostTransport.yPos = y * GameWorld.cellSize;
-                }
-            } else {
-                world.ghostTransport = null;
             }
 
             return true; // handled placement this frame
@@ -117,7 +114,6 @@ public class TransportManager {
             // Mouse released: end drag
             isDragging = false;
             draggedCells.clear();
-            world.ghostTransport = null;
         }
 
         return false;

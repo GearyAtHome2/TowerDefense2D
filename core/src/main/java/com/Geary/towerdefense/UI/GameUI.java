@@ -23,7 +23,8 @@ public class GameUI {
     // Button size relative to UI_BAR_HEIGHT
     private static final float DEFAULT_BUTTON_WIDTH = 0.18f; // % of viewport width
     private static final float BUTTON_HEIGHT = 0.2f * UI_BAR_HEIGHT;
-    private static final float BUTTON_SPACING = 20f;
+    private static final float BUTTON_MARGIN = 18f;
+    private static final float BUTTON_VERTICAL_SPACING = 3f;
 
     // --- Resource panel layout ---
     private static final float RESOURCE_PANEL_WIDTH_RATIO = 0.21f; // % of screen width
@@ -82,14 +83,14 @@ public class GameUI {
     private void updateButtonBounds() {
         float viewportWidth = uiViewport.getWorldWidth();
 
-        float placeTowerX = BUTTON_SPACING;
+        float placeTowerX = BUTTON_MARGIN;
         float placeTowerY = (UI_BAR_HEIGHT - BUTTON_HEIGHT) / 2f;
 
         float placeTowerWidthPixels = viewportWidth * DEFAULT_BUTTON_WIDTH;
-        float transportWidthPixels = viewportWidth * DEFAULT_BUTTON_WIDTH *  1.22f;
+        float transportWidthPixels = viewportWidth * DEFAULT_BUTTON_WIDTH;
 
         placeTowerButtonBounds = new Rectangle(placeTowerX, placeTowerY, placeTowerWidthPixels, BUTTON_HEIGHT);
-        transportButtonBounds = new Rectangle(placeTowerX + placeTowerWidthPixels + BUTTON_SPACING, placeTowerY, transportWidthPixels, BUTTON_HEIGHT);
+        transportButtonBounds = new Rectangle(placeTowerX, placeTowerY - BUTTON_HEIGHT - BUTTON_VERTICAL_SPACING, transportWidthPixels, BUTTON_HEIGHT);
     }
 
     public void updateHover(float screenX, float screenY) {
@@ -99,7 +100,7 @@ public class GameUI {
         Rectangle panel = getResourcePanelBounds();
         float usableHeight = panel.height - RESOURCE_PANEL_PADDING * 2;
         float lineHeight = RESOURCE_ICON_SIZE + RESOURCE_PADDING;
-        int maxRows = Math.max(1, (int)(usableHeight / lineHeight));
+        int maxRows = Math.max(1, (int) (usableHeight / lineHeight));
         float columnSpacing = RESOURCE_ICON_SIZE + RESOURCE_ICON_TEXT_GAP + 35f;
 
         float startX = panel.x + RESOURCE_PANEL_PADDING;
@@ -235,7 +236,7 @@ public class GameUI {
 
         float usableHeight = panel.height - RESOURCE_PANEL_PADDING * 2;
         float lineHeight = RESOURCE_ICON_SIZE + RESOURCE_PADDING;
-        int maxRows = Math.max(1, (int)(usableHeight / lineHeight));
+        int maxRows = Math.max(1, (int) (usableHeight / lineHeight));
 
         float columnSpacing = RESOURCE_ICON_SIZE + RESOURCE_ICON_TEXT_GAP + 35f;
         float startX = panel.x + RESOURCE_PANEL_PADDING;
@@ -291,7 +292,6 @@ public class GameUI {
             // Do NOT end batch here; caller will end batch
         }
     }
-
 
 
     private Rectangle getResourcePanelBounds() {

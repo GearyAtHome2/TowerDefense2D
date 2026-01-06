@@ -60,7 +60,9 @@ public class BuildingUI {
         batch.begin();
         float originalScaleX = font.getData().scaleX;
         float originalScaleY = font.getData().scaleY;
-        float fontScale = 0.8f + (scale - 1f) * 0.9f; // smaller response
+
+        float fontScale = getPopupScale(worldCameraZoom)*1.3f;
+
         font.setColor(building.getInfoTextColor());
         font.getData().setScale(originalScaleX * fontScale, originalScaleY * fontScale);
 
