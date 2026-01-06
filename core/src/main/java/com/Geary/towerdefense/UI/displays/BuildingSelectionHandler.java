@@ -16,9 +16,11 @@ public class BuildingSelectionHandler {
     }
 
     public Building getBuildingAtScreen(int screenX, int screenY) {
+        if (!UIClickManager.isClickInGameArea(screenY)) {
+            return null;
+        }
         Vector3 worldClick = new Vector3(screenX, screenY, 0);
         worldViewport.unproject(worldClick);
-
 
         for (Building b : world.mines) {
             if (isClickInsideBuilding(worldClick, b)) {
@@ -30,14 +32,11 @@ public class BuildingSelectionHandler {
                 return b;
             }
         }
-
         for (Building b : world.transports) {
             if (isClickInsideBuilding(worldClick, b)) {
                 return b;
             }
         }
-
-
         return null;
     }
 

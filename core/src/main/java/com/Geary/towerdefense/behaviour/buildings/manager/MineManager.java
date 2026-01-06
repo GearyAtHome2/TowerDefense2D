@@ -1,6 +1,7 @@
 package com.Geary.towerdefense.behaviour.buildings.manager;
 
 import com.Geary.towerdefense.Direction;
+import com.Geary.towerdefense.UI.displays.UIClickManager;
 import com.Geary.towerdefense.entity.buildings.Mine;
 import com.Geary.towerdefense.entity.resources.Resource;
 import com.Geary.towerdefense.entity.world.Cell;
@@ -10,6 +11,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 
+import java.util.EnumMap;
 import java.util.EnumSet;
 
 public class MineManager {
@@ -44,10 +46,17 @@ public class MineManager {
             return false;
         }
 
-        Vector3 worldPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        float screenX = Gdx.input.getX();
+        float screenY = Gdx.input.getY();
+        if (!UIClickManager.isClickInGameArea(screenY)) {
+            world.ghostTower = null;
+            return false;
+        }
+        Vector3 worldPos = new Vector3(screenX, screenY, 0);
         camera.unproject(worldPos);
-        int x = (int) (worldPos.x / GameWorld.cellSize);
-        int y = (int) (worldPos.y / GameWorld.cellSize);
+
+        int x = (int) (worldPos.x / world.cellSize);
+        int y = (int) (worldPos.y / world.cellSize);
 
         // Check bounds
         if (x < 0 || x >= world.gridWidth || y < 0 || y >= world.gridHeight) {
@@ -78,14 +87,17 @@ public class MineManager {
         return false;
     }
 
-    public float calculateResourcesGeneratedForMines(float delta, Resource.ResourceType type){
-        float resourceGenerated = 0f;
-        for (Mine mine : world.mines) {
-            if (mine.resource.type == type) {
-                resourceGenerated += mine.resource.resourceAbundance * delta;
+    public EnumMap<Resource.ResourceType, Float> calculateResourcesGeneratedForMines(float delta){
+        EnumMap<Resource.ResourceType, Float> generatedResource = new EnumMap<>(Resource.ResourceType.class);
+
+        for (Mine mine : world.mines){
+            if (mine.isConnectedToNetwork) {
+                Resource.ResourceType type = mine.resource.type;
+                float quantity = mine.resource.resourceAbundance * delta;
+                generatedResource.put(type, generatedResource.getOrDefault(type, 0f) + quantity);
             }
         }
-        return resourceGenerated;
+        return generatedResource;
     }
 
     //keeping this in case we decide to add a UI for it

@@ -61,6 +61,7 @@ public class GameWorld {
     private MobManager mobManager;
     private SparkManager sparkManager;
     private SpawnerManager spawnerManager;
+    private GameStateManager gameStateManager;
 
     public GameWorld() {
         grid = new Cell[gridWidth][gridHeight];
@@ -72,13 +73,12 @@ public class GameWorld {
 
     public void initManagers(OrthographicCamera worldCamera) {
         sparkManager = new SparkManager(100);
-
         towerManager = new TowerManager(this, worldCamera);
         transportManager = new TransportManager(this, worldCamera);
         mineManager = new MineManager(this, worldCamera);
-
         mobManager = new MobManager(this, sparkManager); // no camera
         spawnerManager = new SpawnerManager(this);       // no camera
+        gameStateManager = new GameStateManager();
     }
     public TowerManager getTowerManager() { return towerManager; }
     public TransportManager getTransportManager() { return transportManager; }
@@ -86,6 +86,7 @@ public class GameWorld {
     public MobManager getMobManager() { return mobManager; }
     public SparkManager getSparkManager() { return sparkManager; }
     public SpawnerManager getSpawnerManager() { return spawnerManager; }
+    public GameStateManager getGameStateManager(){ return gameStateManager; }
 
     private void generateWorld(Map<Resource.ResourceType, Integer> resourceAllocation) {
         clearWorld();
@@ -203,6 +204,11 @@ public class GameWorld {
         spawnerManager.update(delta);
         sparkManager.update(delta);
         mineManager.animateMines(delta);
+        gameStateManager.addResources(mineManager.calculateResourcesGeneratedForMines(delta));
+    }
+
+    public void handleResourceGeneration(){
+
     }
 
     public void deleteBuilding(Building building) {

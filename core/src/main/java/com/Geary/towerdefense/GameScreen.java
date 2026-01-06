@@ -35,12 +35,6 @@ public class GameScreen implements Screen {
 
     private GameWorld world;
     private CameraController cameraController;
-//    private TowerManager towerManager;
-//    private TransportManager transportManager;
-//    private MineManager mineManager;
-//    private SparkManager sparkManager;
-//    private MobManager mobManager;
-//    private SpawnerManager spawnerManager;
 
     private PlacementHandler placementHandler;
     private BuildingSelectionHandler buildingSelectionHandler;
@@ -99,7 +93,7 @@ public class GameScreen implements Screen {
     }
 
     private void initUI() {
-        gameUI = new GameUI(shapeRenderer, batch, uiFont, uiViewport, world, world.getTowerManager(), world.getTransportManager());
+        gameUI = new GameUI(shapeRenderer, batch, uiFont, uiViewport, world, world.getTowerManager(), world.getTransportManager(), world.getGameStateManager());
         buildingUI = new BuildingUI(world, shapeRenderer, batch, uiFont);
     }
 
@@ -110,7 +104,6 @@ public class GameScreen implements Screen {
 
         inputProcessor.setWorldClickListener((x, y) -> {
             Building clicked = buildingSelectionHandler.getBuildingAtScreen(x, y);
-
             if (selectedBuilding != null) {
                 buildingUI.handleClick(x, y, worldCamera);
                 if (buildingUI.consumeDeleteRequest()) {
@@ -119,7 +112,6 @@ public class GameScreen implements Screen {
                     return;
                 }
             }
-
             if (clicked != null) {
                 selectedBuilding = clicked;
             } else {

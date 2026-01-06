@@ -1,6 +1,7 @@
 package com.Geary.towerdefense.behaviour.buildings.manager;
 
 import com.Geary.towerdefense.Direction;
+import com.Geary.towerdefense.UI.displays.UIClickManager;
 import com.Geary.towerdefense.entity.buildings.*;
 import com.Geary.towerdefense.entity.world.Cell;
 import com.Geary.towerdefense.world.GameWorld;
@@ -46,10 +47,17 @@ public class TransportManager {
             return false;
         }
 
-        Vector3 worldPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        float screenX = Gdx.input.getX();
+        float screenY = Gdx.input.getY();
+        if (!UIClickManager.isClickInGameArea(screenY)) {
+            world.ghostTower = null;
+            return false;
+        }
+        Vector3 worldPos = new Vector3(screenX, screenY, 0);
         camera.unproject(worldPos);
-        int x = (int) (worldPos.x / GameWorld.cellSize);
-        int y = (int) (worldPos.y / GameWorld.cellSize);
+
+        int x = (int) (worldPos.x / world.cellSize);
+        int y = (int) (worldPos.y / world.cellSize);
 
         // Check bounds
         if (x < 0 || x >= world.gridWidth || y < 0 || y >= world.gridHeight) {
@@ -77,7 +85,7 @@ public class TransportManager {
             return true;
         } else if (canPlace) {
             if (world.ghostTransport == null) {
-//                world.ghostTransport = new Transport(x * GameWorld.cellSize, y * GameWorld.cellSize, adjacentTransports);
+                world.ghostTransport = new Transport(x * GameWorld.cellSize, y * GameWorld.cellSize, adjacentTransports);
             } else {
                 world.ghostTransport.directions = adjacentTransports;
                 world.ghostTransport.xPos = x * GameWorld.cellSize;

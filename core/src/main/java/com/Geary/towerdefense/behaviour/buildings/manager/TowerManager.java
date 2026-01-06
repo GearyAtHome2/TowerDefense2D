@@ -1,7 +1,8 @@
 package com.Geary.towerdefense.behaviour.buildings.manager;
 
-import com.Geary.towerdefense.entity.mob.Bullet;
+import com.Geary.towerdefense.UI.displays.UIClickManager;
 import com.Geary.towerdefense.entity.buildings.Tower;
+import com.Geary.towerdefense.entity.mob.Bullet;
 import com.Geary.towerdefense.entity.world.Cell;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.Gdx;
@@ -42,9 +43,15 @@ public class TowerManager {
             world.ghostTower = null;
             return false;
         }
-
-        Vector3 worldPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        float screenX = Gdx.input.getX();
+        float screenY = Gdx.input.getY();
+        if (!UIClickManager.isClickInGameArea(screenY)) {
+            world.ghostTower = null;
+            return false;
+        }
+        Vector3 worldPos = new Vector3(screenX, screenY, 0);
         camera.unproject(worldPos);
+
         int x = (int) (worldPos.x / world.cellSize);
         int y = (int) (worldPos.y / world.cellSize);
 

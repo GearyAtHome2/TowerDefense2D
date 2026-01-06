@@ -2,6 +2,7 @@ package com.Geary.towerdefense.UI;
 
 import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.world.GameWorld;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -82,7 +83,8 @@ public class BuildingUI {
         shapeRenderer.rect(buttonX, buttonY, buttonWidth, buttonHeight);
         shapeRenderer.end();
 
-        font.getData().setScale(originalScaleX, originalScaleY); // Reset font scale
+        font.getData().setScale(originalScaleX, originalScaleY);
+        font.setColor(Color.WHITE);
     }
 
     private float getPopupScale(float zoom) {
