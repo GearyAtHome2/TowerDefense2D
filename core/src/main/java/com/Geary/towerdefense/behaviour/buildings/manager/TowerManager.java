@@ -62,16 +62,14 @@ public class TowerManager {
         boolean canPlace = !world.occupied[x][y] &&
             (world.grid[x][y].type == Cell.Type.EMPTY || world.grid[x][y].type == Cell.Type.HOME);
 
-        // Place real tower on click
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && canPlace) {
             Tower tower = new Tower(x * world.cellSize, y * world.cellSize);
             world.towers.add(tower);
             world.grid[x][y].building = tower;
             world.occupied[x][y] = true;
-            world.ghostTower = null; // clear ghost after placement
+            world.ghostTower = null;
             return true;
         }
-        // Otherwise update ghost tower position
         else if (canPlace) {
             if (world.ghostTower == null) {
                 world.ghostTower = new Tower(x * world.cellSize, y * world.cellSize);
@@ -101,10 +99,8 @@ public class TowerManager {
                 tower.currentTarget = tower.findTargetFurthestProgressed(world.enemies);
             }
 
-            // Rotate gun toward target
             tower.updateGunAngle(delta);
 
-            // Shoot if cooldown finished
             if (tower.cooldown <= 0 && tower.currentTarget != null && tower.canShoot()) {
                 bullets.add(tower.shoot(tower.currentTarget));
                 tower.cooldown = tower.maxCooldown;
@@ -118,10 +114,8 @@ public class TowerManager {
         int x = (int) tower.xPos / world.cellSize;
         int y = (int) tower.yPos / world.cellSize;
 
-        // Remove from tower list
         world.towers.remove(tower);
 
-        // Clear grid reference
         if (x >= 0 && x < world.gridWidth && y >= 0 && y < world.gridHeight) {
             if (world.grid[x][y].building == tower) {
                 world.grid[x][y].building = null;

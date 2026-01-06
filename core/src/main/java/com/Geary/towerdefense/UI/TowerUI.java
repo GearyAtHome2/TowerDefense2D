@@ -2,11 +2,12 @@ package com.Geary.towerdefense.UI;
 
 import com.Geary.towerdefense.entity.buildings.Tower;
 import com.Geary.towerdefense.world.GameWorld;
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 
 public class TowerUI {
 
@@ -19,7 +20,6 @@ public class TowerUI {
     private Rectangle deleteButtonBounds = new Rectangle();
 
     private boolean deleteClickedThisFrame = false;
-    private float clickX, clickY;
 
     public TowerUI(GameWorld world, ShapeRenderer shapeRenderer, SpriteBatch batch, BitmapFont font) {
         this.world = world;
@@ -91,18 +91,26 @@ public class TowerUI {
         return popupScale;
     }
 
-    public void handleClick(float screenX, float screenY) {
-        float yFlipped = Gdx.graphics.getHeight() - screenY;
-        if (deleteButtonBounds.contains(screenX, yFlipped)) {
+    public void handleClick(float screenX, float screenY, OrthographicCamera worldCamera) {
+        Vector3 worldClick = new Vector3(screenX, screenY, 0);
+        worldCamera.unproject(worldClick); // converts to world coordinates
+
+        if (deleteButtonBounds.contains(worldClick.x, worldClick.y)) {
             deleteClickedThisFrame = true;
+            System.out.println("Delete click recognised in world coords");
         }
     }
 
     public boolean consumeDeleteRequest() {
         if (deleteClickedThisFrame) {
-            deleteClickedThisFrame = false;
+            clear();
             return true;
         }
         return false;
+    }
+
+    public void clear() {
+        deleteButtonBounds.set(0, 0, 0, 0);
+        deleteClickedThisFrame = false;
     }
 }

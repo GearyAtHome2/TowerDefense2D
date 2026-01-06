@@ -6,6 +6,8 @@ import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class GameUI {
@@ -74,5 +76,38 @@ public class GameUI {
         }
 
         batch.end();
+    }
+
+    private final Rectangle placeTowerButtonBounds = new Rectangle(
+        PLACE_TOWER_X,
+        PLACE_TOWER_Y,
+        PLACE_TOWER_WIDTH,
+        PLACE_TOWER_HEIGHT
+    );
+
+    private final Rectangle transportButtonBounds = new Rectangle(
+        PLACE_TOWER_X + PLACE_TOWER_WIDTH + 20,
+        PLACE_TOWER_Y,
+        PLACE_TOWER_WIDTH / 2f,
+        PLACE_TOWER_HEIGHT
+    );
+
+    public boolean handleUiClick(Vector3 uiClick) {
+        if (placeTowerButtonBounds.contains(uiClick.x, uiClick.y)) {
+            towerManager.togglePlacementClick(
+                uiClick,
+                placeTowerButtonBounds.x,
+                placeTowerButtonBounds.y,
+                placeTowerButtonBounds.width,
+                placeTowerButtonBounds.height
+            );
+            return true;
+        }
+
+        if (transportButtonBounds.contains(uiClick.x, uiClick.y)) {
+            transportManager.togglePlacementClick();
+            return true;
+        }
+        return false;
     }
 }

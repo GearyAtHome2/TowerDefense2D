@@ -105,14 +105,30 @@ public class GameScreen implements Screen {
 
     private void initInputProcessor() {
         inputProcessor = new GameInputProcessor(world.getTowerManager(), cameraController, uiViewport);
-        inputProcessor.setTowerClickListener((x, y) -> {
+
+        inputProcessor.setUiClickListener(uiClick -> gameUI.handleUiClick(uiClick));
+
+        inputProcessor.setWorldClickListener((x, y) -> {
             Tower clicked = towerSelectionHandler.getTowerAtScreen(x, y);
             if (selectedTower != null) {
-                towerUI.handleClick(x, y);
+                towerUI.handleClick(x, y, worldCamera);
+                if (towerUI.consumeDeleteRequest()) {
+                    world.getTowerManager().deleteTower(selectedTower);
+                    selectedTower = null;
+                    return;
+                }
+                if (clicked != null && clicked != selectedTower) {
+                    selectedTower = clicked;
+                    return;
+                }
+                if (clicked == null) {
+                    selectedTower = null;
+                }
             } else {
                 selectedTower = clicked;
             }
         });
+
         Gdx.input.setInputProcessor(inputProcessor);
     }
 
@@ -122,12 +138,6 @@ public class GameScreen implements Screen {
         delta *= gameStateManager.gameSpeed;
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        if (selectedTower != null && towerUI.consumeDeleteRequest()) {
-            world.getTowerManager().deleteTower(selectedTower);
-            selectedTower = null;
-            return;
-        }
 
         if (!gameStateManager.paused) {
             cameraController.update();

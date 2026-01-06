@@ -16,7 +16,8 @@ public class GameInputProcessor extends InputAdapter {
     private boolean isDraggingCamera = false;
     private static final float DRAG_THRESHOLD = 5f;
 
-    private TowerClickListener towerClickListener;
+    private WorldClickListener worldClickListener;
+    private UiClickListener uiClickListener;
 
     public GameInputProcessor(TowerManager towerManager, CameraController cameraController,
                               Viewport uiViewport) {
@@ -28,8 +29,12 @@ public class GameInputProcessor extends InputAdapter {
     /**
      * Optional callback for world clicks
      */
-    public void setTowerClickListener(TowerClickListener listener) {
-        this.towerClickListener = listener;
+    public void setWorldClickListener(WorldClickListener listener) {
+        this.worldClickListener = listener;
+    }
+
+    public void setUiClickListener(UiClickListener listener) {
+        this.uiClickListener = listener;
     }
 
     @Override
@@ -71,14 +76,15 @@ public class GameInputProcessor extends InputAdapter {
         Vector3 uiClick = new Vector3(screenX, screenY, 0);
         uiViewport.unproject(uiClick);
 
-        if (uiClick.x >= 80 && uiClick.x <= 230 && uiClick.y >= 10 && uiClick.y <= 50) {
-            towerManager.togglePlacementClick(uiClick, 80, 10, 150, 40);
-            return true;
+        if (!isDraggingCamera && uiClickListener != null) {
+            if (uiClickListener.onUiClick(uiClick)) {
+                return true;
+            }
         }
 
         if (!towerManager.isPlacementActive() && !isDraggingCamera) {
-            if (towerClickListener != null) {
-                towerClickListener.onTowerClick(screenX, screenY);
+            if (worldClickListener != null) {
+                worldClickListener.onTowerClick(screenX, screenY);
             }
             return true;
         }
@@ -92,7 +98,11 @@ public class GameInputProcessor extends InputAdapter {
         return true;
     }
 
-    public interface TowerClickListener {
+    public interface WorldClickListener {
         void onTowerClick(int screenX, int screenY);
+    }
+
+    public interface UiClickListener {
+        boolean onUiClick(Vector3 uiCoords);
     }
 }

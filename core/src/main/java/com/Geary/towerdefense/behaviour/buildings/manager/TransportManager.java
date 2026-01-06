@@ -30,15 +30,12 @@ public class TransportManager {
         return transportPlacementButtonActive || transportPlacementKbActive;
     }
 
-    public void togglePlacementClick(Vector3 uiClick, float buttonX, float buttonY, float buttonW, float buttonH) {
-        if (uiClick.x >= buttonX && uiClick.x <= buttonX + buttonW &&
-            uiClick.y >= buttonY && uiClick.y <= buttonY + buttonH) {
+    public void togglePlacementClick() {
             transportPlacementButtonActive = !transportPlacementButtonActive;
-        }
     }
 
     public void togglePlacementKb(boolean ctrlHeld) {
-        transportPlacementButtonActive = ctrlHeld;
+        transportPlacementKbActive = ctrlHeld;
     }
 
     public boolean handlePlacement() {
