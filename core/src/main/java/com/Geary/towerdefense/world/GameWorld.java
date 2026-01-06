@@ -8,6 +8,7 @@ import com.Geary.towerdefense.behaviour.SpawnerManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.MineManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TowerManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TransportManager;
+import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.entity.buildings.Mine;
 import com.Geary.towerdefense.entity.buildings.Tower;
 import com.Geary.towerdefense.entity.buildings.Transport;
@@ -68,6 +69,23 @@ public class GameWorld {
         resourceAllocation.put(Resource.ResourceType.IRON, 4);
         generateWorld(resourceAllocation);
     }
+
+    public void initManagers(OrthographicCamera worldCamera) {
+        sparkManager = new SparkManager(100);
+
+        towerManager = new TowerManager(this, worldCamera);
+        transportManager = new TransportManager(this, worldCamera);
+        mineManager = new MineManager(this, worldCamera);
+
+        mobManager = new MobManager(this, sparkManager); // no camera
+        spawnerManager = new SpawnerManager(this);       // no camera
+    }
+    public TowerManager getTowerManager() { return towerManager; }
+    public TransportManager getTransportManager() { return transportManager; }
+    public MineManager getMineManager() { return mineManager; }
+    public MobManager getMobManager() { return mobManager; }
+    public SparkManager getSparkManager() { return sparkManager; }
+    public SpawnerManager getSpawnerManager() { return spawnerManager; }
 
     private void generateWorld(Map<Resource.ResourceType, Integer> resourceAllocation) {
         clearWorld();
@@ -177,25 +195,6 @@ public class GameWorld {
         }
     }
 
-    public void initManagers(OrthographicCamera worldCamera) {
-        // SparkManager doesn’t need a camera
-        sparkManager = new SparkManager(100);
-
-        // Pass the camera to managers that need it
-        towerManager = new TowerManager(this, worldCamera);
-        transportManager = new TransportManager(this, worldCamera);
-        mineManager = new MineManager(this, worldCamera);
-
-        mobManager = new MobManager(this, sparkManager); // no camera
-        spawnerManager = new SpawnerManager(this);       // no camera
-    }
-    public TowerManager getTowerManager() { return towerManager; }
-    public TransportManager getTransportManager() { return transportManager; }
-    public MineManager getMineManager() { return mineManager; }
-    public MobManager getMobManager() { return mobManager; }
-    public SparkManager getSparkManager() { return sparkManager; }
-    public SpawnerManager getSpawnerManager() { return spawnerManager; }
-
     /** Update all in-world events; called from GameScreen */
     public void update(float delta) {
         towerManager.updateTowers(this.bullets, delta);
@@ -204,6 +203,34 @@ public class GameWorld {
         spawnerManager.update(delta);
         sparkManager.update(delta);
         mineManager.animateMines(delta);
+    }
+
+    public void deleteBuilding(Building building) {
+        if (building == null) return;
+
+        // Remove from type-specific lists
+        if (building instanceof Tower tower) {
+            towers.remove(tower);
+            towerManager.deleteTower(tower); // you may need a helper for clearing occupied cells
+        } else if (building instanceof Transport transport) {
+            transports.remove(transport);
+            transportManager.deleteTransport(transport);
+        } else if (building instanceof Mine mine) {
+            mines.remove(mine);
+            mineManager.deleteMine(mine);
+        }
+
+        // Clear grid cell
+        int x = (int) building.xPos / cellSize;
+        int y = (int) building.yPos / cellSize;
+        if (x >= 0 && x < gridWidth && y >= 0 && y < gridHeight) {
+            if (grid[x][y].building == building) {
+                grid[x][y].building = null;
+            }
+            occupied[x][y] = false;
+        }
+
+        transportManager.updateAllTransportLinks();
     }
 
 

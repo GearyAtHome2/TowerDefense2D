@@ -1,11 +1,11 @@
 package com.Geary.towerdefense;
 
+import com.Geary.towerdefense.UI.BuildingUI;
 import com.Geary.towerdefense.UI.CameraController;
 import com.Geary.towerdefense.UI.GameUI;
-import com.Geary.towerdefense.UI.TowerUI;
-import com.Geary.towerdefense.UI.displays.TowerSelectionHandler;
+import com.Geary.towerdefense.UI.displays.BuildingSelectionHandler;
 import com.Geary.towerdefense.UI.render.*;
-import com.Geary.towerdefense.entity.buildings.Tower;
+import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.world.GameStateManager;
 import com.Geary.towerdefense.world.GameWorld;
 import com.Geary.towerdefense.world.PlacementHandler;
@@ -43,7 +43,7 @@ public class GameScreen implements Screen {
 //    private SpawnerManager spawnerManager;
 
     private PlacementHandler placementHandler;
-    private TowerSelectionHandler towerSelectionHandler;
+    private BuildingSelectionHandler buildingSelectionHandler;
 
     private OrthographicCamera uiCamera;
     private Viewport uiViewport;
@@ -55,12 +55,12 @@ public class GameScreen implements Screen {
     private TowerRenderer towerRenderer;
     private MineRenderer mineRenderer;
 
-    private TowerUI towerUI;
+    private BuildingUI buildingUI;
 
     private GameInputProcessor inputProcessor;
     private GameStateManager gameStateManager;
 
-    private Tower selectedTower = null;
+    private Building selectedBuilding = null;
 
     @Override
     public void show() {
@@ -87,7 +87,7 @@ public class GameScreen implements Screen {
 
     public void initHandlers() {
         placementHandler = new PlacementHandler(world.getTowerManager(), world.getTransportManager(), world.getMineManager());
-        towerSelectionHandler = new TowerSelectionHandler(world, worldViewport);
+        buildingSelectionHandler = new BuildingSelectionHandler(world, worldViewport);
     }
 
     private void initRenderers() {
@@ -100,32 +100,31 @@ public class GameScreen implements Screen {
 
     private void initUI() {
         gameUI = new GameUI(shapeRenderer, batch, uiFont, uiViewport, world, world.getTowerManager(), world.getTransportManager());
-        towerUI = new TowerUI(world, shapeRenderer, batch, uiFont);
+        buildingUI = new BuildingUI(world, shapeRenderer, batch, uiFont);
     }
 
     private void initInputProcessor() {
-        inputProcessor = new GameInputProcessor(world.getTowerManager(), cameraController, uiViewport);
+        inputProcessor = new GameInputProcessor(world.getTowerManager(), world.getMineManager(), world.getTransportManager(), cameraController, uiViewport);
 
         inputProcessor.setUiClickListener(uiClick -> gameUI.handleUiClick(uiClick));
 
         inputProcessor.setWorldClickListener((x, y) -> {
-            Tower clicked = towerSelectionHandler.getTowerAtScreen(x, y);
-            if (selectedTower != null) {
-                towerUI.handleClick(x, y, worldCamera);
-                if (towerUI.consumeDeleteRequest()) {
-                    world.getTowerManager().deleteTower(selectedTower);
-                    selectedTower = null;
+            Building clicked = buildingSelectionHandler.getBuildingAtScreen(x, y);
+
+            if (selectedBuilding != null) {
+                buildingUI.handleClick(x, y, worldCamera);
+                if (buildingUI.consumeDeleteRequest()) {
+                    world.deleteBuilding(selectedBuilding);
+                    selectedBuilding = null;
                     return;
                 }
-                if (clicked != null && clicked != selectedTower) {
-                    selectedTower = clicked;
-                    return;
-                }
-                if (clicked == null) {
-                    selectedTower = null;
-                }
+            }
+
+            if (clicked != null) {
+                selectedBuilding = clicked;
             } else {
-                selectedTower = clicked;
+                selectedBuilding = null;
+                buildingUI.clear();
             }
         });
 
@@ -171,8 +170,8 @@ public class GameScreen implements Screen {
 
     private void drawWorldActors(float delta) {
         worldRenderer.drawActors(batch, world.getSparkManager(), towerRenderer, transportRenderer, mineRenderer);
-        if (selectedTower != null) {
-            towerUI.drawTowerPopup(selectedTower, worldCamera.zoom);
+        if (selectedBuilding != null) {
+            buildingUI.drawBuildingPopup(selectedBuilding, worldCamera.zoom);
         }
     }
 

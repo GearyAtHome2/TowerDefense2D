@@ -1,6 +1,9 @@
 package com.Geary.towerdefense.entity.buildings;
 
 import com.Geary.towerdefense.entity.resources.Resource;
+import com.badlogic.gdx.graphics.Color;
+
+import java.util.List;
 
 public class Mine extends Building {
     public Resource resource;
@@ -23,5 +26,16 @@ public class Mine extends Building {
                 animationState -= 1f;
             }
         }
+    }
+
+    @Override
+    public List<String> getInfoLines() {
+        return List.of(
+            "Abundance: " + resource.resourceAbundance
+        );
+    }
+
+    public Color getInfoTextColor() {
+        return Color.CYAN; // default
     }
 }

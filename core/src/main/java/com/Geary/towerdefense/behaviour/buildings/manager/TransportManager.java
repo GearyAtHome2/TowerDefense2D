@@ -69,13 +69,13 @@ public class TransportManager {
             Transport transport = bridge ? new Bridge(x * GameWorld.cellSize, y * GameWorld.cellSize, adjacentTransports) :
                 new Transport(x * GameWorld.cellSize, y * GameWorld.cellSize, adjacentTransports);
             world.transports.add(transport);
-            cell.building = transport;
+            world.grid[x][y].building = transport;
             world.occupied[x][y] = true;//todo: maybe not this? Would like to be able to override transports in future
-            world.ghostTransport = null; // clear ghost after placement
+            world.ghostTransport = null;
             return true;
         } else if (canPlace) {
             if (world.ghostTransport == null) {
-                world.ghostTransport = new Transport(x * GameWorld.cellSize, y * GameWorld.cellSize, adjacentTransports);
+//                world.ghostTransport = new Transport(x * GameWorld.cellSize, y * GameWorld.cellSize, adjacentTransports);
             } else {
                 world.ghostTransport.directions = adjacentTransports;
                 world.ghostTransport.xPos = x * GameWorld.cellSize;
@@ -174,6 +174,22 @@ public class TransportManager {
         for (Transport transport : world.transports) {
             transport.updateAnimationState(delta);
             //don't do anything yet - might want an animation at some stage.
+        }
+    }
+
+    public void deleteTransport(Transport transport){
+        if (transport == null) return;
+
+        int x = (int) transport.xPos / world.cellSize;
+        int y = (int) transport.yPos / world.cellSize;
+
+        world.transports.remove(transport);
+
+        if (x >= 0 && x < world.gridWidth && y >= 0 && y < world.gridHeight) {
+            if (world.grid[x][y].building == transport) {
+                world.grid[x][y].building = null;
+            }
+            world.occupied[x][y] = false;
         }
     }
 }

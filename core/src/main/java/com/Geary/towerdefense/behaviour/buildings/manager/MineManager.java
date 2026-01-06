@@ -38,10 +38,6 @@ public class MineManager {
         }
     }
 
-    public void togglePlacementKb(boolean buttonHeld) {
-        minePlacementKbActive = buttonHeld;
-    }
-
     public boolean handlePlacement() {
         if (!isPlacementActive()) {
             world.ghostMine = null;
@@ -65,7 +61,7 @@ public class MineManager {
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && canPlace) {
             Mine mine = new Mine(x * GameWorld.cellSize, y * GameWorld.cellSize, cell.resource);
             world.mines.add(mine);
-            cell.building = mine;
+            world.grid[x][y].building = mine;
             world.occupied[x][y] = true;//todo: maybe not this? Would like to be able to override transports in future
             world.ghostMine = null;
             return true;
@@ -113,6 +109,22 @@ public class MineManager {
     public void animateMines(float delta){
         for (Mine mine : world.mines){
             mine.updateAnimationState(delta);
+        }
+    }
+
+    public void deleteMine(Mine mine){
+        if (mine == null) return;
+
+        int x = (int) mine.xPos / world.cellSize;
+        int y = (int) mine.yPos / world.cellSize;
+
+        world.mines.remove(mine);
+
+        if (x >= 0 && x < world.gridWidth && y >= 0 && y < world.gridHeight) {
+            if (world.grid[x][y].building == mine) {
+                world.grid[x][y].building = null;
+            }
+            world.occupied[x][y] = false;
         }
     }
 }

@@ -1,7 +1,9 @@
 package com.Geary.towerdefense;
 
 import com.Geary.towerdefense.UI.CameraController;
+import com.Geary.towerdefense.behaviour.buildings.manager.MineManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TowerManager;
+import com.Geary.towerdefense.behaviour.buildings.manager.TransportManager;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -9,6 +11,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 public class GameInputProcessor extends InputAdapter {
 
     private final TowerManager towerManager;
+    private final MineManager mineManager;
+    private final TransportManager transportManager;
     private final CameraController cameraController;
     private final Viewport uiViewport;
     private int lastMouseX, lastMouseY;
@@ -19,9 +23,11 @@ public class GameInputProcessor extends InputAdapter {
     private WorldClickListener worldClickListener;
     private UiClickListener uiClickListener;
 
-    public GameInputProcessor(TowerManager towerManager, CameraController cameraController,
+    public GameInputProcessor(TowerManager towerManager, MineManager mineManager, TransportManager transportManager, CameraController cameraController,
                               Viewport uiViewport) {
         this.towerManager = towerManager;
+        this.mineManager = mineManager;
+        this.transportManager = transportManager;
         this.cameraController = cameraController;
         this.uiViewport = uiViewport;
     }
@@ -82,7 +88,7 @@ public class GameInputProcessor extends InputAdapter {
             }
         }
 
-        if (!towerManager.isPlacementActive() && !isDraggingCamera) {
+        if (!isAnyPlacementActive() && !isDraggingCamera) {
             if (worldClickListener != null) {
                 worldClickListener.onTowerClick(screenX, screenY);
             }
@@ -90,6 +96,12 @@ public class GameInputProcessor extends InputAdapter {
         }
 
         return false;
+    }
+
+    private boolean isAnyPlacementActive() {
+        return towerManager.isPlacementActive() ||
+            transportManager.isPlacementActive() ||
+            mineManager.isPlacementActive();
     }
 
     @Override

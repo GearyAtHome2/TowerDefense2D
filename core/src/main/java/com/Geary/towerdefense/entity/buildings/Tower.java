@@ -6,6 +6,7 @@ import com.Geary.towerdefense.behaviour.targeting.TargetingHelper;
 import com.Geary.towerdefense.entity.mob.Bullet;
 import com.Geary.towerdefense.entity.mob.Enemy;
 import com.Geary.towerdefense.world.GameWorld;
+import com.badlogic.gdx.graphics.Color;
 
 import java.util.List;
 
@@ -90,6 +91,18 @@ public class Tower extends Building {
         float aimY = ey + vy * t;
 
         return new float[]{aimX, aimY};
+    }
+
+    @Override
+    public List<String> getInfoLines() {
+        return List.of(
+            "Cooldown: " + (int)Math.ceil(cooldown * 10),
+            "Range: " + range
+        );
+    }
+
+    public Color getInfoTextColor() {
+        return Color.GOLDENROD; // default
     }
 
 }

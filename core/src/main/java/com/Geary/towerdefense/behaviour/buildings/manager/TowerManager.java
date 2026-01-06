@@ -37,10 +37,6 @@ public class TowerManager {
         }
     }
 
-    public void togglePlacementKb(boolean ctrlHeld) {
-        towerPlacementKbActive = ctrlHeld;
-    }
-
     public boolean handlePlacement() {
         if (!isPlacementActive()) {
             world.ghostTower = null;
@@ -95,7 +91,7 @@ public class TowerManager {
             if (tower.currentTarget == null || tower.currentTarget.health <= 0 ||
                 tower.getDistanceTo(tower.currentTarget) > tower.range) {
                 //todo: tower behaviour switch here - maybe this is an unlockable tech?
-//                tower.currentTarget = tower.findTarget(world.enemies);
+                tower.currentTarget = tower.findTarget(world.enemies);
                 tower.currentTarget = tower.findTargetFurthestProgressed(world.enemies);
             }
 
