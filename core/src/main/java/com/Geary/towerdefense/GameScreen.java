@@ -1,9 +1,11 @@
 package com.Geary.towerdefense;
 
-import com.Geary.towerdefense.UI.BuildingUI;
 import com.Geary.towerdefense.UI.CameraController;
 import com.Geary.towerdefense.UI.GameUI;
-import com.Geary.towerdefense.UI.displays.BuildingSelectionHandler;
+import com.Geary.towerdefense.UI.displays.building.BuildingSelectionHandler;
+import com.Geary.towerdefense.UI.displays.building.BuildingUI;
+import com.Geary.towerdefense.UI.displays.building.BuildingUIManager;
+import com.Geary.towerdefense.UI.displays.building.specialized.FactoryMenu;
 import com.Geary.towerdefense.UI.render.*;
 import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.world.GameStateManager;
@@ -48,13 +50,17 @@ public class GameScreen implements Screen {
     private TransportRenderer transportRenderer;
     private TowerRenderer towerRenderer;
     private MineRenderer mineRenderer;
+    private FactoryRenderer factoryRenderer;
 
-    private BuildingUI buildingUI;
+    private BuildingUIManager buildingUIManager;
+    private BuildingUI activeBuildingUI;
 
     private GameInputProcessor inputProcessor;
     private GameStateManager gameStateManager;
 
     private Building selectedBuilding = null;
+
+    boolean escConsumedByMenu = false;
 
     @Override
     public void show() {
@@ -80,7 +86,7 @@ public class GameScreen implements Screen {
     }
 
     public void initHandlers() {
-        placementHandler = new PlacementHandler(world.getTowerManager(), world.getTransportManager(), world.getMineManager());
+        placementHandler = new PlacementHandler(world.getTowerManager(), world.getTransportManager(), world.getMineManager(), world.getFactoryManager());
         buildingSelectionHandler = new BuildingSelectionHandler(world, worldViewport);
     }
 
@@ -90,35 +96,56 @@ public class GameScreen implements Screen {
         worldRenderer = new WorldRenderer(world, shapeRenderer);
         resourceRenderer = new ResourceRenderer(world, shapeRenderer);
         mineRenderer = new MineRenderer(world, shapeRenderer);
+        factoryRenderer = new FactoryRenderer(world, shapeRenderer);
     }
 
     private void initUI() {
         gameUI = new GameUI(shapeRenderer, batch, uiFont, uiViewport, world, world.getTowerManager(), world.getTransportManager(), world.getGameStateManager());
-        buildingUI = new BuildingUI(world, shapeRenderer, batch, uiFont);
+
+        buildingUIManager = new BuildingUIManager(world, shapeRenderer, batch, uiFont);
+        activeBuildingUI = null; // default UI
     }
 
     private void initInputProcessor() {
-        inputProcessor = new GameInputProcessor(world.getTowerManager(), world.getMineManager(), world.getTransportManager(), cameraController, uiViewport);
+        inputProcessor = new GameInputProcessor(world.getTowerManager(), world.getMineManager(), world.getTransportManager(), world.getFactoryManager(), cameraController, uiViewport);
 
         inputProcessor.setUiClickListener(uiClick -> gameUI.handleUiClick(uiClick));
 
         inputProcessor.setWorldClickListener((x, y) -> {
-            Building clicked = buildingSelectionHandler.getBuildingAtScreen(x, y);
-            if (selectedBuilding != null) {
-                buildingUI.handleClick(x, y, worldCamera);
-                if (buildingUI.consumeDeleteRequest()) {
+
+            if (world.getActiveFactoryMenu() != null) {
+                boolean consumed = world.getActiveFactoryMenu()
+                    .handleClick(x, y, worldCamera);
+
+                if (world.getActiveFactoryMenu().shouldClose()) {
+                    world.closeFactoryMenu();
+                }
+
+                if (consumed) {
+                    return; // 🚨 STOP propagation
+                }
+            }
+            // First: forward click to current UI (for buttons)
+            if (selectedBuilding != null && activeBuildingUI != null) {
+                activeBuildingUI.handleClick(x, y, worldCamera);
+                if (activeBuildingUI.consumeDeleteRequest()) {
                     world.deleteBuilding(selectedBuilding);
                     selectedBuilding = null;
+                    activeBuildingUI = null;
                     return;
                 }
             }
+
+            Building clicked = buildingSelectionHandler.getBuildingAtScreen(x, y);
             if (clicked != null) {
                 selectedBuilding = clicked;
+                activeBuildingUI = buildingUIManager.getUIFor(clicked);
             } else {
                 selectedBuilding = null;
-                buildingUI.clear();
+                activeBuildingUI = null;
             }
         });
+
 
         Gdx.input.setInputProcessor(inputProcessor);
     }
@@ -129,19 +156,30 @@ public class GameScreen implements Screen {
         delta *= gameStateManager.gameSpeed;
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+        FactoryMenu menu = world.getActiveFactoryMenu();
+        if (menu != null) {
+            menu.update();
+
+            if (menu.shouldClose()) {
+                world.closeFactoryMenu();
+                escConsumedByMenu = true;
+            }
+        } else {
+            //only handle placements if we're not in a menu
+            placementHandler.handlePlacements();
+            placementHandler.handleKeyboardInput(
+                Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT),
+                Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT),
+                Gdx.input.isKeyPressed(Input.Keys.Z),
+                Gdx.input.isKeyPressed(Input.Keys.X));
+        }
+        if (!escConsumedByMenu && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             gameStateManager.togglePause();
         }
         cameraController.update();
-        placementHandler.handlePlacements();
         if (!gameStateManager.paused) {
             world.update(delta);
         }
-        placementHandler.handleKeyboardInput(
-            Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT),
-            Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT),
-            Gdx.input.isKeyPressed(Input.Keys.Z)
-        );
 
         drawWorld(delta);
         gameUI.updateHover(Gdx.input.getX(), Gdx.input.getY());
@@ -164,9 +202,13 @@ public class GameScreen implements Screen {
     }
 
     private void drawWorldActors(float delta) {
-        worldRenderer.drawActors(batch, world.getSparkManager(), towerRenderer, transportRenderer, mineRenderer);
+        worldRenderer.drawActors(batch, world.getSparkManager(), towerRenderer, transportRenderer, mineRenderer, factoryRenderer);
         if (selectedBuilding != null) {
-            buildingUI.drawBuildingPopup(selectedBuilding, worldCamera.zoom);
+            activeBuildingUI.drawBuildingPopup(selectedBuilding, worldCamera.zoom);
+        }
+        if (world.getActiveFactoryMenu() != null) {
+            world.getActiveFactoryMenu().layout(worldCamera);
+            world.getActiveFactoryMenu().draw(shapeRenderer, batch, worldCamera);
         }
     }
 

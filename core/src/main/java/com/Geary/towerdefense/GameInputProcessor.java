@@ -1,6 +1,7 @@
 package com.Geary.towerdefense;
 
 import com.Geary.towerdefense.UI.CameraController;
+import com.Geary.towerdefense.behaviour.buildings.manager.FactoryManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.MineManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TowerManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TransportManager;
@@ -13,6 +14,7 @@ public class GameInputProcessor extends InputAdapter {
     private final TowerManager towerManager;
     private final MineManager mineManager;
     private final TransportManager transportManager;
+    private final FactoryManager factoryManager;
     private final CameraController cameraController;
     private final Viewport uiViewport;
     private int lastMouseX, lastMouseY;
@@ -23,10 +25,11 @@ public class GameInputProcessor extends InputAdapter {
     private WorldClickListener worldClickListener;
     private UiClickListener uiClickListener;
 
-    public GameInputProcessor(TowerManager towerManager, MineManager mineManager, TransportManager transportManager, CameraController cameraController,
+    public GameInputProcessor(TowerManager towerManager, MineManager mineManager, TransportManager transportManager, FactoryManager factoryManager, CameraController cameraController,
                               Viewport uiViewport) {
         this.towerManager = towerManager;
         this.mineManager = mineManager;
+        this.factoryManager = factoryManager;
         this.transportManager = transportManager;
         this.cameraController = cameraController;
         this.uiViewport = uiViewport;
@@ -101,7 +104,8 @@ public class GameInputProcessor extends InputAdapter {
     private boolean isAnyPlacementActive() {
         return towerManager.isPlacementActive() ||
             transportManager.isPlacementActive() ||
-            mineManager.isPlacementActive();
+            mineManager.isPlacementActive() ||
+            factoryManager.isPlacementActive();
     }
 
     @Override

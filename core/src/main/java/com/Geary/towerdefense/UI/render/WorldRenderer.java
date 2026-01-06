@@ -111,7 +111,7 @@ public class WorldRenderer {
     }
 
     public void drawActors(SpriteBatch batch, SparkManager sparkManager, TowerRenderer towerRenderer,
-                           TransportRenderer transportRenderer, MineRenderer mineRenderer) {
+                           TransportRenderer transportRenderer, MineRenderer mineRenderer, FactoryRenderer factoryRenderer) {
         // Draw enemies, friends, bullets with SpriteBatch
         batch.begin();
         for (Enemy e : world.enemies) e.draw(batch);
@@ -126,6 +126,8 @@ public class WorldRenderer {
 
         transportRenderer.drawTransports();
         mineRenderer.drawMines();
+        factoryRenderer.drawFactories();
+
         for (EnemySpawner es : world.enemySpawners) es.draw(shapeRenderer);
         for (FriendlySpawner fs : world.friendlySpawners) fs.draw(shapeRenderer);
         towerRenderer.drawTowers();

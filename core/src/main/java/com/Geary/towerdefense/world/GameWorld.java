@@ -1,17 +1,16 @@
 package com.Geary.towerdefense.world;
 
 import com.Geary.towerdefense.Direction;
+import com.Geary.towerdefense.UI.displays.building.specialized.FactoryMenu;
 import com.Geary.towerdefense.behaviour.MobManager;
 import com.Geary.towerdefense.behaviour.ResourceManager;
 import com.Geary.towerdefense.behaviour.SparkManager;
 import com.Geary.towerdefense.behaviour.SpawnerManager;
+import com.Geary.towerdefense.behaviour.buildings.manager.FactoryManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.MineManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TowerManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TransportManager;
-import com.Geary.towerdefense.entity.buildings.Building;
-import com.Geary.towerdefense.entity.buildings.Mine;
-import com.Geary.towerdefense.entity.buildings.Tower;
-import com.Geary.towerdefense.entity.buildings.Transport;
+import com.Geary.towerdefense.entity.buildings.*;
 import com.Geary.towerdefense.entity.mob.Bullet;
 import com.Geary.towerdefense.entity.mob.Enemy;
 import com.Geary.towerdefense.entity.mob.Friendly;
@@ -47,6 +46,8 @@ public class GameWorld {
     public Transport ghostTransport = null;
     public List<Mine> mines = new ArrayList<>();
     public Mine ghostMine = null;
+    public List<Factory> factories = new ArrayList<>();
+    public Factory ghostFactory = null;
 
     public List<Enemy> enemies = new ArrayList<>();
     public List<Friendly> friends = new ArrayList<>();
@@ -58,10 +59,13 @@ public class GameWorld {
     private TowerManager towerManager;
     private TransportManager transportManager;
     private MineManager mineManager;
+    private FactoryManager factoryManager;
     private MobManager mobManager;
     private SparkManager sparkManager;
     private SpawnerManager spawnerManager;
     private GameStateManager gameStateManager;
+
+    private FactoryMenu activeFactoryMenu;
 
     public GameWorld() {
         grid = new Cell[gridWidth][gridHeight];
@@ -81,17 +85,11 @@ public class GameWorld {
         towerManager = new TowerManager(this, worldCamera);
         transportManager = new TransportManager(this, worldCamera);
         mineManager = new MineManager(this, worldCamera);
+        factoryManager = new FactoryManager(this, worldCamera);
         mobManager = new MobManager(this, sparkManager); // no camera
         spawnerManager = new SpawnerManager(this);       // no camera
         gameStateManager = new GameStateManager();
     }
-    public TowerManager getTowerManager() { return towerManager; }
-    public TransportManager getTransportManager() { return transportManager; }
-    public MineManager getMineManager() { return mineManager; }
-    public MobManager getMobManager() { return mobManager; }
-    public SparkManager getSparkManager() { return sparkManager; }
-    public SpawnerManager getSpawnerManager() { return spawnerManager; }
-    public GameStateManager getGameStateManager(){ return gameStateManager; }
 
     private void generateWorld(Map<Resource.RawResourceType, Integer> resourceAllocation) {
         clearWorld();
@@ -161,7 +159,7 @@ public class GameWorld {
             if (i == 0) {
                 enemySpawners.add(new EnemySpawner(cell.x, cell.y));
             }
-            if (i == (generatedPath.size()-1)) {
+            if (i == (generatedPath.size() - 1)) {
                 FriendlySpawner spawner = new FriendlySpawner(cell.x, cell.y);
                 friendlySpawners.add(spawner);
                 grid[gx][gy].building = spawner;
@@ -201,7 +199,6 @@ public class GameWorld {
         }
     }
 
-    /** Update all in-world events; called from GameScreen */
     public void update(float delta) {
         towerManager.updateTowers(this.bullets, delta);
         transportManager.updateTransports(delta);
@@ -209,17 +206,13 @@ public class GameWorld {
         spawnerManager.update(delta);
         sparkManager.update(delta);
         mineManager.animateMines(delta);
+        factoryManager.animateFactories(delta);
         gameStateManager.addResources(mineManager.calculateResourcesGenerated(delta));
-    }
-
-    public void handleResourceGeneration(){
-
     }
 
     public void deleteBuilding(Building building) {
         if (building == null) return;
 
-        // Remove from type-specific lists
         if (building instanceof Tower tower) {
             towers.remove(tower);
             towerManager.deleteTower(tower); // you may need a helper for clearing occupied cells
@@ -229,7 +222,11 @@ public class GameWorld {
         } else if (building instanceof Mine mine) {
             mines.remove(mine);
             mineManager.deleteBuilding(mine, mines);
+        } else if (building instanceof Factory factory) {
+            factories.remove(factory);
+            factoryManager.deleteBuilding(factory, factories);
         }
+
 
         // Clear grid cell
         int x = (int) building.xPos / cellSize;
@@ -243,5 +240,47 @@ public class GameWorld {
         transportManager.updateAllTransportLinks();
     }
 
+    public void showFactoryMenu(Factory factory) {
+        activeFactoryMenu = new FactoryMenu(factory);
+    }
 
+    public void closeFactoryMenu() {
+        activeFactoryMenu = null;
+    }
+
+    public FactoryMenu getActiveFactoryMenu() {
+        return activeFactoryMenu;
+    }
+
+    public TowerManager getTowerManager() {
+        return towerManager;
+    }
+
+    public TransportManager getTransportManager() {
+        return transportManager;
+    }
+
+    public MineManager getMineManager() {
+        return mineManager;
+    }
+
+    public FactoryManager getFactoryManager() {
+        return factoryManager;
+    }
+
+    public MobManager getMobManager() {
+        return mobManager;
+    }
+
+    public SparkManager getSparkManager() {
+        return sparkManager;
+    }
+
+    public SpawnerManager getSpawnerManager() {
+        return spawnerManager;
+    }
+
+    public GameStateManager getGameStateManager() {
+        return gameStateManager;
+    }
 }

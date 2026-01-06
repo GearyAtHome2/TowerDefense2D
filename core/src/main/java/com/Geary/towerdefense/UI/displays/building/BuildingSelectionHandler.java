@@ -1,5 +1,6 @@
-package com.Geary.towerdefense.UI.displays;
+package com.Geary.towerdefense.UI.displays.building;
 
+import com.Geary.towerdefense.UI.displays.UIClickManager;
 import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.math.Vector3;
@@ -33,6 +34,11 @@ public class BuildingSelectionHandler {
             }
         }
         for (Building b : world.transports) {
+            if (isClickInsideBuilding(worldClick, b)) {
+                return b;
+            }
+        }
+        for (Building b : world.factories) {
             if (isClickInsideBuilding(worldClick, b)) {
                 return b;
             }

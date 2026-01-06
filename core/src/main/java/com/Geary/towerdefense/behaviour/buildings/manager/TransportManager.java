@@ -121,6 +121,7 @@ public class TransportManager extends BuildingManager<Transport> {
             for (Transport t : world.transports) changed |= updateIfConnected(t);
             for (Tower t : world.towers) changed |= updateIfConnected(t);
             for (Mine m : world.mines) changed |= updateIfConnected(m);
+            for (Factory f : world.factories) changed |= updateIfConnected(f);
         } while (changed);
     }
 
