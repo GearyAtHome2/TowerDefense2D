@@ -9,7 +9,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 
 public class TransportManager {
     private final GameWorld world;
@@ -22,7 +24,7 @@ public class TransportManager {
         this.camera = camera;
     }
 
-    public void setPlacementKeyboardActive(boolean isActive){
+    public void setPlacementKeyboardActive(boolean isActive) {
         transportPlacementKbActive = isActive;
     }
 
@@ -31,7 +33,7 @@ public class TransportManager {
     }
 
     public void togglePlacementClick() {
-            transportPlacementButtonActive = !transportPlacementButtonActive;
+        transportPlacementButtonActive = !transportPlacementButtonActive;
     }
 
     public void togglePlacementKb(boolean ctrlHeld) {
@@ -88,17 +90,32 @@ public class TransportManager {
     }
 
     public void updateAllTransportLinks() {
+        List<Building> allBuildings = new ArrayList<>();
+        allBuildings.addAll(world.transports);
+        allBuildings.addAll(world.towers);
+        allBuildings.addAll(world.mines);
+
+        // Step 1: Clear network status
+        for (Building b : allBuildings) {
+            b.isConnectedToNetwork = false;
+        }
         boolean changed;
         do {
             changed = false;
             for (Transport t : world.transports) {
-                changed |= updateIfConnected(t);
+                if (!t.isConnectedToNetwork) {
+                    changed |= updateIfConnected(t);
+                }
             }
             for (Tower t : world.towers) {
-                changed |= updateIfConnected(t);
+                if (!t.isConnectedToNetwork) {
+                    changed |= updateIfConnected(t);
+                }
             }
             for (Mine m : world.mines) {
-                changed |= updateIfConnected(m);
+                if (!m.isConnectedToNetwork) {
+                    changed |= updateIfConnected(m);
+                }
             }
 
         } while (changed);
@@ -177,7 +194,7 @@ public class TransportManager {
         }
     }
 
-    public void deleteTransport(Transport transport){
+    public void deleteTransport(Transport transport) {
         if (transport == null) return;
 
         int x = (int) transport.xPos / world.cellSize;

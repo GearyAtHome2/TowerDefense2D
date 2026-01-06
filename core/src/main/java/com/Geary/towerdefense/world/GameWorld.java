@@ -229,7 +229,6 @@ public class GameWorld {
             }
             occupied[x][y] = false;
         }
-
         transportManager.updateAllTransportLinks();
     }
 
