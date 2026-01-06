@@ -142,6 +142,7 @@ public class GameScreen implements Screen {
         );
 
         drawWorld(delta);
+        gameUI.updateHover(Gdx.input.getX(), Gdx.input.getY());
         gameUI.drawUI(gameStateManager.paused, gameStateManager.gameSpeed);
     }
 

@@ -17,15 +17,15 @@ public class ResourceManager {
         this.world = world;
     }
 
-    public void populate(Map<Resource.ResourceType, Integer> resourceAllocation) {
+    public void populate(Map<Resource.RawResourceType, Integer> resourceAllocation) {
         List<Cell> freeCells = world.getFreeCells();
         if (freeCells.isEmpty()) return;
 
-        for (Resource.ResourceType resourceType : resourceAllocation.keySet()){
-            int quantity = resourceAllocation.get(resourceType);
+        for (Resource.RawResourceType rawResourceType : resourceAllocation.keySet()){
+            int quantity = resourceAllocation.get(rawResourceType);
             Collections.shuffle(freeCells);
             for (int i = 0; i < quantity; i++) {
-                placeResource(freeCells.get(i), resourceType);
+                placeResource(freeCells.get(i), rawResourceType);
             }
         };
 
@@ -37,7 +37,7 @@ public class ResourceManager {
         return MathUtils.random(min, max);
     }
 
-    private void placeResource(Cell cell, Resource.ResourceType resourceType) {
+    private void placeResource(Cell cell, Resource.RawResourceType rawResourceType) {
         float abundance;
         switch (cell.type) {
             case HOME -> {
@@ -61,7 +61,7 @@ public class ResourceManager {
             }
         }
         System.out.println("placed mine of abundance: "+abundance);
-        cell.resource = new Resource(resourceType, abundance);
+        cell.resource = new Resource(rawResourceType, abundance);
     }
 
 }

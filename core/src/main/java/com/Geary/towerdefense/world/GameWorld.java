@@ -38,7 +38,7 @@ public class GameWorld {
     public Cell[][] grid;
     public boolean[][] occupied = new boolean[gridWidth][gridHeight];
 
-    Map<Resource.ResourceType, Integer> resourceAllocation = new HashMap<>();
+    Map<Resource.RawResourceType, Integer> resourceAllocation = new HashMap<>();
     public List<Cell> path = new ArrayList<>();
 
     public List<Tower> towers = new ArrayList<>();
@@ -67,7 +67,12 @@ public class GameWorld {
         grid = new Cell[gridWidth][gridHeight];
         occupied = new boolean[gridWidth][gridHeight];
         this.resourceManager = new ResourceManager(this);
-        resourceAllocation.put(Resource.ResourceType.IRON, 4);
+        resourceAllocation.put(Resource.RawResourceType.IRON, 2);
+        resourceAllocation.put(Resource.RawResourceType.COAL, 2);
+        resourceAllocation.put(Resource.RawResourceType.COPPER, 2);
+        resourceAllocation.put(Resource.RawResourceType.STONE, 2);
+        resourceAllocation.put(Resource.RawResourceType.TIN, 2);
+
         generateWorld(resourceAllocation);
     }
 
@@ -88,7 +93,7 @@ public class GameWorld {
     public SpawnerManager getSpawnerManager() { return spawnerManager; }
     public GameStateManager getGameStateManager(){ return gameStateManager; }
 
-    private void generateWorld(Map<Resource.ResourceType, Integer> resourceAllocation) {
+    private void generateWorld(Map<Resource.RawResourceType, Integer> resourceAllocation) {
         clearWorld();
         generateZones();
         populatePath();

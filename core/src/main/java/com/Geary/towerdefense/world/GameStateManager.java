@@ -24,13 +24,17 @@ public class GameStateManager {
         if (com.badlogic.gdx.Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) gameSpeed = 9f;
     }
 
-    public EnumMap<Resource.ResourceType, Float> getResourceCount() {
-        return gameState.resources;
+    public EnumMap<Resource.RawResourceType, Double> getRawResourceCount() {
+        return gameState.rawResources;
     }
 
-    public void addResources(EnumMap<Resource.ResourceType, Float> resources) {
-        for (Resource.ResourceType type : resources.keySet()) {
-            gameState.resources.put(type, gameState.resources.getOrDefault(type, 0f) + resources.get(type));
+    public EnumMap<Resource.RefinedResourceType, Double> getRefinedResourceCount() {
+        return gameState.refinedResources;
+    }
+
+    public void addResources(EnumMap<Resource.RawResourceType, Float> resources) {
+        for (Resource.RawResourceType type : resources.keySet()) {
+            gameState.rawResources.put(type, gameState.rawResources.getOrDefault(type, 0.0) + resources.get(type));
         }
     }
 }

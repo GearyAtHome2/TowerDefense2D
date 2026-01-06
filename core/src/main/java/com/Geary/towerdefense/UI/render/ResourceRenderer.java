@@ -47,7 +47,7 @@ public class ResourceRenderer {
             case STONE -> Color.LIGHT_GRAY;
             case COPPER -> Color.GOLDENROD;
             case TIN -> Color.SLATE;
-            case IRON -> Color.LIGHT_GRAY;
+            case IRON -> Color.FIREBRICK;
             case COAL -> Color.DARK_GRAY;
         };
     }

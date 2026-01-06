@@ -10,15 +10,17 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
+import java.util.*;
 
 public class TransportManager {
     private final GameWorld world;
     private final OrthographicCamera camera;
     private boolean transportPlacementButtonActive = false;
     private boolean transportPlacementKbActive = false;
+    private boolean isDragging = false;
+    private int dragStartX = -1;
+    private int dragStartY = -1;
+    private final Set<Cell> draggedCells = new HashSet<>();
 
     public TransportManager(GameWorld world, OrthographicCamera camera) {
         this.world = world;
@@ -44,15 +46,20 @@ public class TransportManager {
     public boolean handlePlacement() {
         if (!isPlacementActive()) {
             world.ghostTransport = null;
+            isDragging = false;
+            draggedCells.clear();
             return false;
         }
 
         float screenX = Gdx.input.getX();
         float screenY = Gdx.input.getY();
         if (!UIClickManager.isClickInGameArea(screenY)) {
-            world.ghostTower = null;
+            world.ghostTransport = null;
+            isDragging = false;
+            draggedCells.clear();
             return false;
         }
+
         Vector3 worldPos = new Vector3(screenX, screenY, 0);
         camera.unproject(worldPos);
 
@@ -67,35 +74,55 @@ public class TransportManager {
 
         Cell cell = world.grid[x][y];
         Cell.Type type = cell.type;
-
         boolean bridge = type == Cell.Type.PATH || type == Cell.Type.TURN;
-
         boolean canPlace = !world.occupied[x][y] && cell.bridgable &&
             (type == Cell.Type.EMPTY || type == Cell.Type.HOME || bridge);
 
         EnumSet<Direction> adjacentTransports = checkAdjacentTiles(x, y);
 
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && canPlace) {
-            Transport transport = bridge ? new Bridge(x * GameWorld.cellSize, y * GameWorld.cellSize, adjacentTransports) :
-                new Transport(x * GameWorld.cellSize, y * GameWorld.cellSize, adjacentTransports);
-            world.transports.add(transport);
-            world.grid[x][y].building = transport;
-            world.occupied[x][y] = true;//todo: maybe not this? Would like to be able to override transports in future
-            world.ghostTransport = null;
-            return true;
-        } else if (canPlace) {
-            if (world.ghostTransport == null) {
-                world.ghostTransport = new Transport(x * GameWorld.cellSize, y * GameWorld.cellSize, adjacentTransports);
-            } else {
-                world.ghostTransport.directions = adjacentTransports;
-                world.ghostTransport.xPos = x * GameWorld.cellSize;
-                world.ghostTransport.yPos = y * GameWorld.cellSize;
+        // --- Start drag ---
+        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+            if (!isDragging) {
+                isDragging = true;
+                dragStartX = x;
+                dragStartY = y;
+                draggedCells.clear();
             }
+
+            // Place transport if tile is valid and not already placed in this drag
+            if (canPlace && !draggedCells.contains(cell)) {
+                Transport transport = bridge ? new Bridge(x * GameWorld.cellSize, y * GameWorld.cellSize, adjacentTransports) :
+                    new Transport(x * GameWorld.cellSize, y * GameWorld.cellSize, adjacentTransports);
+                world.transports.add(transport);
+                world.grid[x][y].building = transport;
+                world.occupied[x][y] = true; // TODO: consider allowing override
+                draggedCells.add(cell);
+            }
+
+            // Update ghost transport at current cursor
+            if (canPlace) {
+                if (world.ghostTransport == null) {
+                    world.ghostTransport = new Transport(x * GameWorld.cellSize, y * GameWorld.cellSize, adjacentTransports);
+                } else {
+                    world.ghostTransport.directions = adjacentTransports;
+                    world.ghostTransport.xPos = x * GameWorld.cellSize;
+                    world.ghostTransport.yPos = y * GameWorld.cellSize;
+                }
+            } else {
+                world.ghostTransport = null;
+            }
+
+            return true; // handled placement this frame
         } else {
+            // Mouse released: end drag
+            isDragging = false;
+            draggedCells.clear();
             world.ghostTransport = null;
         }
+
         return false;
     }
+
 
     public void updateAllTransportLinks() {
         List<Building> allBuildings = new ArrayList<>();

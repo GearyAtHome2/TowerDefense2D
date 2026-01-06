@@ -3,12 +3,13 @@ package com.Geary.towerdefense.entity.resources;
 public class Resource {
     public float xPos, yPos;
     public float resourceAbundance;
-    public ResourceType type;
+    public RawResourceType type;
 
-    public Resource(ResourceType type, float resourceAbundance){
+    public Resource(RawResourceType type, float resourceAbundance){
         this.type = type;
         this.resourceAbundance = resourceAbundance;
     }
 
-    public enum ResourceType { STONE, COPPER, TIN, IRON, COAL}
+    public enum RawResourceType { STONE, COPPER, TIN, IRON, COAL}
+    public enum RefinedResourceType {BASIC_AMMO, BASIC_WEAPONS}
 }

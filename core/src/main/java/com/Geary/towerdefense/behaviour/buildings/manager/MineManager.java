@@ -87,12 +87,12 @@ public class MineManager {
         return false;
     }
 
-    public EnumMap<Resource.ResourceType, Float> calculateResourcesGeneratedForMines(float delta){
-        EnumMap<Resource.ResourceType, Float> generatedResource = new EnumMap<>(Resource.ResourceType.class);
+    public EnumMap<Resource.RawResourceType, Float> calculateResourcesGeneratedForMines(float delta){
+        EnumMap<Resource.RawResourceType, Float> generatedResource = new EnumMap<>(Resource.RawResourceType.class);
 
         for (Mine mine : world.mines){
             if (mine.isConnectedToNetwork) {
-                Resource.ResourceType type = mine.resource.type;
+                Resource.RawResourceType type = mine.resource.type;
                 float quantity = mine.resource.resourceAbundance * delta;
                 generatedResource.put(type, generatedResource.getOrDefault(type, 0f) + quantity);
             }

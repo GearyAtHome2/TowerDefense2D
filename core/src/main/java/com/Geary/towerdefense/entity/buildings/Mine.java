@@ -10,7 +10,7 @@ public class Mine extends Building {
 
     public Mine(float x, float y) {
         super(x, y);
-        this.resource = new Resource(Resource.ResourceType.COAL, 0.1f);
+        this.resource = new Resource(Resource.RawResourceType.COAL, 0.1f);
     }
 
     public Mine(float x, float y, Resource resource) {
