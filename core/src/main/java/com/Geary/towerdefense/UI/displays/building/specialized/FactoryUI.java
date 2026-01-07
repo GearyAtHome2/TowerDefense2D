@@ -25,7 +25,6 @@ public class FactoryUI extends BuildingUI {
 
         extraButtons.add(new BuildingUIButton("Open Factory Menu", 0.2f, 0.6f, 1f, () -> {
             world.showFactoryMenu((Factory) building);
-            System.out.println("opening factory menu");
         }) {{
             bounds.set(buttonX, buttonY, buttonWidth, buttonHeight);
         }});

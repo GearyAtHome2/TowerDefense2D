@@ -68,12 +68,12 @@ public class TransportManager extends BuildingManager<Transport> {
 
     @Override
     public boolean handlePlacement() {
-        if (!isPlacementActive()) {
+        Vector3 worldPos = getWorldMousePosition();
+
+        if (!isPlacementActive() || worldPos == null) {
             resetGhost();
             return false;
         }
-
-        Vector3 worldPos = getWorldMousePosition();
         int x = (int) (worldPos.x / world.cellSize);
         int y = (int) (worldPos.y / world.cellSize);
 
