@@ -1,6 +1,6 @@
 package com.Geary.towerdefense.UI.displays.building;
 
-import com.Geary.towerdefense.UI.displays.building.specialized.FactoryUI;
+import com.Geary.towerdefense.UI.displays.building.specialized.factory.FactoryUI;
 import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.entity.buildings.Factory;
 import com.Geary.towerdefense.world.GameWorld;

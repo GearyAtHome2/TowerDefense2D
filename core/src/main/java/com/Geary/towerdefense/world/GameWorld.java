@@ -1,7 +1,7 @@
 package com.Geary.towerdefense.world;
 
 import com.Geary.towerdefense.Direction;
-import com.Geary.towerdefense.UI.displays.building.specialized.FactoryMenu;
+import com.Geary.towerdefense.UI.displays.building.specialized.factory.FactoryMenu;
 import com.Geary.towerdefense.behaviour.MobManager;
 import com.Geary.towerdefense.behaviour.ResourceManager;
 import com.Geary.towerdefense.behaviour.SparkManager;
@@ -20,6 +20,7 @@ import com.Geary.towerdefense.entity.spawner.FriendlySpawner;
 import com.Geary.towerdefense.entity.world.Cell;
 import com.Geary.towerdefense.pathGeneration.PathGenerator;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.MathUtils;
 
 import java.util.ArrayList;
@@ -240,8 +241,8 @@ public class GameWorld {
         transportManager.updateAllTransportLinks();
     }
 
-    public void showFactoryMenu(Factory factory) {
-        activeFactoryMenu = new FactoryMenu(factory);
+    public void showFactoryMenu(Factory factory, BitmapFont font) {
+        activeFactoryMenu = new FactoryMenu(factory, font);
     }
 
     public void closeFactoryMenu() {

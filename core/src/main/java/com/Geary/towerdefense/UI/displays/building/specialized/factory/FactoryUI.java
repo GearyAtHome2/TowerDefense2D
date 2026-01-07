@@ -1,4 +1,4 @@
-package com.Geary.towerdefense.UI.displays.building.specialized;
+package com.Geary.towerdefense.UI.displays.building.specialized.factory;
 
 import com.Geary.towerdefense.UI.displays.building.BuildingUI;
 import com.Geary.towerdefense.entity.buildings.Building;
@@ -24,7 +24,7 @@ public class FactoryUI extends BuildingUI {
         float buttonY = popupY + 40; // above delete button
 
         extraButtons.add(new BuildingUIButton("Open Factory Menu", 0.2f, 0.6f, 1f, () -> {
-            world.showFactoryMenu((Factory) building);
+            world.showFactoryMenu((Factory) building, font);
         }) {{
             bounds.set(buttonX, buttonY, buttonWidth, buttonHeight);
         }});

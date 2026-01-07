@@ -5,7 +5,7 @@ import com.Geary.towerdefense.UI.GameUI;
 import com.Geary.towerdefense.UI.displays.building.BuildingSelectionHandler;
 import com.Geary.towerdefense.UI.displays.building.BuildingUI;
 import com.Geary.towerdefense.UI.displays.building.BuildingUIManager;
-import com.Geary.towerdefense.UI.displays.building.specialized.FactoryMenu;
+import com.Geary.towerdefense.UI.displays.building.specialized.factory.FactoryMenu;
 import com.Geary.towerdefense.UI.render.*;
 import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.world.GameStateManager;
@@ -115,7 +115,7 @@ public class GameScreen implements Screen {
 
             if (world.getActiveFactoryMenu() != null) {
                 boolean consumed = world.getActiveFactoryMenu()
-                    .handleClick(x, y, worldCamera);
+                    .handleClick(x, y);
 
                 if (world.getActiveFactoryMenu().shouldClose()) {
                     world.closeFactoryMenu();
@@ -164,6 +164,7 @@ public class GameScreen implements Screen {
                 world.closeFactoryMenu();
                 escConsumedByMenu = true;
             }
+            inputProcessor.setActiveModal(menu, worldCamera);
         } else {
             //only handle placements if we're not in a menu
             placementHandler.handlePlacements();
@@ -172,6 +173,7 @@ public class GameScreen implements Screen {
                 Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT),
                 Gdx.input.isKeyPressed(Input.Keys.Z),
                 Gdx.input.isKeyPressed(Input.Keys.X));
+            inputProcessor.setActiveModal(null, null);
         }
         if (!escConsumedByMenu && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             gameStateManager.togglePause();
@@ -207,8 +209,12 @@ public class GameScreen implements Screen {
             activeBuildingUI.drawBuildingPopup(selectedBuilding, worldCamera.zoom);
         }
         if (world.getActiveFactoryMenu() != null) {
-            world.getActiveFactoryMenu().layout(worldCamera);
-            world.getActiveFactoryMenu().draw(shapeRenderer, batch, worldCamera);
+            world.getActiveFactoryMenu().layout(); // layout for size/position
+
+            uiViewport.apply();
+            batch.setProjectionMatrix(uiCamera.combined);
+            shapeRenderer.setProjectionMatrix(uiCamera.combined);
+            world.getActiveFactoryMenu().draw(shapeRenderer, batch); // pass UI camera
         }
     }
 
@@ -232,7 +238,9 @@ public class GameScreen implements Screen {
     private void setupUICamera() {
         uiCamera = new OrthographicCamera();
         uiViewport = new ScreenViewport(uiCamera);
-        uiCamera = createCamera(uiViewport, uiViewport.getWorldWidth() / 2f, uiViewport.getWorldHeight() / 2f);
+        uiViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+        uiCamera.position.set(uiViewport.getWorldWidth() / 2f, uiViewport.getWorldHeight() / 2f, 0);
+        uiCamera.update();
     }
 
     private OrthographicCamera createCamera(Viewport viewport, float posX, float posY) {

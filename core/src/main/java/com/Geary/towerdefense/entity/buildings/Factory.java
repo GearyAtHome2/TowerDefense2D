@@ -13,11 +13,14 @@ public class Factory extends Building {
 
     public Factory(float x, float y) {
         super(x, y);
-        Recipe recipe = new Recipe();
-        recipe.addInput(Resource.RawResourceType.IRON, 1);
-        recipe.addInput(Resource.RawResourceType.STONE, 1);
-        recipe.addOutput(Resource.RefinedResourceType.BASIC_AMMO, 50);
-        recipes.add(recipe);
+        for (int i = 0; i < 20; i++) {
+            Recipe recipe = new Recipe();
+            recipe.addInput(Resource.RawResourceType.IRON, 99999);
+            recipe.addInput(Resource.RawResourceType.STONE, 1);
+            recipe.addOutput(Resource.RefinedResourceType.BASIC_AMMO, 99999);
+            recipe.addOutput(Resource.RefinedResourceType.BASIC_WEAPONS, 1);
+            recipes.add(recipe);
+        }
     }
 
     public void updateAnimationState(float delta) {
@@ -33,7 +36,7 @@ public class Factory extends Building {
         );
     }
 
-    public void activateRecipe(Recipe recipe){
+    public void activateRecipe(Recipe recipe) {
         this.activeRecipe = recipe;
     }
 

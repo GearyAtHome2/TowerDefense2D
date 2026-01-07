@@ -1,11 +1,13 @@
 package com.Geary.towerdefense;
 
 import com.Geary.towerdefense.UI.CameraController;
+import com.Geary.towerdefense.UI.displays.building.specialized.factory.FactoryMenu;
 import com.Geary.towerdefense.behaviour.buildings.manager.FactoryManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.MineManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TowerManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TransportManager;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -25,6 +27,10 @@ public class GameInputProcessor extends InputAdapter {
     private WorldClickListener worldClickListener;
     private UiClickListener uiClickListener;
 
+    private FactoryMenu activeModal = null;
+    private OrthographicCamera worldCameraRef = null;
+
+
     public GameInputProcessor(TowerManager towerManager, MineManager mineManager, TransportManager transportManager, FactoryManager factoryManager, CameraController cameraController,
                               Viewport uiViewport) {
         this.towerManager = towerManager;
@@ -34,7 +40,6 @@ public class GameInputProcessor extends InputAdapter {
         this.cameraController = cameraController;
         this.uiViewport = uiViewport;
     }
-
     /**
      * Optional callback for world clicks
      */
@@ -44,6 +49,11 @@ public class GameInputProcessor extends InputAdapter {
 
     public void setUiClickListener(UiClickListener listener) {
         this.uiClickListener = listener;
+    }
+
+    public void setActiveModal(FactoryMenu modal, OrthographicCamera worldCamera) {
+        this.activeModal = modal;
+        this.worldCameraRef = worldCamera;
     }
 
     @Override
@@ -110,6 +120,13 @@ public class GameInputProcessor extends InputAdapter {
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
+        if (activeModal != null && worldCameraRef != null) {
+            boolean consumed = activeModal.handleScroll(amountY);
+            if (consumed) {
+                return true;
+            }
+        }
+
         cameraController.scrolled(amountX, amountY);
         return true;
     }
