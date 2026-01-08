@@ -14,7 +14,7 @@ public class Factory extends Building {
     public Factory(float x, float y) {
         super(x, y);
         for (int i = 0; i < 20; i++) {
-            Recipe recipe = new Recipe();
+            Recipe recipe = new Recipe("Recipe "+i);
             recipe.addInput(Resource.RawResourceType.IRON, 99999);
             recipe.addInput(Resource.RawResourceType.STONE, 1);
             recipe.addOutput(Resource.RefinedResourceType.BASIC_AMMO, 99999);

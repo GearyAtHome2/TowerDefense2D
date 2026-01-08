@@ -30,7 +30,7 @@ public class ScrollBox {
     }
 
     public void scroll(float deltaY) {
-        scrollOffset -= deltaY; // mouse wheel down = positive deltaY
+        scrollOffset += deltaY; // mouse wheel down = positive deltaY
 
         float maxOffset = Math.max(0, contentHeight - bounds.height);
         if (scrollOffset < 0) scrollOffset = 0;
@@ -48,7 +48,7 @@ public class ScrollBox {
             entry.bounds.width = bounds.width - 20;
 
             y -= entry.bounds.height;
-            entry.bounds.y = y + scrollOffset; // ← FIX
+            entry.bounds.y = y + scrollOffset;
             y -= spacing;
         }
     }
@@ -60,7 +60,7 @@ public class ScrollBox {
             if (entry.bounds.y + entry.bounds.height < bounds.y) continue;
             if (entry.bounds.y > bounds.y + bounds.height) continue;
 
-            entry.draw(renderer, batch, font, i);
+            entry.draw(renderer, batch, font);
         }
     }
 
@@ -75,14 +75,13 @@ public class ScrollBox {
     /**
      * Forward clicks to entries
      */
-    public boolean click(float x, float y) {
+    public RecipeMenuEntry  click(float x, float y) {
         for (RecipeMenuEntry entry : entries) {
             if (entry.bounds.contains(x, y)) {
-                entry.onClick.run();
-                return true;
+                return entry;
             }
         }
-        return false;
+        return null;
     }
 
     public void setContentHeight(float height) {

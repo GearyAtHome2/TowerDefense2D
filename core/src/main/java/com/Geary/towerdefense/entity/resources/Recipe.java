@@ -1,12 +1,16 @@
 package com.Geary.towerdefense.entity.resources;
 
-import java.util.EnumMap;
+import com.Geary.towerdefense.entity.resources.mapEntity.ResourceType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Recipe {
-    public final EnumMap<Resource.RawResourceType, Integer> inputs = new EnumMap<>(Resource.RawResourceType.class);
-    public final EnumMap<Resource.RefinedResourceType, Integer> outputs = new EnumMap<>(Resource.RefinedResourceType.class);
+    public String name;
+    public final Map<ResourceType, Integer> inputs = new HashMap<>();
+    public final Map<ResourceType, Integer> outputs = new HashMap<>();
 
-    public Recipe() {}
+    public Recipe(String name) {this.name=name;}
 
     public Recipe addInput(Resource.RawResourceType type, int amount) {
         inputs.put(type, amount);

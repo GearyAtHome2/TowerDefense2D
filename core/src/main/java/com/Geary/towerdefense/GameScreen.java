@@ -7,6 +7,7 @@ import com.Geary.towerdefense.UI.displays.building.BuildingUI;
 import com.Geary.towerdefense.UI.displays.building.BuildingUIManager;
 import com.Geary.towerdefense.UI.displays.building.specialized.factory.FactoryMenu;
 import com.Geary.towerdefense.UI.render.*;
+import com.Geary.towerdefense.UI.render.icons.IconStore;
 import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.world.GameStateManager;
 import com.Geary.towerdefense.world.GameWorld;
@@ -21,6 +22,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
+import javax.swing.*;
 
 public class GameScreen implements Screen {
 
@@ -64,6 +67,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
+        IconStore.load();
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         shapeRenderer.setAutoShapeType(true);
@@ -159,7 +163,7 @@ public class GameScreen implements Screen {
         FactoryMenu menu = world.getActiveFactoryMenu();
         if (menu != null) {
             menu.update();
-
+            menu.updateHover(Gdx.input.getX(), Gdx.input.getY(), uiViewport);
             if (menu.shouldClose()) {
                 world.closeFactoryMenu();
                 escConsumedByMenu = true;

@@ -1,22 +1,36 @@
 package com.Geary.towerdefense.UI.displays.building.specialized.factory;
 
+import com.Geary.towerdefense.UI.render.icons.IconStore;
+import com.Geary.towerdefense.UI.text.TextFormatter;
 import com.Geary.towerdefense.entity.resources.Recipe;
 import com.Geary.towerdefense.entity.resources.Resource;
+import com.Geary.towerdefense.entity.resources.mapEntity.ResourceType;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
+import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Visual representation of a FactoryRecipe inside a ScrollBox
- */
 public class RecipeMenuEntry {
 
     public final Rectangle bounds = new Rectangle();
-    private final Recipe recipe;
-    public final Runnable onClick;
+    final Recipe recipe;
+    public Runnable onClick;
+    public boolean active = false;
+
+    // ---- layout constants ----
+    private static final float PADDING = 6f;
+    private static final float ICON_SIZE = 18f;
+    private static final float ICON_SPACING = 6f;
+    private static final float GROUP_SPACING = 14f;
+
+    public final Map<ResourceType, Rectangle> resourceHitboxes = new HashMap<>();
+
+    private static final GlyphLayout layout = new GlyphLayout();
 
     public RecipeMenuEntry(Recipe recipe, float x, float y, float width, float height, Runnable onClick) {
         this.recipe = recipe;
@@ -24,33 +38,87 @@ public class RecipeMenuEntry {
         this.onClick = onClick;
     }
 
+    public void draw(ShapeRenderer renderer, SpriteBatch batch, BitmapFont font) {
+        // Clear previous hitboxes
+        resourceHitboxes.clear();
 
-    public void draw(ShapeRenderer renderer, SpriteBatch batch, BitmapFont font, int index) {
-        // Draw rectangle background
         renderer.begin(ShapeRenderer.ShapeType.Filled);
-        renderer.setColor(0.3f, 0.3f, 0.7f, 1f);
+        renderer.setColor(active ? 0.2f : 0.3f, active ? 0.6f : 0.3f, 0.7f, 1f);
         renderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
         renderer.end();
 
         batch.begin();
-        float textX = bounds.x + 5;
-        float textY = bounds.y + bounds.height - 5;
+        float centerY = bounds.y + bounds.height / 2f;
+        float textY = centerY + font.getCapHeight() / 2f;
 
-        // Recipe header (optional: generate simple name)
-        font.draw(batch, "Recipe: "+index, textX, textY);
-        textY -= font.getCapHeight() + 2;
+        float x = bounds.x + PADDING;
 
-        // Inputs
-        font.draw(batch, "Inputs:", textX, textY);
-        textY -= font.getCapHeight() + 2;
-        for (Map.Entry<Resource.RawResourceType, Integer> e : recipe.inputs.entrySet()) {
-            font.draw(batch, e.getKey().name() + " x" + e.getValue(), textX + 10, textY);
-            textY -= font.getCapHeight() + 2;
+        // Recipe name
+        layout.setText(font, recipe.name);
+        font.draw(batch, layout, x, textY);
+        x += layout.width + GROUP_SPACING;
+
+        // INPUTS
+        for (Map.Entry<ResourceType, Integer> e : recipe.inputs.entrySet()) {
+            ResourceType type = e.getKey();
+            TextureRegion icon = null;
+
+            if (type instanceof Resource.RawResourceType) {
+                icon = IconStore.raw((Resource.RawResourceType) type);
+            } else if (type instanceof Resource.RefinedResourceType) {
+                icon = IconStore.refined((Resource.RefinedResourceType) type);
+            }
+            String count = "x" + TextFormatter.formatResourceAmount(e.getValue());
+            layout.setText(font, count);
+
+            float iconX = x;
+            float iconY = centerY - ICON_SIZE / 2f;
+            if (icon != null) batch.draw(icon, iconX, iconY, ICON_SIZE, ICON_SIZE);
+
+            float textX = iconX + ICON_SIZE + 2f;
+            font.draw(batch, layout, textX, textY);
+
+            // Register hitbox (icon + text)
+            float width = ICON_SIZE + 2f + layout.width;
+            float height = ICON_SIZE; // align with icon height
+            resourceHitboxes.put(e.getKey(), new Rectangle(iconX, iconY, width, height));
+
+            x = textX + layout.width + ICON_SPACING;
+        }
+
+        // OUTPUTS (right-aligned)
+        float outX = bounds.x + bounds.width - PADDING;
+        for (Map.Entry<ResourceType, Integer> e : recipe.outputs.entrySet()) {
+            String count = "x" + TextFormatter.formatResourceAmount(e.getValue());
+            layout.setText(font, count);
+            outX -= layout.width;
+            float textX = outX;
+            font.draw(batch, layout, textX, textY);
+            outX -= 2f;
+
+            ResourceType type = e.getKey();
+            TextureRegion icon = null;
+
+            if (type instanceof Resource.RawResourceType) {
+                icon = IconStore.raw((Resource.RawResourceType) type);
+            } else if (type instanceof Resource.RefinedResourceType) {
+                icon = IconStore.refined((Resource.RefinedResourceType) type);
+            }
+            if (icon != null) {
+                outX -= ICON_SIZE;
+                batch.draw(icon, outX, centerY - ICON_SIZE / 2f, ICON_SIZE, ICON_SIZE);
+            }
+
+            // Register hitbox (icon + text)
+            float width = ICON_SIZE + 2f + layout.width;
+            float height = ICON_SIZE;
+            resourceHitboxes.put(e.getKey(), new Rectangle(outX, centerY - ICON_SIZE / 2f, width, height));
+
+            outX -= ICON_SPACING;
         }
 
         batch.end();
     }
-
 
     public boolean click(float worldX, float worldY) {
         if (bounds.contains(worldX, worldY)) {
