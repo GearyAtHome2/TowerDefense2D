@@ -8,6 +8,7 @@ public class Building {
     public float xPos, yPos;
     public boolean isConnectedToNetwork = false;
     public float animationState = 0;
+    public String name;
 
     public Building(float x, float y) {
         this.xPos = x;

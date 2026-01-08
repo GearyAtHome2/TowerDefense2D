@@ -15,18 +15,26 @@ public class FactoryUI extends BuildingUI {
     }
 
     @Override
-    protected void addExtraButtons(Building building, float popupX, float popupY, float popupWidth, float popupHeight, float scale) {
-        extraButtons.clear();
+    protected float getPopupScale(float zoom) {
+        return super.getPopupScale(zoom);
+    }
 
-        float buttonHeight = 20 * scale;
-        float buttonWidth = popupWidth - 16;
-        float buttonX = popupX + 8;
-        float buttonY = popupY + 40; // above delete button
-
-        extraButtons.add(new BuildingUIButton("Open Factory Menu", 0.2f, 0.6f, 1f, () -> {
-            world.showFactoryMenu((Factory) building, font);
-        }) {{
-            bounds.set(buttonX, buttonY, buttonWidth, buttonHeight);
-        }});
+    @Override
+    protected void addExtraButtons(
+        Building building,
+        float popupX,
+        float popupY,
+        float popupWidth,
+        float popupHeight,
+        float scale
+    ) {
+        addStackedButton(
+            "Open Factory Menu",
+            popupX,
+            popupWidth,
+            scale,
+            0.2f, 0.6f, 1f,
+            () -> world.showFactoryMenu((Factory) building, font)
+        );
     }
 }

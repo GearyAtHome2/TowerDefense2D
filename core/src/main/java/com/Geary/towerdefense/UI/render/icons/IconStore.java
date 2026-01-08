@@ -11,12 +11,13 @@ public class IconStore {
 
     private static final Map<Resource.RawResourceType, TextureRegion> RAW_ICONS = new EnumMap<>(Resource.RawResourceType.class);
     private static final Map<Resource.RefinedResourceType, TextureRegion> REFINED_ICONS = new EnumMap<>(Resource.RefinedResourceType.class);
+    private static final Map<Icon, TextureRegion> SYMBOL_ICONS = new EnumMap<>(Icon.class);
 
     public static void load() {
         for (Resource.RawResourceType type : Resource.RawResourceType.values()) {
             RAW_ICONS.put(
                 type,
-                new TextureRegion(new Texture("resources/raw/" + type.name().toLowerCase() + ".png"))
+                new TextureRegion(new Texture("icons/resources/raw/" + type.name().toLowerCase() + ".png"))
             );
         }
 
@@ -25,17 +26,38 @@ public class IconStore {
             //todo: add this once I've made the .png for refined icons
 //            REFINED_ICONS.put(
 //                type,
-//                new TextureRegion(new Texture("resources/refined/" + type.name().toLowerCase() + ".png"))
+//                new TextureRegion(new Texture("icons/resources/refined/" + type.name().toLowerCase() + ".png"))
 //            );
         }
+
+        for (Icon type : Icon.values()) {
+            SYMBOL_ICONS.put(
+                type,
+                new TextureRegion(new Texture("icons/" + type.name().toLowerCase() + ".png"))
+            );
+        }
+
+
     }
 
-    public static TextureRegion raw(Resource.RawResourceType type) {
+    public static TextureRegion getSymbol(Icon symbol) {
+        return SYMBOL_ICONS.get(symbol);
+    }
 
+    public static TextureRegion rawResource(Resource.RawResourceType type) {
         return RAW_ICONS.get(type);
     }
 
-    public static TextureRegion refined(Resource.RefinedResourceType type) {
+    public static TextureRegion refinedResource(Resource.RefinedResourceType type) {
         return REFINED_ICONS.get(type);
+    }
+
+
+    public enum Icon {
+        ARROW_SYMBOL;
+
+        public String getName() {
+            return this.name();
+        }
     }
 }

@@ -27,6 +27,8 @@ public class RecipeMenuEntry {
     private static final float ICON_SIZE = 18f;
     private static final float ICON_SPACING = 6f;
     private static final float GROUP_SPACING = 14f;
+    private static final float ARROW_SIZE = 26f;
+    private static final float ARROW_ALPHA = 0.85f;
 
     public final Map<ResourceType, Rectangle> resourceHitboxes = new HashMap<>();
 
@@ -47,6 +49,8 @@ public class RecipeMenuEntry {
         renderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
         renderer.end();
 
+
+
         batch.begin();
         float centerY = bounds.y + bounds.height / 2f;
         float textY = centerY + font.getCapHeight() / 2f;
@@ -58,15 +62,17 @@ public class RecipeMenuEntry {
         font.draw(batch, layout, x, textY);
         x += layout.width + GROUP_SPACING;
 
-        // INPUTS
+        float inputsEndX;
+        float outputsStartX;
+
         for (Map.Entry<ResourceType, Integer> e : recipe.inputs.entrySet()) {
             ResourceType type = e.getKey();
             TextureRegion icon = null;
 
             if (type instanceof Resource.RawResourceType) {
-                icon = IconStore.raw((Resource.RawResourceType) type);
+                icon = IconStore.rawResource((Resource.RawResourceType) type);
             } else if (type instanceof Resource.RefinedResourceType) {
-                icon = IconStore.refined((Resource.RefinedResourceType) type);
+                icon = IconStore.refinedResource((Resource.RefinedResourceType) type);
             }
             String count = "x" + TextFormatter.formatResourceAmount(e.getValue());
             layout.setText(font, count);
@@ -85,9 +91,19 @@ public class RecipeMenuEntry {
 
             x = textX + layout.width + ICON_SPACING;
         }
-
-        // OUTPUTS (right-aligned)
+        inputsEndX = x;
         float outX = bounds.x + bounds.width - PADDING;
+        outputsStartX = outX;
+        TextureRegion arrowIcon = IconStore.getSymbol(IconStore.Icon.ARROW_SYMBOL);
+        if (arrowIcon != null) {
+            float arrowCenterX = (inputsEndX + outputsStartX) * 0.5f;
+            float arrowX = arrowCenterX - ARROW_SIZE / 2f;
+            float arrowY = centerY - ARROW_SIZE / 2f;
+
+            batch.setColor(1f, 1f, 1f, ARROW_ALPHA);
+            batch.draw(arrowIcon, arrowX, arrowY, ARROW_SIZE, ARROW_SIZE);
+            batch.setColor(1f, 1f, 1f, 1f);
+        }
         for (Map.Entry<ResourceType, Integer> e : recipe.outputs.entrySet()) {
             String count = "x" + TextFormatter.formatResourceAmount(e.getValue());
             layout.setText(font, count);
@@ -100,9 +116,9 @@ public class RecipeMenuEntry {
             TextureRegion icon = null;
 
             if (type instanceof Resource.RawResourceType) {
-                icon = IconStore.raw((Resource.RawResourceType) type);
+                icon = IconStore.rawResource((Resource.RawResourceType) type);
             } else if (type instanceof Resource.RefinedResourceType) {
-                icon = IconStore.refined((Resource.RefinedResourceType) type);
+                icon = IconStore.refinedResource((Resource.RefinedResourceType) type);
             }
             if (icon != null) {
                 outX -= ICON_SIZE;

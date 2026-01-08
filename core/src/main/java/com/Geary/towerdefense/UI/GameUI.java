@@ -210,7 +210,7 @@ public class GameUI {
         int column = 0;
 
         for (Resource.RawResourceType type : resources.keySet()) {
-            TextureRegion icon = IconStore.raw(type);
+            TextureRegion icon = IconStore.rawResource(type);
             if (icon == null) continue;
 
             String text = TextFormatter.formatResourceAmount(resources.get(type));

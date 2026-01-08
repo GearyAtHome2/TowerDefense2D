@@ -28,7 +28,28 @@ public class FactoryMenu extends Modal {
     private ResourceType hoveredResource = null;
     private int resourceQuantity;
     private final TooltipRenderer tooltipRenderer;
+    private final GlyphLayout layout = new GlyphLayout();
     private float mouseX, mouseY;
+
+    /** Layout configuration: all ratios relative to modal or scrollbox */
+    private static class LayoutConfig {
+        float xPaddingRatio = 0.05f;           // fraction of modal width
+        float scrollboxBottomRatio = 0.1f;     // fraction of modal height
+        float scrollboxTopRatio = 0.7f;        // fraction of modal height
+        float entryHeightRatio = 0.12f;        // max fraction of scrollbox height per entry
+        float entrySpacingRatio = 0.01f;       // fraction of scrollbox height
+        float hoodHeightRatio = 0.12f;         // fraction of scrollbox height
+        float entrySidePaddingRatio = 0.05f;   // fraction of scrollbox width
+        float tooltipOffsetXRatio = 0.02f;     // fraction of modal width
+        float tooltipOffsetYRatio = 0.02f;     // fraction of modal height
+        float tooltipPaddingRatio = 0.015f;    // fraction of modal width
+        float hoodOverlapRatio = 0.002f;       // fraction of modal height
+        float titleHeightRatio = 0.12f;     // fraction of modal height
+        float titlePaddingYRatio = 0.02f;   // vertical padding inside title area
+        float titleScale = 1.6f;
+    }
+
+    private final LayoutConfig layoutCfg = new LayoutConfig();
 
     public FactoryMenu(Factory factory, BitmapFont font) {
         super(font);
@@ -38,60 +59,17 @@ public class FactoryMenu extends Modal {
         populateScrollBox();
     }
 
-    /**
-     * Layout modal elements
-     */
     @Override
     protected void layoutButtons() {
-        float padding = 20f;
-
-        // Compute scrollbox positions based on current bounds
-        float scrollboxBottom = bounds.y + bounds.height * 0.1f;
-        float scrollboxTop    = bounds.y + bounds.height * 0.9f;
-        float scrollboxHeight = scrollboxTop - scrollboxBottom;
-
-        scrollBox.bounds.set(
-            bounds.x + padding,
-            scrollboxBottom,
-            bounds.width - padding * 2,
-            scrollboxHeight
-        );
-
-        // Layout entries
-        float entryHeight = 40;
-        for (RecipeMenuEntry entry : scrollBox.entries) {
-            entry.bounds.x = scrollBox.bounds.x + 10;
-            entry.bounds.width = scrollBox.bounds.width - 20;
-            entry.bounds.height = entryHeight - 5;
-        }
-
-        // Compute total content height
-        float spacing = 5f;
-        float totalHeight = 0;
-        for (int i = 0; i < scrollBox.entries.size(); i++) {
-            totalHeight += scrollBox.entries.get(i).bounds.height;
-            if (i < scrollBox.entries.size() - 1) totalHeight += spacing;
-        }
-
-        scrollBox.setContentHeight(totalHeight);
-        scrollBox.relayout();
+        layoutScrollBox();
+        layoutScrollEntries();
     }
 
     @Override
     protected void drawContent(ShapeRenderer shapeRenderer, SpriteBatch batch) {
         scrollBox.draw(shapeRenderer, batch, font);
-
-        // Draw top hood
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(0.12f, 0.12f, 0.12f, 1f);
-        shapeRenderer.rect(scrollBox.bounds.x, scrollBox.bounds.y + scrollBox.bounds.height + 1,
-            scrollBox.bounds.width, bounds.height / 11f); // 15 px hood
-        // Draw bottom hood
-        shapeRenderer.rect(scrollBox.bounds.x, scrollBox.bounds.y - bounds.height / 10f,
-            scrollBox.bounds.width, bounds.height / 10f);
-        shapeRenderer.end();
-
-        // Draw tooltip if hovering
+        drawScrollHoods(shapeRenderer);
+        drawTitle(batch);
         if (hoveredEntry != null) {
             drawTooltip(batch, shapeRenderer, hoveredEntry);
         }
@@ -102,114 +80,220 @@ public class FactoryMenu extends Modal {
         mouseX = uiPos.x;
         mouseY = uiPos.y;
 
-        hoveredEntry = null;
-        hoveredResource = null;
-
-        for (RecipeMenuEntry entry : scrollBox.entries) {
-            if (entry.bounds.contains(mouseX, mouseY)) {
-                hoveredEntry = entry;
-                for (Map.Entry<ResourceType, Rectangle> hit : entry.resourceHitboxes.entrySet()) {
-                    if (hit.getValue().contains(mouseX, mouseY)) {
-                        hoveredResource = hit.getKey();
-                        resourceQuantity = entry.recipe.inputs.containsKey(hoveredResource)
-                            ? entry.recipe.inputs.get(hoveredResource)
-                            : entry.recipe.outputs.get(hoveredResource);
-                        return;
-                    }
-                }
-                break;
-            }
-        }
+        updateHoveredEntry(mouseX, mouseY);
     }
-
-    // Helper: approximate width of "xN" text for hit detection
-    private float getTextWidth(int amount) {
-        layout.setText(font, "x" + amount);
-        return layout.width;
-    }
-
 
     @Override
     protected boolean handleClickInside(float x, float y) {
         if (!scrollBox.contains(x, y)) return false;
-
         RecipeMenuEntry clicked = scrollBox.click(x, y);
-        if (clicked != null) {
-            setActiveEntry(clicked);
-        }
+        if (clicked != null) setActiveEntry(clicked);
         return true;
     }
 
     @Override
     protected boolean handleScrollInside(float x, float y, float amountY) {
         if (scrollBox.contains(x, y)) {
-            scrollBox.scroll(amountY * 10f);
+            scrollBox.scroll(amountY * 10f); // scroll speed
             return true;
         }
         return false;
     }
 
     private void populateScrollBox() {
-        float entryHeight = 40;
-        float entrySpacing = 5f; // buffer between entries
         List<RecipeMenuEntry> entries = new ArrayList<>();
 
         for (Recipe recipe : factory.recipes) {
-
             RecipeMenuEntry entry = new RecipeMenuEntry(
                 recipe,
-                0, 0, 0, entryHeight - 5,
+                0, 0, 0, 0,
                 null
             );
 
             entry.onClick = () -> setActiveEntry(entry);
 
+            if (factory.activeRecipe == recipe) {
+                entry.active = true;
+                activeMenuEntry = entry;
+            }
+
             entries.add(entry);
         }
 
-        float totalHeight = 0;
-        for (int i = 0; i < entries.size(); i++) {
-            totalHeight += entries.get(i).bounds.height;
-            if (i < entries.size() - 1) totalHeight += entrySpacing; // spacing after each entry except last
-        }
-
-        scrollBox.setEntries(entries, totalHeight);
+        scrollBox.setEntries(entries, entries.size() * 40f);
     }
+
 
     public void setActiveEntry(RecipeMenuEntry entry) {
-        if (activeMenuEntry != null) {
-            activeMenuEntry.active = false;
-        }
-
+        if (activeMenuEntry != null) activeMenuEntry.active = false;
+        System.out.println("setting active recipe: "+entry.recipe.name);
         activeMenuEntry = entry;
         activeMenuEntry.active = true;
-
         factory.activeRecipe = entry.recipe;
     }
-
-    // ---------------- Tooltip rendering ----------------
-    private final GlyphLayout layout = new GlyphLayout();
 
     private void drawTooltip(SpriteBatch batch, ShapeRenderer shapeRenderer, RecipeMenuEntry entry) {
         if (hoveredResource == null) return;
 
-        String text = hoveredResource.getName() + ": " + resourceQuantity; // display only the hovered resource
-        float padding = 6f;
+        String text = hoveredResource.getName() + ": " + resourceQuantity;
+        float offsetX = bounds.width * layoutCfg.tooltipOffsetXRatio;
+        float offsetY = bounds.height * layoutCfg.tooltipOffsetYRatio;
+        float padding = bounds.width * layoutCfg.tooltipPaddingRatio;
 
-        float tooltipX = mouseX + 8;
-        float tooltipY = mouseY - 8;
+        float tooltipX = mouseX + offsetX;
+        float tooltipY = mouseY - offsetY;
 
-        float menuRight = bounds.x + bounds.width;
         layout.setText(font, text);
         float tooltipWidth = layout.width + padding * 2;
         float tooltipHeight = layout.height + padding * 2;
 
-        // Clamp to right edge
-        if (tooltipX + tooltipWidth > menuRight) {
-            tooltipX = mouseX - tooltipWidth - 8;
-        }
+        float menuRight = bounds.x + bounds.width;
+        float menuTop = bounds.y + bounds.height;
+
+        // Clamp tooltip within modal bounds
+        if (tooltipX + tooltipWidth > menuRight) tooltipX = mouseX - tooltipWidth - offsetX;
+        if (tooltipY < bounds.y) tooltipY = bounds.y;
+        if (tooltipY + tooltipHeight > menuTop) tooltipY = menuTop - tooltipHeight;
 
         tooltipRenderer.drawTooltip(batch, shapeRenderer, text, tooltipX, tooltipY, padding);
     }
 
+    private void layoutScrollBox() {
+        float xPadding = modalXPadding();
+
+        scrollBox.bounds.set(
+            bounds.x + xPadding,
+            scrollboxBottom(),
+            bounds.width - xPadding * 2,
+            scrollboxHeight()
+        );
+    }
+
+    private void layoutScrollEntries() {
+        float entryHeight = scrollBox.bounds.height * layoutCfg.entryHeightRatio;
+        float entrySpacing = scrollBox.bounds.height * layoutCfg.entrySpacingRatio;
+        float sidePadding = scrollBox.bounds.width * layoutCfg.entrySidePaddingRatio;
+
+        float totalHeight = 0f;
+
+        for (RecipeMenuEntry entry : scrollBox.entries) {
+            entry.bounds.x = scrollBox.bounds.x + sidePadding;
+            entry.bounds.width = scrollBox.bounds.width - sidePadding * 2;
+            entry.bounds.height = entryHeight;
+
+            totalHeight += entryHeight + entrySpacing;
+        }
+
+        if (!scrollBox.entries.isEmpty()) {
+            totalHeight -= entrySpacing;
+        }
+
+        // bottom padding for hood masking
+        float bottomPadding = scrollBox.bounds.height * layoutCfg.hoodHeightRatio;
+        totalHeight += bottomPadding * 2;
+
+        scrollBox.setContentHeight(totalHeight);
+        scrollBox.relayout();
+    }
+
+    private void drawScrollHoods(ShapeRenderer shapeRenderer) {
+        float hoodHeight = scrollBox.bounds.height * layoutCfg.hoodHeightRatio;
+        float hoodOverlap = bounds.height * layoutCfg.hoodOverlapRatio;
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(0.12f, 0.12f, 0f, 1f);
+
+        // Top hood
+        shapeRenderer.rect(
+            scrollBox.bounds.x,
+            scrollBox.bounds.y + scrollBox.bounds.height + hoodOverlap,
+            scrollBox.bounds.width,
+            hoodHeight
+        );
+
+        // Bottom hood
+        shapeRenderer.rect(
+            scrollBox.bounds.x,
+            scrollBox.bounds.y - hoodHeight,
+            scrollBox.bounds.width,
+            hoodHeight
+        );
+
+        shapeRenderer.end();
+    }
+
+    private void drawTitle(SpriteBatch batch) {
+        batch.begin();
+        String title = factory.name;
+
+        float oldScaleX = font.getScaleX();
+        float oldScaleY = font.getScaleY();
+
+        font.getData().setScale(layoutCfg.titleScale);
+
+        layout.setText(font, title);
+
+        float x = bounds.x + (bounds.width - layout.width) * 0.5f;
+        float y = titleTextY();
+
+        font.draw(batch, layout, x, y);
+
+        font.getData().setScale(oldScaleX, oldScaleY);
+        batch.end();
+    }
+
+
+    private void updateHoveredEntry(float x, float y) {
+        hoveredEntry = null;
+        hoveredResource = null;
+
+        for (RecipeMenuEntry entry : scrollBox.entries) {
+            if (entry.bounds.contains(x, y)) {
+                hoveredEntry = entry;
+
+                for (Map.Entry<ResourceType, Rectangle> hit : entry.resourceHitboxes.entrySet()) {
+                    if (hit.getValue().contains(x, y)) {
+                        hoveredResource = hit.getKey();
+                        resourceQuantity =
+                            entry.recipe.inputs.containsKey(hoveredResource)
+                                ? entry.recipe.inputs.get(hoveredResource)
+                                : entry.recipe.outputs.get(hoveredResource);
+                        return;
+                    }
+                }
+                return;
+            }
+        }
+    }
+
+    private float titleHeight() {
+        return bounds.height * layoutCfg.titleHeightRatio;
+    }
+
+    private float titleBottomY() {
+        return bounds.y + bounds.height - titleHeight();
+    }
+
+    private float titleTextY() {
+        return titleBottomY()
+            + titleHeight() * 0.5f
+            + bounds.height * layoutCfg.titlePaddingYRatio;
+    }
+
+
+    private float modalXPadding() {
+        return bounds.width * layoutCfg.xPaddingRatio;
+    }
+
+    private float scrollboxBottom() {
+        return bounds.y + bounds.height * layoutCfg.scrollboxBottomRatio;
+    }
+
+    private float scrollboxTop() {
+        return bounds.y + bounds.height * layoutCfg.scrollboxTopRatio;
+    }
+
+    private float scrollboxHeight() {
+        return scrollboxTop() - scrollboxBottom();
+    }
 }
