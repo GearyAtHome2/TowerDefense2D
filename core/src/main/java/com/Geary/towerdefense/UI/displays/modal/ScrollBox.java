@@ -54,15 +54,27 @@ public class ScrollBox {
     }
 
     public void draw(ShapeRenderer renderer, SpriteBatch batch, BitmapFont font) {
-        int i = 0;
+        // Draw background
+        renderer.begin(ShapeRenderer.ShapeType.Filled);
+        renderer.setColor(0.2f, 0.2f, 0.2f, 1f); // dark gray background
+        renderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
+        renderer.end();
+
+        // Draw entries
         for (RecipeMenuEntry entry : entries) {
-            i++;
             if (entry.bounds.y + entry.bounds.height < bounds.y) continue;
             if (entry.bounds.y > bounds.y + bounds.height) continue;
 
             entry.draw(renderer, batch, font);
         }
+
+        // Draw border (optional)
+        renderer.begin(ShapeRenderer.ShapeType.Line);
+        renderer.setColor(1f, 1f, 1f, 1f); // white border
+        renderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
+        renderer.end();
     }
+
 
     /**
      *

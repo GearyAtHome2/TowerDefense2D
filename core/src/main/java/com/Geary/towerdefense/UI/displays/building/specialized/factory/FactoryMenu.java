@@ -38,17 +38,26 @@ public class FactoryMenu extends Modal {
         populateScrollBox();
     }
 
-    /** Layout modal elements */
+    /**
+     * Layout modal elements
+     */
     @Override
     protected void layoutButtons() {
-        float padding = 20;
+        float padding = 20f;
+
+        // Compute scrollbox positions based on current bounds
+        float scrollboxBottom = bounds.y + bounds.height * 0.1f;
+        float scrollboxTop    = bounds.y + bounds.height * 0.9f;
+        float scrollboxHeight = scrollboxTop - scrollboxBottom;
+
         scrollBox.bounds.set(
             bounds.x + padding,
-            bounds.y + 60,
+            scrollboxBottom,
             bounds.width - padding * 2,
-            bounds.height - 100
+            scrollboxHeight
         );
 
+        // Layout entries
         float entryHeight = 40;
         for (RecipeMenuEntry entry : scrollBox.entries) {
             entry.bounds.x = scrollBox.bounds.x + 10;
@@ -56,6 +65,7 @@ public class FactoryMenu extends Modal {
             entry.bounds.height = entryHeight - 5;
         }
 
+        // Compute total content height
         float spacing = 5f;
         float totalHeight = 0;
         for (int i = 0; i < scrollBox.entries.size(); i++) {
@@ -70,6 +80,16 @@ public class FactoryMenu extends Modal {
     @Override
     protected void drawContent(ShapeRenderer shapeRenderer, SpriteBatch batch) {
         scrollBox.draw(shapeRenderer, batch, font);
+
+        // Draw top hood
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(0.12f, 0.12f, 0.12f, 1f);
+        shapeRenderer.rect(scrollBox.bounds.x, scrollBox.bounds.y + scrollBox.bounds.height + 1,
+            scrollBox.bounds.width, bounds.height / 11f); // 15 px hood
+        // Draw bottom hood
+        shapeRenderer.rect(scrollBox.bounds.x, scrollBox.bounds.y - bounds.height / 10f,
+            scrollBox.bounds.width, bounds.height / 10f);
+        shapeRenderer.end();
 
         // Draw tooltip if hovering
         if (hoveredEntry != null) {
@@ -173,7 +193,7 @@ public class FactoryMenu extends Modal {
     private void drawTooltip(SpriteBatch batch, ShapeRenderer shapeRenderer, RecipeMenuEntry entry) {
         if (hoveredResource == null) return;
 
-        String text = hoveredResource.getName()+": "+resourceQuantity; // display only the hovered resource
+        String text = hoveredResource.getName() + ": " + resourceQuantity; // display only the hovered resource
         float padding = 6f;
 
         float tooltipX = mouseX + 8;
