@@ -46,12 +46,6 @@ public class PathGeneratorDepracated_Clumped {
             if (path.size() >= PATH_LENGTH && correctEnd) {
                 long endTimeNs = System.nanoTime();
                 logTiming(startTimeNs, endTimeNs, attempts, true);
-
-                System.out.println(
-                    "Success! Attempt " + i +
-                        ": length: " + path.size() +
-                        ", end: " + correctEnd
-                );
                 return flipPath(path);
             }
 

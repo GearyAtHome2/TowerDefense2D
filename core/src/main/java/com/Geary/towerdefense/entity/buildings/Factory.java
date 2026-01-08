@@ -15,10 +15,9 @@ public class Factory extends Building {
         super(x, y);
         for (int i = 0; i < 20; i++) {
             Recipe recipe = new Recipe("Recipe " + i);
-            recipe.addInput(Resource.RawResourceType.IRON, 99999);
+            recipe.addInput(Resource.RawResourceType.IRON, 1);
             recipe.addInput(Resource.RawResourceType.STONE, 1);
-            recipe.addOutput(Resource.RefinedResourceType.BASIC_AMMO, 99999);
-            recipe.addOutput(Resource.RefinedResourceType.BASIC_WEAPONS, 1);
+            recipe.addOutput(Resource.RefinedResourceType.BASIC_AMMO, 200);
             recipes.add(recipe);
         }
         this.name = "parent factory object";
@@ -37,10 +36,6 @@ public class Factory extends Building {
             infoLines.add(activeRecipe.name);
         }
         return infoLines;
-    }
-
-    public void activateRecipe(Recipe recipe) {
-        this.activeRecipe = recipe;
     }
 
     public Color getInfoTextColor() {

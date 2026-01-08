@@ -7,6 +7,7 @@ import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
 import java.util.EnumMap;
+import java.util.Map;
 
 public class MineManager extends BuildingManager<Mine> {
 
@@ -41,15 +42,15 @@ public class MineManager extends BuildingManager<Mine> {
         world.ghostMine = null;
     }
 
-    public EnumMap<Resource.RawResourceType, Float> calculateResourcesGenerated(float delta) {
-        EnumMap<Resource.RawResourceType, Float> generated = new EnumMap<>(Resource.RawResourceType.class);
+    public void calculateResourcesGenerated(float delta) {
+        Map<Resource.RawResourceType, Float> generated = new EnumMap<>(Resource.RawResourceType.class);
         for (Mine mine : world.mines) {
             if (mine.isConnectedToNetwork) {
                 float quantity = mine.resource.resourceAbundance * delta;
                 generated.put(mine.resource.type, generated.getOrDefault(mine.resource.type, 0f) + quantity);
             }
         }
-        return generated;
+        world.getGameStateManager().addRawResources(generated);
     }
 
     public void animateMines(float delta) {

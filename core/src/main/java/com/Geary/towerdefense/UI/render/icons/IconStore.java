@@ -22,12 +22,10 @@ public class IconStore {
         }
 
         for (Resource.RefinedResourceType type : Resource.RefinedResourceType.values()) {
-
-            //todo: add this once I've made the .png for refined icons
-//            REFINED_ICONS.put(
-//                type,
-//                new TextureRegion(new Texture("icons/resources/refined/" + type.name().toLowerCase() + ".png"))
-//            );
+            REFINED_ICONS.put(
+                type,
+                new TextureRegion(new Texture("icons/resources/refined/" + type.name().toLowerCase() + ".png"))
+            );
         }
 
         for (Icon type : Icon.values()) {

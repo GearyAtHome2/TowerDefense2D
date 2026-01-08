@@ -13,5 +13,8 @@ public class GameState {
         for (Resource.RawResourceType type: Resource.RawResourceType.values()){
             rawResources.put(type, 3535353.0);
         }
+        for (Resource.RefinedResourceType type: Resource.RefinedResourceType.values()){
+            refinedResources.put(type, 2.0);
+        }
     }
 }

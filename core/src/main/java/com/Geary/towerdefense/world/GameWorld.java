@@ -208,7 +208,8 @@ public class GameWorld {
         sparkManager.update(delta);
         mineManager.animateMines(delta);
         factoryManager.animateFactories(delta);
-        gameStateManager.addResources(mineManager.calculateResourcesGenerated(delta));
+        mineManager.calculateResourcesGenerated(delta);
+        factoryManager.handleFactoryProduction(delta);
     }
 
     public void deleteBuilding(Building building) {
@@ -216,7 +217,7 @@ public class GameWorld {
 
         if (building instanceof Tower tower) {
             towers.remove(tower);
-            towerManager.deleteTower(tower); // you may need a helper for clearing occupied cells
+            towerManager.deleteTower(tower);
         } else if (building instanceof Transport transport) {
             transports.remove(transport);
             transportManager.deleteTransport(transport);
