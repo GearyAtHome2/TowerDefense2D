@@ -94,6 +94,49 @@ public class ArcTurnHandler {
         return new float[]{x, y};
     }
 
+    public void rebuildArcPreserveProgress(
+        Cell cell,
+        Direction from,
+        Direction to,
+        float mobCenterX,
+        float mobCenterY,
+        float cellSize
+    ) {
+        // Recompute arc center (same logic as setupArc)
+        float cx = cell.x;
+        float cy = cell.y;
+        float size = cellSize;
+
+        if (from == Direction.RIGHT && to == Direction.UP) { arcCenterX = cx; arcCenterY = cy + size; }
+        else if (from == Direction.RIGHT && to == Direction.DOWN) { arcCenterX = cx; arcCenterY = cy; }
+        else if (from == Direction.LEFT && to == Direction.UP) { arcCenterX = cx + size; arcCenterY = cy + size; }
+        else if (from == Direction.LEFT && to == Direction.DOWN) { arcCenterX = cx + size; arcCenterY = cy; }
+        else if (from == Direction.UP && to == Direction.RIGHT) { arcCenterX = cx + size; arcCenterY = cy; }
+        else if (from == Direction.UP && to == Direction.LEFT) { arcCenterX = cx; arcCenterY = cy; }
+        else if (from == Direction.DOWN && to == Direction.RIGHT) { arcCenterX = cx + size; arcCenterY = cy + size; }
+        else if (from == Direction.DOWN && to == Direction.LEFT) { arcCenterX = cx; arcCenterY = cy + size; }
+
+        arcRadius = (float) hypot(mobCenterX - arcCenterX, mobCenterY - arcCenterY);
+        arcRadius = Math.max(arcRadius, 0.001f);
+
+        // Compute current angle from center
+        arcAngle = (float) atan2(mobCenterY - arcCenterY, mobCenterX - arcCenterX);
+
+        // Recompute progress based on angle delta
+        float totalAngle = arcEndAngle - arcStartAngle;
+        float currentAngle = arcAngle - arcStartAngle;
+
+        // Handle clockwise vs anticlockwise
+        float t = currentAngle / totalAngle;
+        t = clamp(t, 0f, 1f);
+
+        float arcLength = arcRadius * Math.abs(totalAngle);
+        arcProgress = t * arcLength;
+
+        inArcTurn = true;
+    }
+
+
     private float clamp(float v, float min, float max) {
         return Math.max(min, Math.min(max, v));
     }

@@ -74,34 +74,49 @@ public class MobManager {
         return dx * dx + dy * dy <= r * r;
     }
 
-    private void applyBounce(Friendly friendly, Enemy enemy) {
-        float strength = 8f;//25 is very high
+    private void applyBounce(Friendly f, Enemy e) {
+        float fx = f.getCenterX();
+        float fy = f.getCenterY();
+        float ex = e.getCenterX();
+        float ey = e.getCenterY();
 
-        friendly.pathImpulse -= strength;
-        enemy.pathImpulse -= strength;
-    }
-
-
-    //todo: for kb bullets in future. Make sure I keep this relatively small to avoid pushing things out of lanes?
-    private void applyKnockback(Mob a, Bullet b) {
-        float ax = a.getCenterX();
-        float ay = a.getCenterY();
-        float bx = b.getCenterX();
-        float by = b.getCenterY();
-
-        float dx = ax - bx;
-        float dy = ay - by;
-
-        float len = (float) Math.sqrt(dx * dx + dy * dy);
+        float dx = fx - ex;
+        float dy = fy - ey;
+        float len = (float)Math.sqrt(dx*dx + dy*dy);
         if (len == 0) return;
 
         dx /= len;
         dy /= len;
 
-        float strength = 120f; // tune
+        float strength = 170f;
 
-        a.kbX += dx * strength;
-        a.kbY += dy * strength;
+        f.bounceVX += dx * strength;
+        f.bounceVY += dy * strength;
+
+        e.bounceVX -= dx * strength;
+        e.bounceVY -= dy * strength;
+
+    }
+
+    //todo: for kb bullets in future. Make sure I keep this relatively small to avoid pushing things out of lanes?
+    private void applyKnockback(Mob m, Bullet b) {
+        float mx = m.getCenterX();
+        float my = m.getCenterY();
+        float bx = b.getCenterX();
+        float by = b.getCenterY();
+
+        float dx = mx - bx;
+        float dy = my - by;
+        float len = (float)Math.sqrt(dx*dx + dy*dy);
+        if (len == 0) return;
+
+        dx /= len;
+        dy /= len;
+
+        float strength = 120f;
+
+        m.bounceVX += dx * strength;
+        m.bounceVY += dy * strength;
     }
 
 }

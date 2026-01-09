@@ -33,15 +33,14 @@ public class TileRandomMover {
             probLeft = baseMoveProb * (1f - distanceFactor);
         } else probLeft = probRight = baseMoveProb;
 
-        float stayProb = max(0f, 1f - (probLeft + probRight));
-
         float r = random();
         float moveDir;
         if (r < probLeft) moveDir = -1f;
         else if (r < probLeft + probRight) moveDir = 1f;
         else moveDir = 0f;
 
-        float maxMove = moveDir < 0 ? axisValue - minBound : maxBound - axisValue;
-        return moveDir * min(abs(moveDir), maxMove) * delta * 10f;
+        float maxStep = 0.25f * cellSize; // symmetric step cap
+        float step = min(maxStep, abs(axisValue - center));
+        return moveDir * step * delta;
     }
 }
