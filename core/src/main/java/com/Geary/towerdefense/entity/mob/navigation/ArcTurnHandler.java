@@ -71,13 +71,13 @@ public class ArcTurnHandler {
         arcProgress = 0f;
     }
 
-    public float[] updateArc(float delta, float speed, float cellSize) {
+    public float[] updateArc(float deltaDist) {
         if (!inArcTurn) return null;
 
         float arcLength = arcRadius * Math.abs(arcEndAngle - arcStartAngle);
-        arcProgress += speed * delta * cellSize;
 
-        if (arcProgress >= arcLength) arcProgress = arcLength;
+        arcProgress += deltaDist;
+        arcProgress = clamp(arcProgress, 0f, arcLength);
 
         float t = arcProgress / arcLength;
         arcAngle = arcStartAngle + t * (arcEndAngle - arcStartAngle);
@@ -90,7 +90,12 @@ public class ArcTurnHandler {
 
         float x = arcCenterX + (float) cos(arcAngle) * arcRadius;
         float y = arcCenterY + (float) sin(arcAngle) * arcRadius;
-
+        arcProgress = Math.max(arcProgress, 0f);
         return new float[]{x, y};
     }
+
+    private float clamp(float v, float min, float max) {
+        return Math.max(min, Math.min(max, v));
+    }
+
 }

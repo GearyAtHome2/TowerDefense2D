@@ -120,4 +120,9 @@ public class Bullet {
             y - texture.getHeight() / 2f
         );
     }
+
+
+    public float getCenterX() { return x + texture.getWidth() / 2f; }
+
+    public float getCenterY() { return y + texture.getHeight() / 2f; }
 }

@@ -164,6 +164,7 @@ public class GameWorld {
                 FriendlySpawner spawner = new FriendlySpawner(cell.x, cell.y);
                 friendlySpawners.add(spawner);
                 grid[gx][gy].building = spawner;
+                grid[gx][gy].bridgable = false;
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.Geary.towerdefense.behaviour;
 
+import com.Geary.towerdefense.entity.mob.Bullet;
 import com.Geary.towerdefense.entity.mob.Enemy;
 import com.Geary.towerdefense.entity.mob.Friendly;
 import com.Geary.towerdefense.entity.mob.Mob;
@@ -35,9 +36,17 @@ public class MobManager {
                 if (!friendly.isAlive()) continue;
 
                 if (overlaps(enemy, friendly)) {
-                    int tmpEnemyHealth = enemy.health;
-                    enemy.applyDamage(friendly.health);
-                    friendly.applyDamage(tmpEnemyHealth);
+                    if (enemy.collisionCooldown <= 0 && friendly.collisionCooldown <= 0) {
+                        int tmpEnemyHealth = enemy.damage;
+                        enemy.applyDamage(friendly.damage);
+                        friendly.applyDamage(tmpEnemyHealth);
+
+                        applyBounce(friendly, enemy);
+
+                        enemy.collisionCooldown = 0.1f;
+                        friendly.collisionCooldown = 0.1f;
+                    }
+
                 }
             }
         }
@@ -64,4 +73,35 @@ public class MobManager {
         float r = a.collisionRadius + b.collisionRadius;
         return dx * dx + dy * dy <= r * r;
     }
+
+    private void applyBounce(Friendly friendly, Enemy enemy) {
+        float strength = 8f;//25 is very high
+
+        friendly.pathImpulse -= strength;
+        enemy.pathImpulse -= strength;
+    }
+
+
+    //todo: for kb bullets in future. Make sure I keep this relatively small to avoid pushing things out of lanes?
+    private void applyKnockback(Mob a, Bullet b) {
+        float ax = a.getCenterX();
+        float ay = a.getCenterY();
+        float bx = b.getCenterX();
+        float by = b.getCenterY();
+
+        float dx = ax - bx;
+        float dy = ay - by;
+
+        float len = (float) Math.sqrt(dx * dx + dy * dy);
+        if (len == 0) return;
+
+        dx /= len;
+        dy /= len;
+
+        float strength = 120f; // tune
+
+        a.kbX += dx * strength;
+        a.kbY += dy * strength;
+    }
+
 }

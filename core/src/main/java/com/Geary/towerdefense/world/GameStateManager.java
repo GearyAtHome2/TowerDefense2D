@@ -24,6 +24,7 @@ public class GameStateManager {
         if (com.badlogic.gdx.Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) gameSpeed = 1f;
         if (com.badlogic.gdx.Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) gameSpeed = 3f;
         if (com.badlogic.gdx.Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) gameSpeed = 9f;
+        if (com.badlogic.gdx.Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)) gameSpeed = 18f;
     }
 
     public EnumMap<Resource.RawResourceType, Double> getRawResourceCount() {

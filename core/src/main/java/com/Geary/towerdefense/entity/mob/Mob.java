@@ -17,13 +17,14 @@ public abstract class Mob {
     public Texture texture;
     public float collisionRadius;
     public int health = 18;
+    public int damage=6;;
 
     public float x, y;
     public float vx, vy;
 
     protected Faction faction;
     protected boolean useCustomTurnLogic = false;
-    protected boolean reversed = false;
+    public boolean reversed = false;
     protected int turnMultiplier = 1;
 
     protected MobPathNavigator pathNavigator;
@@ -31,6 +32,15 @@ public abstract class Mob {
     protected TileRandomMover randomMover;
 
     protected float speed;
+    protected float ranMoveProb = 0.15f;
+
+    public float kbX = 0f;
+    public float kbY = 0f;
+    protected float knockbackDamping = 8f;
+    public float pathImpulse = 0f;
+    protected float pathImpulseDamping = 10f;
+
+    public float collisionCooldown = 0f;
 
     protected Mob(float startX, float startY, Texture texture) {
         this.texture = texture;
@@ -60,17 +70,36 @@ public abstract class Mob {
 
         if (pathNavigator.hasEnteredNewTile()) onEnterCell(cell);
 
+        float forwardDist = speed * delta * pathNavigator.getCellSize();
+        float deltaDist = forwardDist;
+        float knockDist = pathImpulse;
+
         if (arcHandler.isInArcTurn()) {
-            float[] pos = arcHandler.updateArc(delta, speed, pathNavigator.getCellSize());
-            if (pos != null) { x = pos[0] - texture.getWidth()/2f; y = pos[1] - texture.getHeight()/2f; }
+            deltaDist = speed * delta * pathNavigator.getCellSize();
+            knockDist = pathImpulse;
+
+            // add knockback to arcProgress (can be negative)
+            float[] pos = arcHandler.updateArc(deltaDist + knockDist);
+            if (pos != null) {
+                x = pos[0] - texture.getWidth() / 2f;
+                y = pos[1] - texture.getHeight() / 2f;
+            }
+            // decay impulse AFTER applying it
+            pathImpulse -= pathImpulse * pathImpulseDamping * delta;
+            if (Math.abs(pathImpulse) < 0.01f) pathImpulse = 0f;
+
+            // move to next tile if finished
             if (!arcHandler.isInArcTurn()) pathNavigator.advance();
+            collisionCooldown = Math.max(0, collisionCooldown - delta);
             return;
         }
+
 
         Direction moveDir = resolveMoveDirection(cell);
         if (moveDir == null) return;
 
-        float move = speed * delta * pathNavigator.getCellSize();
+        float move = deltaDist + knockDist;
+//        float move = speed * delta * pathNavigator.getCellSize();
         float oldX = x;
         float oldY = y;
 
@@ -81,14 +110,27 @@ public abstract class Mob {
             case DOWN -> y -= move;
         }
 
-        if (moveDir == UP || moveDir == DOWN) x += randomMover.computeMovement(getCenterX() - cell.x, delta);
-        else y += randomMover.computeMovement(getCenterY() - cell.y, delta);
+        if (moveDir == UP || moveDir == DOWN) x += randomMover.computeMovement(getCenterX() - cell.x, delta, ranMoveProb);
+        else y += randomMover.computeMovement(getCenterY() - cell.y, delta, ranMoveProb);
 
         vx = (x - oldX) / delta;
         vy = (y - oldY) / delta;
 
+        x += kbX * delta;
+        y += kbY * delta;
+
+        kbX -= kbX * knockbackDamping * delta;
+        kbY -= kbY * knockbackDamping * delta;
+
+        if (Math.abs(kbX) < 1f) kbX = 0;
+        if (Math.abs(kbY) < 1f) kbY = 0;
+
         pathNavigator.updateTileProgress(computeTileProgress(cell, moveDir));
         if (pathNavigator.getTileProgress() >= 1f) pathNavigator.advance();
+
+        pathImpulse -= pathImpulse * pathImpulseDamping * delta;
+        if (Math.abs(pathImpulse) < 1f) pathImpulse = 0f;
+        collisionCooldown = Math.max(0, collisionCooldown - delta);
     }
 
     protected void onEnterCell(Cell cell) {

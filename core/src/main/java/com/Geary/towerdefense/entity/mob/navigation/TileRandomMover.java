@@ -11,7 +11,7 @@ public class TileRandomMover {
         this.cellSize = cellSize;
     }
 
-    public float computeMovement(float axisValue, float delta) {
+    public float computeMovement(float axisValue, float delta, float baseMoveProb) {
         float minBound = 0.05f * cellSize;
         float maxBound = 0.95f * cellSize;
         float center = 0.5f * cellSize;
@@ -21,7 +21,6 @@ public class TileRandomMover {
         float totalWidth = maxBound - minBound;
         float offsetFromCenter = axisValue - center;
 
-        float baseMoveProb = 0.35f;
         float distanceFactor = abs(offsetFromCenter) / (totalWidth / 2f);
         float moveTowardCenterProb = baseMoveProb + distanceFactor * (1f - baseMoveProb);
 
