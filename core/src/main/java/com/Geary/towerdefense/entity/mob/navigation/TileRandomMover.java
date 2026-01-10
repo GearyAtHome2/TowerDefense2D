@@ -5,42 +5,51 @@ import static java.lang.Math.*;
 
 public class TileRandomMover {
 
-    private final int cellSize;
+    private final float cellSize;
+    private final float center;
+    private final float hardMin;
+    private final float hardMax;
 
     public TileRandomMover(int cellSize) {
         this.cellSize = cellSize;
+        this.center   = cellSize * 0.5f;
+        this.hardMin  = cellSize * 0.1f;
+        this.hardMax  = cellSize * 0.9f;
     }
 
     public float computeMovement(float axisValue, float delta, float baseMoveProb) {
-        float minBound = 0.05f * cellSize;
-        float maxBound = 0.95f * cellSize;
-        float center = 0.5f * cellSize;
 
-        axisValue = max(minBound, min(maxBound, axisValue));
+        // Clamp to cell
+        axisValue = max(0f, min(cellSize, axisValue));
 
-        float totalWidth = maxBound - minBound;
-        float offsetFromCenter = axisValue - center;
+        // Chance to move at all
+        if (random() > baseMoveProb)
+            return 0f;
 
-        float distanceFactor = abs(offsetFromCenter) / (totalWidth / 2f);
-        float moveTowardCenterProb = baseMoveProb + distanceFactor * (1f - baseMoveProb);
+        float offset = axisValue - center;
+        float absOffset = abs(offset);
 
-        float probLeft, probRight;
-        if (offsetFromCenter > 0) {
-            probLeft = moveTowardCenterProb;
-            probRight = baseMoveProb * (1f - distanceFactor);
-        } else if (offsetFromCenter < 0) {
-            probRight = moveTowardCenterProb;
-            probLeft = baseMoveProb * (1f - distanceFactor);
-        } else probLeft = probRight = baseMoveProb;
+        float centerBiasProb;
 
-        float r = random();
-        float moveDir;
-        if (r < probLeft) moveDir = -1f;
-        else if (r < probLeft + probRight) moveDir = 1f;
-        else moveDir = 0f;
+        // Hard walls
+        if (axisValue <= hardMin || axisValue >= hardMax) {
+            centerBiasProb = 1f;
+        } else {
+            // Linear ramp: 0 at centre, 1 at hardMin/hardMax
+            centerBiasProb = absOffset / (center - hardMin);
+        }
 
-        float maxStep = 0.25f * cellSize; // symmetric step cap
-        float step = min(maxStep, abs(axisValue - center));
-        return moveDir * step * delta;
+        float dir;
+
+        if (random() < centerBiasProb) {
+            // Move toward centre
+            dir = offset > 0 ? -1f : 1f;
+        } else {
+            // Pure random
+            dir = random() < 0.5f ? -1f : 1f;
+        }
+
+        float maxStep = 0.25f * cellSize;
+        return dir * maxStep * delta;
     }
 }

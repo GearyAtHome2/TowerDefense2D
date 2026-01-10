@@ -4,5 +4,6 @@ public record MobStats(
     int health,
     int damage,
     float speed,
-    float knockbackDamping
+    float knockbackDamping,
+    float ranMoveProb
 ) {}

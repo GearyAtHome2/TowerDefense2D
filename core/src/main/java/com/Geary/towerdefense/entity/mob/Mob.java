@@ -35,9 +35,9 @@ public abstract class Mob {
     protected TileRandomMover randomMover;
 
     protected float speed;
-    protected float ranMoveProb = 0.15f;
+    protected float ranMoveProb;
 
-    protected float knockbackDamping = 8f;
+    protected float knockbackDamping;
     public float collisionCooldown = 0f;
 
     protected Mob(float x, float y, Texture texture, MobStats stats) {
@@ -49,7 +49,7 @@ public abstract class Mob {
         this.damage = stats.damage();
         this.speed = stats.speed();
         this.knockbackDamping = stats.knockbackDamping();
-
+        this.ranMoveProb = stats.ranMoveProb();
         this.collisionRadius = texture.getWidth() * 0.5f;
     }
 

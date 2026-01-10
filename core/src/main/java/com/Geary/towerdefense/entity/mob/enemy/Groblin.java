@@ -9,7 +9,8 @@ public class Groblin extends Enemy {
         18,   // health
         5,   // damage
         0.8f, // speed
-        6f    // knockback damping
+        6f,    // knockback damping
+        0.45f  //random movement probability
     );
 
     public Groblin(float x, float y) {
