@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BuildingUIManager {
+public class UIManager {
 
     private final GameWorld world;
     private final ShapeRenderer shapeRenderer;
@@ -19,9 +19,9 @@ public class BuildingUIManager {
     private final BitmapFont font;
 
     private final BuildingUI defaultUI;
-    private final Map<Class<? extends Entity>, BuildingUI> specializedUIs = new HashMap<>();
+    private final Map<Class<? extends Entity>, EntityUI> specializedUIs = new HashMap<>();
 
-    public BuildingUIManager(GameWorld world, ShapeRenderer shapeRenderer, SpriteBatch batch, BitmapFont font) {
+    public UIManager(GameWorld world, ShapeRenderer shapeRenderer, SpriteBatch batch, BitmapFont font) {
         this.world = world;
         this.shapeRenderer = shapeRenderer;
         this.batch = batch;
@@ -34,10 +34,10 @@ public class BuildingUIManager {
         // Add others as needed: TowerUI, MineUI, etc.
     }
 
-    public BuildingUI getUIFor(Entity building) {
-        if (building == null) {
-            throw new IllegalArgumentException("BuildingUIFactory.getUIFor() called with null building");
+    public EntityUI getUIFor(Entity entity) {
+        if (entity == null) {
+            throw new IllegalArgumentException("UIFactory.getUIFor() called with null entity");
         }
-        return specializedUIs.getOrDefault(building.getClass(), defaultUI);
+        return specializedUIs.getOrDefault(entity.getClass(), defaultUI);
     }
 }

@@ -63,10 +63,10 @@ public class MobManager {
 
     /** Checks if two mobs are overlapping */
     private boolean overlaps(Mob a, Mob b) {
-        float ax = a.x + a.collisionRadius;
-        float ay = a.y + a.collisionRadius;
-        float bx = b.x + b.collisionRadius;
-        float by = b.y + b.collisionRadius;
+        float ax = a.xPos + a.collisionRadius;
+        float ay = a.yPos + a.collisionRadius;
+        float bx = b.xPos + b.collisionRadius;
+        float by = b.yPos + b.collisionRadius;
         float dx = ax - bx;
         float dy = ay - by;
         float r = a.collisionRadius + b.collisionRadius;

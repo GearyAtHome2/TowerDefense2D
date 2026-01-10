@@ -1,10 +1,12 @@
 package com.Geary.towerdefense.entity.mob;
 
 import com.Geary.towerdefense.Direction;
+import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.mob.navigation.ArcTurnHandler;
 import com.Geary.towerdefense.entity.mob.navigation.MobPathNavigator;
 import com.Geary.towerdefense.entity.mob.navigation.TileRandomMover;
 import com.Geary.towerdefense.entity.world.Cell;
+import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -12,14 +14,14 @@ import java.util.List;
 
 import static com.Geary.towerdefense.Direction.*;
 
-public abstract class Mob {
+public abstract class Mob extends Entity {
 
     public Texture texture;
+    public float size;
     public float collisionRadius;
-    public int health = 18;
-    public int damage = 6;
+    public int health;
+    public int damage;
 
-    public float x, y;
     public float bounceVX = 0f;
     public float bounceVY = 0f;
 
@@ -40,10 +42,12 @@ public abstract class Mob {
     protected float knockbackDamping;
     public float collisionCooldown = 0f;
 
-    protected Mob(float x, float y, Texture texture, MobStats stats) {
+    protected Mob(float xPos, float yPos, Texture texture, MobStats stats) {
         this.texture = texture;
-        this.x = x;
-        this.y = y;
+        this.xPos = xPos;
+        this.yPos = yPos;
+
+        this.size = GameWorld.cellSize * stats.size();
 
         this.health = stats.health();
         this.damage = stats.damage();
@@ -106,8 +110,8 @@ public abstract class Mob {
 
             float[] pos = arcHandler.updateArc(arcMove);
             if (pos != null) {
-                x = pos[0] - texture.getWidth() / 2f;
-                y = pos[1] - texture.getHeight() / 2f;
+                xPos = pos[0] - texture.getWidth() / 2f;
+                yPos = pos[1] - texture.getHeight() / 2f;
             }
 
             if (!arcHandler.isInArcTurn()) {
@@ -116,23 +120,23 @@ public abstract class Mob {
         } else {
             float move = speed * delta * pathNavigator.getCellSize();
 
-            float oldX = x;
-            float oldY = y;
+            float oldX = xPos;
+            float oldY = yPos;
 
             switch (moveDir) {
-                case RIGHT -> x += move;
-                case LEFT -> x -= move;
-                case UP -> y += move;
-                case DOWN -> y -= move;
+                case RIGHT -> xPos += move;
+                case LEFT -> xPos -= move;
+                case UP -> yPos += move;
+                case DOWN -> yPos -= move;
             }
 
             if (moveDir == UP || moveDir == DOWN)
-                x += randomMover.computeMovement(getCenterX() - cell.x, delta, ranMoveProb);
+                xPos += randomMover.computeMovement(getCenterX() - cell.x, delta, ranMoveProb);
             else
-                y += randomMover.computeMovement(getCenterY() - cell.y, delta, ranMoveProb);
+                yPos += randomMover.computeMovement(getCenterY() - cell.y, delta, ranMoveProb);
 
-            vx = (x - oldX) / delta;
-            vy = (y - oldY) / delta;
+            vx = (xPos - oldX) / delta;
+            vy = (yPos - oldY) / delta;
 
             pathNavigator.updateTileProgress(computeTileProgress(cell, moveDir));
             if (pathNavigator.getTileProgress() >= 1f)
@@ -144,15 +148,15 @@ public abstract class Mob {
         if (decay > 0f) {
             float factor = (1f - (float)Math.exp(-decay * delta)) / decay;
 
-            x += bounceVX * factor;
-            y += bounceVY * factor;
+            xPos += bounceVX * factor;
+            yPos += bounceVY * factor;
 
             float damp = (float)Math.exp(-decay * delta);
             bounceVX *= damp;
             bounceVY *= damp;
         } else {
-            x += bounceVX * delta;
-            y += bounceVY * delta;
+            xPos += bounceVX * delta;
+            yPos += bounceVY * delta;
         }
 
         if (Math.abs(bounceVX) < 1f) bounceVX = 0f;
@@ -208,15 +212,15 @@ public abstract class Mob {
     }
 
     public float getCenterX() {
-        return x + texture.getWidth() / 2f;
+        return xPos + texture.getWidth() / 2f;
     }
 
     public float getCenterY() {
-        return y + texture.getHeight() / 2f;
+        return yPos + texture.getHeight() / 2f;
     }
 
     public void draw(SpriteBatch batch) {
-        batch.draw(texture, x, y);
+        batch.draw(texture, xPos, yPos);
     }
 
     public enum Faction {FRIENDLY, ENEMY}

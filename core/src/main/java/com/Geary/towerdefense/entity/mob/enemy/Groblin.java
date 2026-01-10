@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.Texture;
 public class Groblin extends Enemy {
 
     private static final MobStats STATS = new MobStats(
+        "Groblin",
+        0.1f,
         18,   // health
         5,   // damage
         0.8f, // speed

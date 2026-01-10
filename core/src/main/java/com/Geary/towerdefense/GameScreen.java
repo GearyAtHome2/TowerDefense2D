@@ -2,13 +2,13 @@ package com.Geary.towerdefense;
 
 import com.Geary.towerdefense.UI.CameraController;
 import com.Geary.towerdefense.UI.GameUI;
-import com.Geary.towerdefense.UI.displays.building.BuildingSelectionHandler;
-import com.Geary.towerdefense.UI.displays.building.BuildingUI;
-import com.Geary.towerdefense.UI.displays.building.BuildingUIManager;
+import com.Geary.towerdefense.UI.displays.building.*;
 import com.Geary.towerdefense.UI.displays.building.specialized.factory.FactoryMenu;
+import com.Geary.towerdefense.UI.displays.mob.MobSelectionHandler;
 import com.Geary.towerdefense.UI.render.*;
 import com.Geary.towerdefense.UI.render.icons.IconStore;
 import com.Geary.towerdefense.entity.buildings.Building;
+import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.world.GameStateManager;
 import com.Geary.towerdefense.world.GameWorld;
 import com.Geary.towerdefense.world.PlacementHandler;
@@ -22,8 +22,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-
-import javax.swing.*;
 
 public class GameScreen implements Screen {
 
@@ -43,6 +41,7 @@ public class GameScreen implements Screen {
 
     private PlacementHandler placementHandler;
     private BuildingSelectionHandler buildingSelectionHandler;
+    private MobSelectionHandler mobSelectionHandler;
 
     private OrthographicCamera uiCamera;
     private Viewport uiViewport;
@@ -56,12 +55,17 @@ public class GameScreen implements Screen {
     private FactoryRenderer factoryRenderer;
 
     private BuildingUIManager buildingUIManager;
+    private Building selectedBuilding = null;
     private BuildingUI activeBuildingUI;
+
+    private UIManager uIManager;
+    private Mob selectedMob = null;
+    private EntityUI activeMobUI;
 
     private GameInputProcessor inputProcessor;
     private GameStateManager gameStateManager;
 
-    private Building selectedBuilding = null;
+
 
     boolean escConsumedByMenu = false;
 
@@ -92,6 +96,7 @@ public class GameScreen implements Screen {
     public void initHandlers() {
         placementHandler = new PlacementHandler(world.getTowerManager(), world.getTransportManager(), world.getMineManager(), world.getFactoryManager());
         buildingSelectionHandler = new BuildingSelectionHandler(world, worldViewport);
+        mobSelectionHandler = new MobSelectionHandler(world, worldViewport);
     }
 
     private void initRenderers() {
@@ -107,7 +112,9 @@ public class GameScreen implements Screen {
         gameUI = new GameUI(shapeRenderer, batch, uiFont, uiViewport, world, world.getTowerManager(), world.getTransportManager(), world.getGameStateManager());
 
         buildingUIManager = new BuildingUIManager(world, shapeRenderer, batch, uiFont);
+        uIManager = new UIManager(world, shapeRenderer, batch, uiFont);
         activeBuildingUI = null; // default UI
+        activeMobUI = null; // default UI
     }
 
     private void initInputProcessor() {
@@ -140,13 +147,23 @@ public class GameScreen implements Screen {
                 }
             }
 
-            Building clicked = buildingSelectionHandler.getBuildingAtScreen(x, y);
-            if (clicked != null) {
-                selectedBuilding = clicked;
-                activeBuildingUI = buildingUIManager.getUIFor(clicked);
+            Building clickedBuilding = buildingSelectionHandler.getBuildingAtScreen(x, y);
+            if (clickedBuilding != null) {
+
+                selectedBuilding = clickedBuilding;
+                activeBuildingUI = buildingUIManager.getUIFor(clickedBuilding);
             } else {
                 selectedBuilding = null;
                 activeBuildingUI = null;
+            }
+            Mob clickedMob = mobSelectionHandler.getMobAtScreen(x, y);
+            if (clickedMob != null) {
+                System.out.println("mob clicked.");
+                selectedMob = clickedMob;
+                activeMobUI = uIManager.getUIFor(clickedMob);
+            } else {
+                selectedMob = null;
+                activeMobUI = null;
             }
         });
 
@@ -210,7 +227,11 @@ public class GameScreen implements Screen {
     private void drawWorldActors(float delta) {
         worldRenderer.drawActors(batch, world.getSparkManager(), towerRenderer, transportRenderer, mineRenderer, factoryRenderer);
         if (selectedBuilding != null) {
-            activeBuildingUI.drawBuildingPopup(selectedBuilding, worldCamera.zoom);
+            activeBuildingUI.drawPopup(selectedBuilding, worldCamera.zoom);
+        }
+        if (selectedMob != null) {
+            System.out.println("selected mob not null, drawing popup:");
+            activeMobUI.drawPopup(selectedMob, worldCamera.zoom);
         }
         if (world.getActiveFactoryMenu() != null) {
             world.getActiveFactoryMenu().layout(); // layout for size/position

@@ -1,14 +1,13 @@
 package com.Geary.towerdefense.entity.buildings;
 
+import com.Geary.towerdefense.entity.Entity;
 import com.badlogic.gdx.graphics.Color;
 
 import java.util.List;
 
-public class Building {
-    public float xPos, yPos;
+public class Building extends Entity {
     public boolean isConnectedToNetwork = false;
     public float animationState = 0;
-    public String name;
 
     public Building(float x, float y) {
         this.xPos = x;

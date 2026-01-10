@@ -1,6 +1,7 @@
 package com.Geary.towerdefense.UI.displays.building;
 
-import com.Geary.towerdefense.entity.buildings.Building;
+import com.Geary.towerdefense.entity.Entity;
+import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -14,8 +15,12 @@ import com.badlogic.gdx.math.Vector3;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BuildingUI extends EntityUI {
+public class EntityUI {
 
+    protected final GameWorld world;
+    protected final ShapeRenderer shapeRenderer;
+    protected final SpriteBatch batch;
+    protected final BitmapFont font;
 
     private float popupScale = 1f;
     private final Rectangle deleteButtonBounds = new Rectangle();
@@ -26,14 +31,16 @@ public class BuildingUI extends EntityUI {
     // cursor for stacking buttons vertically
     protected float layoutCursorY;
 
-    public BuildingUI(GameWorld world, ShapeRenderer shapeRenderer, SpriteBatch batch, BitmapFont font) {
-        super(world, shapeRenderer, batch, font);
+    public EntityUI(GameWorld world, ShapeRenderer shapeRenderer, SpriteBatch batch, BitmapFont font) {
+        this.world = world;
+        this.shapeRenderer = shapeRenderer;
+        this.batch = batch;
+        this.font = font;
     }
 
     // ===================== DRAW =====================
-    public void drawPopup(Building building, float worldCameraZoom) {
-
-        if (building == null) return;
+    public void drawPopup(Entity entity, float worldCameraZoom) {
+        if (entity == null) return;
 
         float baseWidth = 140;
         float baseHeight = 120;
@@ -44,14 +51,15 @@ public class BuildingUI extends EntityUI {
         float minHeight = baseHeight * scale;
         float rowHeight = 24 * scale;
 
-        float x = building.xPos + world.cellSize + 5;
-        float y = building.yPos + world.cellSize;
-
-        // Highlight building
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(1f, 1f, 0f, 1f);
-        shapeRenderer.rect(building.xPos, building.yPos, world.cellSize, world.cellSize);
-        shapeRenderer.end();
+        float x;
+        float y;
+        if (entity instanceof Mob){
+            x = entity.xPos+((Mob) entity).size;
+            y = entity.yPos+((Mob) entity).size;
+        } else {
+            x = entity.xPos + world.cellSize + 5;
+            y = entity.yPos + world.cellSize;
+        }
 
         // ---- LAYOUT START ----
         float deleteButtonHeight = 20 * scale;
@@ -59,7 +67,7 @@ public class BuildingUI extends EntityUI {
 
         // Clear + rebuild extra buttons
         extraButtons.clear();
-        addExtraButtons(building, x, y, scaledWidth, minHeight, scale);
+        addExtraButtons(entity, x, y, scaledWidth, minHeight, scale);
 
         // ---- POPUP HEIGHT ----
         float contentHeight = layoutCursorY - y + padding;
@@ -76,10 +84,10 @@ public class BuildingUI extends EntityUI {
         float originalScaleX = font.getData().scaleX;
         float originalScaleY = font.getData().scaleY;
 
-        font.setColor(building.getInfoTextColor());
+        font.setColor(entity.getInfoTextColor());
         font.getData().setScale(originalScaleX * scale * 1.3f, originalScaleY * scale * 1.3f);
 
-        List<String> infoLines = building.getInfoLines();
+        List<String> infoLines = entity.getInfoLines();
         float textTopY = y + minHeight - padding * scale;
 
         for (int i = 0; i < infoLines.size(); i++) {
@@ -119,7 +127,7 @@ public class BuildingUI extends EntityUI {
     }
 
     /** Subclasses override this */
-    protected void addExtraButtons(Building building, float popupX, float popupY, float popupWidth, float popupHeight, float scale) {
+    protected void addExtraButtons(Entity entity, float popupX, float popupY, float popupWidth, float popupHeight, float scale) {
         // default: none
     }
 

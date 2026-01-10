@@ -42,10 +42,10 @@ public class Bullet {
         for (Enemy e : enemies) {
             if (e.health <= 0) continue;
 
-            float left   = e.x;
-            float right  = e.x + e.texture.getWidth();
-            float bottom = e.y;
-            float top    = e.y + e.texture.getHeight();
+            float left   = e.xPos;
+            float right  = e.xPos + e.texture.getWidth();
+            float bottom = e.yPos;
+            float top    = e.yPos + e.texture.getHeight();
             if (lineIntersectsRect(startX, startY, x, y, left, bottom, right, top)) {
                 float centerX = (left + right) / 2f;
                 float centerY = (bottom + top) / 2f;
