@@ -144,7 +144,7 @@ public class MobManager {
     }
 
     //todo: for kb bullets in future. Make sure I keep this relatively small to avoid pushing things out of lanes?
-    private void applyKnockback(Mob m, Bullet b) {
+    private void applyProjectileKnockback(Mob m, Bullet b) {
         float mx = m.getCenterX();
         float my = m.getCenterY();
         float bx = b.getCenterX();

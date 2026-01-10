@@ -226,7 +226,7 @@ public class GameScreen implements Screen {
     }
 
     private void drawWorldActors(float delta) {
-        worldRenderer.drawActors(batch, world.getSparkManager(), towerRenderer, transportRenderer, mineRenderer, factoryRenderer);
+        worldRenderer.drawActors(shapeRenderer, world.getSparkManager(), towerRenderer, transportRenderer, mineRenderer, factoryRenderer);
         if (selectedBuilding != null) {
             activeBuildingUI.drawPopup(selectedBuilding, worldCamera.zoom);
         }

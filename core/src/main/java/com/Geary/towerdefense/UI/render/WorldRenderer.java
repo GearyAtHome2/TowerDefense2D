@@ -10,7 +10,6 @@ import com.Geary.towerdefense.entity.world.Cell;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class WorldRenderer {
@@ -110,14 +109,12 @@ public class WorldRenderer {
         shapeRenderer.end();
     }
 
-    public void drawActors(SpriteBatch batch, SparkManager sparkManager, TowerRenderer towerRenderer,
+    public void drawActors(ShapeRenderer shapeRenderer, SparkManager sparkManager, TowerRenderer towerRenderer,
                            TransportRenderer transportRenderer, MineRenderer mineRenderer, FactoryRenderer factoryRenderer) {
         // Draw enemies, friends, bullets with SpriteBatch
-        batch.begin();
-        for (Enemy e : world.enemies) e.draw(batch);
-        for (Friendly f : world.friends) f.draw(batch);
-        for (Bullet b : world.bullets) b.draw(batch);
-        batch.end();
+        for (Enemy e : world.enemies) e.draw(shapeRenderer);
+        for (Friendly f : world.friends) f.draw(shapeRenderer);
+        for (Bullet b : world.bullets) b.draw(shapeRenderer);
 
         // Draw sparks
         sparkManager.draw(shapeRenderer);

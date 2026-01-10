@@ -1,5 +1,7 @@
 package com.Geary.towerdefense.entity.mob;
 
+import com.badlogic.gdx.graphics.Color;
+
 public record MobStats(
     String name,
     float size,
@@ -7,5 +9,6 @@ public record MobStats(
     int damage,
     float speed,
     float knockbackDamping,
-    float ranMoveProb
+    float ranMoveProb,
+    Color color
 ) {}

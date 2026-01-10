@@ -1,7 +1,8 @@
 package com.Geary.towerdefense.entity.mob.friendly;
 
 import com.Geary.towerdefense.entity.mob.MobStats;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Color;
+
 
 public class Serf extends Friendly {
 
@@ -12,10 +13,11 @@ public class Serf extends Friendly {
         5,   // damage
         0.71f, // speed
         8f,    // knockback damping
-        0.3f
+        0.3f,
+        Color.GREEN
     );
 
     public Serf(float x, float y) {
-        super(x, y, new Texture("friendly.png"), STATS);
+        super(x, y, STATS);
     }
 }

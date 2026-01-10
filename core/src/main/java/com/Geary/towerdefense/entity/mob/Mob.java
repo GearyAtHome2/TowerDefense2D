@@ -9,7 +9,7 @@ import com.Geary.towerdefense.entity.world.Cell;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +23,7 @@ public abstract class Mob extends Entity {
     public float collisionRadius;
     public int health;
     public int damage;
+    public Color color;
 
     public float bounceVX = 0f;
     public float bounceVY = 0f;
@@ -44,8 +45,7 @@ public abstract class Mob extends Entity {
     protected float knockbackDamping;
     public float collisionCooldown = 0f;
 
-    protected Mob(float xPos, float yPos, Texture texture, MobStats stats) {
-        this.texture = texture;
+    protected Mob(float xPos, float yPos, MobStats stats) {
         this.xPos = xPos;
         this.yPos = yPos;
 
@@ -54,6 +54,7 @@ public abstract class Mob extends Entity {
         this.health = stats.health();
         this.damage = stats.damage();
         this.speed = stats.speed();
+        this.color = stats.color();
         this.knockbackDamping = stats.knockbackDamping();
         this.ranMoveProb = stats.ranMoveProb();
         this.collisionRadius = size * 0.5f;
@@ -112,16 +113,14 @@ public abstract class Mob extends Entity {
     private void handleArcMovement(Cell cell, float delta, boolean bouncing, int cellSize) {
         if (bouncing) {
             Direction[] turn = computeTurnDirections(cell);
-//            if (arcHandler.arcProgress < 1) {
-                arcHandler.rebuildArcPreserveProgress(
-                    cell,
-                    turn[0],
-                    turn[1],
-                    getCenterX(),
-                    getCenterY(),
-                    cellSize
-                );
-//            }
+            arcHandler.rebuildArcPreserveProgress(
+                cell,
+                turn[0],
+                turn[1],
+                getCenterX(),
+                getCenterY(),
+                cellSize
+            );
         }
 
         float arcMove = speed * delta * cellSize;
@@ -131,16 +130,16 @@ public abstract class Mob extends Entity {
         float[] pos = arcHandler.updateArc(arcMove);
 
         if (pos != null) {
-            xPos = pos[0] - texture.getWidth() / 2f;
-            yPos = pos[1] - texture.getHeight() / 2f;
+            xPos = pos[0] - size / 2f;
+            yPos = pos[1] - size / 2f;
         }
 
         if (xPos - initxPos > 40 || yPos - inityPos > 40) {
 
             System.out.println("teleport possible? Size > 20:");
             System.out.println(initxPos + ", " + inityPos + "->" + xPos + ", " + yPos);
-            System.out.println("bouncing: " +bouncing);
-            System.out.println("arc progress: " +arcHandler.arcProgress);
+            System.out.println("bouncing: " + bouncing);
+            System.out.println("arc progress: " + arcHandler.arcProgress);
             System.out.println("----------collision log----------");
         }
 
@@ -174,7 +173,6 @@ public abstract class Mob extends Entity {
         if (pathNavigator.getTileProgress() >= 1f)
             pathNavigator.advance();
     }
-
 
     private void applyKnockback(float delta) {
         float decay = knockbackDamping;
@@ -258,15 +256,18 @@ public abstract class Mob extends Entity {
     }
 
     public float getCenterX() {
-        return xPos + texture.getWidth() / 2f;
+        return xPos + size / 2f;
     }
 
     public float getCenterY() {
-        return yPos + texture.getHeight() / 2f;
+        return yPos + size / 2f;
     }
 
-    public void draw(SpriteBatch batch) {
-        batch.draw(texture, xPos, yPos);
+    public void draw(ShapeRenderer shapeRenderer) {
+        shapeRenderer.setColor(this.color);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.rect(xPos - size / 2, yPos - size / 2, size, size);
+        shapeRenderer.end();
     }
 
     public enum Faction {FRIENDLY, ENEMY}

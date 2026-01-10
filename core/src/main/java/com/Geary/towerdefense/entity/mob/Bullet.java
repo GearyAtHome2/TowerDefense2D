@@ -1,8 +1,9 @@
 package com.Geary.towerdefense.entity.mob;
 
 import com.Geary.towerdefense.entity.mob.enemy.Enemy;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class Bullet {
 
@@ -12,6 +13,8 @@ public class Bullet {
     float speed = SPEED; // pixels per second
     int damage;
     Texture texture;
+    private static final float SIZE = 12f; // 12x12 rectangle
+    private static final Color COLOR = Color.WHITE;
 
     private static final float HIT_RADIUS = 8f;
     private static final float MAX_LIFETIME = 0.8f; // bullet disappears after 2 seconds
@@ -114,12 +117,11 @@ public class Bullet {
     }
 
 
-    public void draw(SpriteBatch batch) {
-        batch.draw(
-            texture,
-            x - texture.getWidth() / 2f,
-            y - texture.getHeight() / 2f
-        );
+    public void draw(ShapeRenderer shapeRenderer) {
+        shapeRenderer.setColor(COLOR);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.rect(x - SIZE / 2, y - SIZE / 2, SIZE, SIZE);
+        shapeRenderer.end();
     }
 
 
