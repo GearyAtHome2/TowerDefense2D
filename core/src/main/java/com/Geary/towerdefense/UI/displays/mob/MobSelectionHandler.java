@@ -22,27 +22,33 @@ public class MobSelectionHandler {
         if (!UIClickManager.isClickInGameArea(screenY)) {
             return null;
         }
+
         Vector3 worldClick = new Vector3(screenX, screenY, 0);
         worldViewport.unproject(worldClick);
 
+        return getMobAtWorld(worldClick.x, worldClick.y);
+    }
+
+
+    public Mob getMobAtWorld(float worldX, float worldY) {
         for (Friendly friendly : world.friends) {
-            if (isClickInsideMob(worldClick, friendly)) {
-                System.out.println("found a click on a friendly mob");
+            if (isInsideMob(worldX, worldY, friendly)) {
                 return friendly;
             }
         }
         for (Enemy enemy : world.enemies) {
-            if (isClickInsideMob(worldClick, enemy)) {
+            if (isInsideMob(worldX, worldY, enemy)) {
                 return enemy;
             }
         }
         return null;
     }
 
-    private boolean isClickInsideMob(Vector3 click, Mob mob) {
-        return click.x >= mob.xPos &&
-            click.x <= mob.xPos + mob.size &&
-            click.y >= mob.yPos &&
-            click.y <= mob.yPos + mob.size;
+    private boolean isInsideMob(float x, float y, Mob mob) {
+        return x >= mob.xPos - mob.size/2 &&
+            x <= mob.xPos + mob.size/2 &&
+            y >= mob.yPos - mob.size/2 &&
+            y <= mob.yPos + mob.size/2;
     }
+
 }
