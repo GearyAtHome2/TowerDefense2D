@@ -1,6 +1,7 @@
 package com.Geary.towerdefense.entity.spawner;
 
-import com.Geary.towerdefense.entity.mob.Enemy;
+import com.Geary.towerdefense.entity.mob.enemy.Enemy;
+import com.Geary.towerdefense.entity.mob.enemy.Groblin;
 import com.badlogic.gdx.graphics.Color;
 
 public class EnemySpawner extends Spawner {
@@ -18,9 +19,10 @@ public class EnemySpawner extends Spawner {
     }
 
     public Enemy spawn() {
-        return new Enemy(
+        return new Groblin(
             getCenterX() - 7,
             getCenterY() - 7
-        );
+        ) {
+        };
     }
 }

@@ -1,0 +1,18 @@
+package com.Geary.towerdefense.entity.mob.enemy;
+
+import com.Geary.towerdefense.entity.mob.MobStats;
+import com.badlogic.gdx.graphics.Texture;
+
+public class Groblin extends Enemy {
+
+    private static final MobStats STATS = new MobStats(
+        18,   // health
+        5,   // damage
+        0.8f, // speed
+        6f    // knockback damping
+    );
+
+    public Groblin(float x, float y) {
+        super(x, y, new Texture("enemy.png"), STATS);
+    }
+}

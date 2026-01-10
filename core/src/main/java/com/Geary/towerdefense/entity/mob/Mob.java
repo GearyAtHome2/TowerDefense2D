@@ -40,13 +40,17 @@ public abstract class Mob {
     protected float knockbackDamping = 8f;
     public float collisionCooldown = 0f;
 
-    protected Mob(float startX, float startY, Texture texture) {
+    protected Mob(float x, float y, Texture texture, MobStats stats) {
         this.texture = texture;
-        this.x = startX;
-        this.y = startY;
+        this.x = x;
+        this.y = y;
+
+        this.health = stats.health();
+        this.damage = stats.damage();
+        this.speed = stats.speed();
+        this.knockbackDamping = stats.knockbackDamping();
+
         this.collisionRadius = texture.getWidth() * 0.5f;
-        double ran = (float) Math.random();
-        speed = (float) (0.5f + ran / 8f);
     }
 
     public void setPath(List<Cell> path, int cellSize, boolean reverse) {

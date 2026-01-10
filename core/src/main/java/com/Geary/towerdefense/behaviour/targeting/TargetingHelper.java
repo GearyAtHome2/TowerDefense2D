@@ -1,7 +1,7 @@
 package com.Geary.towerdefense.behaviour.targeting;
 
 import com.Geary.towerdefense.entity.buildings.Tower;
-import com.Geary.towerdefense.entity.mob.Enemy;
+import com.Geary.towerdefense.entity.mob.enemy.Enemy;
 import com.Geary.towerdefense.world.GameWorld;
 
 import java.util.List;

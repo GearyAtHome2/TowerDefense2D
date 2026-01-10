@@ -1,8 +1,8 @@
 package com.Geary.towerdefense.behaviour;
 
 import com.Geary.towerdefense.entity.mob.Bullet;
-import com.Geary.towerdefense.entity.mob.Enemy;
-import com.Geary.towerdefense.entity.mob.Friendly;
+import com.Geary.towerdefense.entity.mob.enemy.Enemy;
+import com.Geary.towerdefense.entity.mob.friendly.Friendly;
 import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.world.GameWorld;
 
@@ -37,9 +37,8 @@ public class MobManager {
 
                 if (overlaps(enemy, friendly)) {
                     if (enemy.collisionCooldown <= 0 && friendly.collisionCooldown <= 0) {
-                        int tmpEnemyHealth = enemy.damage;
                         enemy.applyDamage(friendly.damage);
-                        friendly.applyDamage(tmpEnemyHealth);
+                        friendly.applyDamage(enemy.damage);
 
                         applyBounce(friendly, enemy);
 

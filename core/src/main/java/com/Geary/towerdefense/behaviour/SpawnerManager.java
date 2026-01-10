@@ -1,7 +1,7 @@
 package com.Geary.towerdefense.behaviour;
 
-import com.Geary.towerdefense.entity.mob.Enemy;
-import com.Geary.towerdefense.entity.mob.Friendly;
+import com.Geary.towerdefense.entity.mob.enemy.Enemy;
+import com.Geary.towerdefense.entity.mob.friendly.Friendly;
 import com.Geary.towerdefense.entity.spawner.EnemySpawner;
 import com.Geary.towerdefense.entity.spawner.FriendlySpawner;
 import com.Geary.towerdefense.world.GameWorld;

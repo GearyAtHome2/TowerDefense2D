@@ -4,7 +4,7 @@ import com.Geary.towerdefense.behaviour.targeting.AimingHelper;
 import com.Geary.towerdefense.behaviour.targeting.ShootingHelper;
 import com.Geary.towerdefense.behaviour.targeting.TargetingHelper;
 import com.Geary.towerdefense.entity.mob.Bullet;
-import com.Geary.towerdefense.entity.mob.Enemy;
+import com.Geary.towerdefense.entity.mob.enemy.Enemy;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.Color;
 

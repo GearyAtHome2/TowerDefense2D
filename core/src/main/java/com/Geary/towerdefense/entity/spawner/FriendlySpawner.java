@@ -1,6 +1,7 @@
 package com.Geary.towerdefense.entity.spawner;
 
-import com.Geary.towerdefense.entity.mob.Friendly;
+import com.Geary.towerdefense.entity.mob.friendly.Friendly;
+import com.Geary.towerdefense.entity.mob.friendly.Serf;
 import com.badlogic.gdx.graphics.Color;
 
 public class FriendlySpawner extends Spawner {
@@ -19,7 +20,7 @@ public class FriendlySpawner extends Spawner {
     }
 
     public Friendly spawn() {
-        return new Friendly(
+        return new Serf(
             getCenterX() - 7,
             getCenterY() - 7
         );
