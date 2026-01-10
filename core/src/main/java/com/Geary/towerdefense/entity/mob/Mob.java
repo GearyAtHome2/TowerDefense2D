@@ -56,7 +56,7 @@ public abstract class Mob extends Entity {
         this.speed = stats.speed();
         this.knockbackDamping = stats.knockbackDamping();
         this.ranMoveProb = stats.ranMoveProb();
-        this.collisionRadius = texture.getWidth() * 0.5f;
+        this.collisionRadius = size * 0.5f;
     }
 
     public void setPath(List<Cell> path, int cellSize, boolean reverse) {
@@ -70,10 +70,6 @@ public abstract class Mob extends Entity {
 
     public boolean isHostileTo(Mob other) {
         return faction != other.faction;
-    }
-
-    public void applyDamage(int amount) {
-        health -= amount;
     }
 
     public void update(float delta) {
@@ -193,6 +189,9 @@ public abstract class Mob extends Entity {
 
     protected void onEnterCell(Cell cell) {
         if (cell.type != Cell.Type.TURN) return;
+
+        //guard against setting up the arc
+        if (arcHandler.isInArcTurn()) return;
 
         Direction[] turn = computeTurnDirections(cell);
         arcHandler.setupArc(

@@ -4,9 +4,14 @@ import com.Geary.towerdefense.entity.mob.enemy.Enemy;
 import com.Geary.towerdefense.entity.mob.enemy.Groblin;
 import com.badlogic.gdx.graphics.Color;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.lang.Math.random;
+
 public class EnemySpawner extends Spawner {
 
-    public float maxCooldown = 3f;
+    public float maxCooldown = 1.2f;
     public float cooldown = maxCooldown;
 
     public EnemySpawner(float x, float y) {
@@ -20,9 +25,18 @@ public class EnemySpawner extends Spawner {
 
     public Enemy spawn() {
         return new Groblin(
-            getCenterX() - 7,
-            getCenterY() - 7
+            getCenterX() - (int) (random() * 14),
+            getCenterY() - (int) (random() * 14)
         ) {
         };
+    }
+
+    public List<Enemy> deathRattleSpawns(){
+        System.out.println("enemy spawner deathrattle");
+        List<Enemy> deathrattleSpawns = new ArrayList<>();
+        for (int i=0; i< 20; i++){
+            deathrattleSpawns.add(spawn());
+        }
+        return deathrattleSpawns;
     }
 }

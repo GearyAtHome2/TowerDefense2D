@@ -1,9 +1,12 @@
 package com.Geary.towerdefense.behaviour;
 
+import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.mob.Bullet;
+import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.entity.mob.enemy.Enemy;
 import com.Geary.towerdefense.entity.mob.friendly.Friendly;
-import com.Geary.towerdefense.entity.mob.Mob;
+import com.Geary.towerdefense.entity.spawner.EnemySpawner;
+import com.Geary.towerdefense.entity.spawner.FriendlySpawner;
 import com.Geary.towerdefense.world.GameWorld;
 
 public class MobManager {
@@ -20,7 +23,8 @@ public class MobManager {
         for (Enemy e : world.enemies) e.update(delta);
         for (Friendly f : world.friends) f.update(delta);
 
-        handleCollisions();
+        handleMobCollisions();
+        handleSpawnerHit();
 
         removeDeadMobs(world.enemies);
         removeDeadMobs(world.friends);
@@ -28,7 +32,31 @@ public class MobManager {
         world.bullets.removeIf(b -> !b.update(delta, world.enemies));
     }
 
-    private void handleCollisions() {
+    private void handleSpawnerHit() {
+        for (Enemy enemy : world.enemies) {
+            if (!enemy.isAlive()) continue;
+            if (world.friendlySpawners.isEmpty()) continue;
+            //for now - will want to loop over them in future?
+
+            FriendlySpawner friendlySpawner = world.friendlySpawners.get(0);
+            if (overlaps(enemy, friendlySpawner)) {
+                friendlySpawner.applyDamage(enemy.damage);
+                enemy.health = 0;
+            }
+        }
+        for (Friendly friendly : world.friends) {
+            if (!friendly.isAlive()) continue;
+            if (world.enemySpawners.isEmpty()) continue;
+            //for now - will want to loop over them in future?
+            EnemySpawner enemySpawner = world.enemySpawners.get(0);
+            if (overlaps(friendly, enemySpawner)) {
+                enemySpawner.applyDamage(friendly.damage);
+                friendly.health = 0;
+            }
+        }
+    }
+
+    private void handleMobCollisions() {
         for (Enemy enemy : world.enemies) {
             if (!enemy.isAlive()) continue;
 
@@ -45,7 +73,6 @@ public class MobManager {
                         enemy.collisionCooldown = 0.1f;
                         friendly.collisionCooldown = 0.1f;
                     }
-
                 }
             }
         }
@@ -59,6 +86,19 @@ public class MobManager {
             }
             return false;
         });
+    }
+
+
+    //todo: this doesn't seem to work when I pass it two mobs?
+    private boolean overlaps(Entity a, Entity b) {
+        float ax = a.xPos + a.collisionRadius;
+        float ay = a.yPos + a.collisionRadius;
+        float bx = b.xPos + b.collisionRadius;
+        float by = b.yPos + b.collisionRadius;
+        float dx = ax - bx;
+        float dy = ay - by;
+        float r = a.collisionRadius + b.collisionRadius;
+        return dx * dx + dy * dy <= r * r;
     }
 
     /** Checks if two mobs are overlapping */

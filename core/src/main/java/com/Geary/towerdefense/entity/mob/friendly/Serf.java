@@ -8,7 +8,7 @@ public class Serf extends Friendly {
     private static final MobStats STATS = new MobStats(
         "Serf",
         0.1f,
-        22,   // health
+        220,   // health
         5,   // damage
         0.71f, // speed
         8f,    // knockback damping

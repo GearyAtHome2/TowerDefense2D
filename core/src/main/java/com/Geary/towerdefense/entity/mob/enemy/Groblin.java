@@ -8,7 +8,7 @@ public class Groblin extends Enemy {
     private static final MobStats STATS = new MobStats(
         "Groblin",
         0.1f,
-        18,   // health
+        180,   // health
         5,   // damage
         0.8f, // speed
         6f,    // knockback damping

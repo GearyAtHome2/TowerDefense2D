@@ -4,9 +4,14 @@ import com.Geary.towerdefense.entity.mob.friendly.Friendly;
 import com.Geary.towerdefense.entity.mob.friendly.Serf;
 import com.badlogic.gdx.graphics.Color;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.lang.Math.random;
+
 public class FriendlySpawner extends Spawner {
     //to be removed
-    public float maxCooldown = 3f;
+    public float maxCooldown = 1.2f;
     public float cooldown = maxCooldown;
 
     public FriendlySpawner(float x, float y) {
@@ -14,15 +19,24 @@ public class FriendlySpawner extends Spawner {
         isConnectedToNetwork = true;
     }
 
+    public Friendly spawn() {
+        return new Serf(
+            getCenterX() - (int) (random()*14),
+            getCenterY() - (int) (random()*14)
+        );
+    }
+
     @Override
     protected Color getColor() {
         return Color.GREEN;
     }
 
-    public Friendly spawn() {
-        return new Serf(
-            getCenterX() - 7,
-            getCenterY() - 7
-        );
+    public List<Friendly> deathRattleSpawns(){
+        System.out.println("friendly spawner deathrattle");
+        List<Friendly> deathrattleSpawns = new ArrayList<>();
+        for (int i=0; i< 20; i++){
+            deathrattleSpawns.add(spawn());
+        }
+        return deathrattleSpawns;
     }
 }

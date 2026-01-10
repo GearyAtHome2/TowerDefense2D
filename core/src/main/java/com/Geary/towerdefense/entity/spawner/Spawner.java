@@ -10,15 +10,17 @@ public abstract class Spawner extends Building {
     protected static final float BUFFER = 8f;
 
     protected Spawner(float x, float y) {
-        super(x,y);
+        super(x, y);
         this.isConnectedToNetwork = true;
+        this.collisionRadius = (GameWorld.cellSize - (2 * BUFFER)) / 2;
+        this.health = 8000;
     }
 
     public void draw(ShapeRenderer sr) {
         sr.begin(ShapeRenderer.ShapeType.Filled);
         sr.setColor(getColor());
 
-        float size = GameWorld.cellSize - (2 * BUFFER);
+        float size = collisionRadius * 2;
         sr.rect(
             xPos + BUFFER,
             yPos + BUFFER,
@@ -28,10 +30,14 @@ public abstract class Spawner extends Building {
         sr.end();
     }
 
-    /** Override for visual distinction */
+    /**
+     * Override for visual distinction
+     */
     protected abstract Color getColor();
 
-    /** World-space center of this tile */
+    /**
+     * World-space center of this tile
+     */
     protected float getCenterX() {
         return xPos + GameWorld.cellSize / 2f;
     }
