@@ -124,9 +124,9 @@ public class MobManager {
 
 
         //important - this dramatically changes collisions to cause "scrums" - removeable and the collisions work very differently.
-        float bias = Math.abs(f.vx) > Math.abs(f.vy) ? 1f : 0.5f;
-        dx *= bias;
-        dy *= (1f - bias);
+//        float bias = Math.abs(f.vx) > Math.abs(f.vy) ? 1f : 0.5f;
+//        dx *= bias;
+//        dy *= (1f - bias);
 
         float len = (float)Math.sqrt(dx*dx + dy*dy);
         if (len == 0) return;
@@ -138,7 +138,6 @@ public class MobManager {
 
         f.bounceVX += dx * strength;
         f.bounceVY += dy * strength;
-
         e.bounceVX -= dx * strength;
         e.bounceVY -= dy * strength;
 

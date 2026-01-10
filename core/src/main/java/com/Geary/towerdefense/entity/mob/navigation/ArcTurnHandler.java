@@ -13,7 +13,7 @@ public class ArcTurnHandler {
     private float arcEndAngle;
     private float arcCenterX;
     private float arcCenterY;
-    private float arcProgress = 0f;
+    public float arcProgress = 0f;
     private boolean inArcTurn = false;
 
     public boolean isInArcTurn() {
@@ -77,7 +77,7 @@ public class ArcTurnHandler {
         float arcLength = arcRadius * Math.abs(arcEndAngle - arcStartAngle);
 
         arcProgress += deltaDist;
-        arcProgress = clamp(arcProgress, 0f, arcLength);
+//        arcProgress = clamp(arcProgress, 0f, arcLength);
 
         float t = arcProgress / arcLength;
         arcAngle = arcStartAngle + t * (arcEndAngle - arcStartAngle);
@@ -90,7 +90,7 @@ public class ArcTurnHandler {
 
         float x = arcCenterX + (float) cos(arcAngle) * arcRadius;
         float y = arcCenterY + (float) sin(arcAngle) * arcRadius;
-        arcProgress = Math.max(arcProgress, 0f);
+//        arcProgress = Math.max(arcProgress, 0f);
         return new float[]{x, y};
     }
 
@@ -126,9 +126,17 @@ public class ArcTurnHandler {
         float totalAngle = arcEndAngle - arcStartAngle;
         float currentAngle = arcAngle - arcStartAngle;
 
+        float deltaAngle = arcAngle - arcStartAngle;
+        while (deltaAngle > Math.PI) deltaAngle -= 2*Math.PI;
+        while (deltaAngle < -Math.PI) deltaAngle += 2*Math.PI;
+        if (currentAngle < -6){
+            System.out.println("found a dodgy currentAngle: "+currentAngle);
+            System.out.println("corrected to deltaAngle: "+deltaAngle);
+        }
+
         // Handle clockwise vs anticlockwise
         float t = currentAngle / totalAngle;
-        t = clamp(t, 0f, 1f);
+//        t = clamp(t, 0f, 1f);
 
         float arcLength = arcRadius * Math.abs(totalAngle);
         arcProgress = t * arcLength;

@@ -112,22 +112,36 @@ public abstract class Mob extends Entity {
     private void handleArcMovement(Cell cell, float delta, boolean bouncing, int cellSize) {
         if (bouncing) {
             Direction[] turn = computeTurnDirections(cell);
-            arcHandler.rebuildArcPreserveProgress(
-                cell,
-                turn[0],
-                turn[1],
-                getCenterX(),
-                getCenterY(),
-                cellSize
-            );
+//            if (arcHandler.arcProgress < 1) {
+                arcHandler.rebuildArcPreserveProgress(
+                    cell,
+                    turn[0],
+                    turn[1],
+                    getCenterX(),
+                    getCenterY(),
+                    cellSize
+                );
+//            }
         }
 
         float arcMove = speed * delta * cellSize;
+
+        float initxPos = xPos;
+        float inityPos = yPos;
         float[] pos = arcHandler.updateArc(arcMove);
 
         if (pos != null) {
             xPos = pos[0] - texture.getWidth() / 2f;
             yPos = pos[1] - texture.getHeight() / 2f;
+        }
+
+        if (xPos - initxPos > 40 || yPos - inityPos > 40) {
+
+            System.out.println("teleport possible? Size > 20:");
+            System.out.println(initxPos + ", " + inityPos + "->" + xPos + ", " + yPos);
+            System.out.println("bouncing: " +bouncing);
+            System.out.println("arc progress: " +arcHandler.arcProgress);
+            System.out.println("----------collision log----------");
         }
 
         if (!arcHandler.isInArcTurn()) {
@@ -235,8 +249,8 @@ public abstract class Mob extends Entity {
 
     private Direction[] computeTurnDirections(Cell cell) {
         Direction entry = adjusted(turnMultiplier < 0 ? cell.nextDirection : cell.direction);
-        Direction exit  = adjusted(turnMultiplier < 0 ? cell.direction     : cell.nextDirection);
-        return new Direction[] { entry, exit };
+        Direction exit = adjusted(turnMultiplier < 0 ? cell.direction : cell.nextDirection);
+        return new Direction[]{entry, exit};
     }
 
     protected float clamp(float v) {
