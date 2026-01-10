@@ -41,7 +41,6 @@ public class EntityUI {
     // ===================== DRAW =====================
     public void drawPopup(Entity entity, float worldCameraZoom) {
         if (entity == null) return;
-
         float baseWidth = 140;
         float baseHeight = 120;
         float padding = 8;
@@ -91,6 +90,7 @@ public class EntityUI {
         float textTopY = y + minHeight - padding * scale;
 
         for (int i = 0; i < infoLines.size(); i++) {
+            System.out.println("Attempting to draw line: "+infoLines.get(i));
             font.draw(batch, infoLines.get(i), x + padding * scale, textTopY - i * rowHeight);
         }
         batch.end();

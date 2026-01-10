@@ -7,6 +7,7 @@ import com.Geary.towerdefense.UI.displays.building.specialized.factory.FactoryMe
 import com.Geary.towerdefense.UI.displays.mob.MobSelectionHandler;
 import com.Geary.towerdefense.UI.render.*;
 import com.Geary.towerdefense.UI.render.icons.IconStore;
+import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.world.GameStateManager;
@@ -59,7 +60,7 @@ public class GameScreen implements Screen {
     private BuildingUI activeBuildingUI;
 
     private UIManager uIManager;
-    private Mob selectedMob = null;
+    private Entity selectedMob = null;
     private EntityUI activeMobUI;
 
     private GameInputProcessor inputProcessor;
@@ -229,9 +230,13 @@ public class GameScreen implements Screen {
         if (selectedBuilding != null) {
             activeBuildingUI.drawPopup(selectedBuilding, worldCamera.zoom);
         }
+
         if (selectedMob != null) {
-            System.out.println("selected mob not null, drawing popup:");
-            activeMobUI.drawPopup(selectedMob, worldCamera.zoom);
+            if (selectedMob instanceof Mob && ((Mob) selectedMob).health < 1){
+                selectedMob = null;
+            } else {
+                activeMobUI.drawPopup(selectedMob, worldCamera.zoom);
+            }
         }
         if (world.getActiveFactoryMenu() != null) {
             world.getActiveFactoryMenu().layout(); // layout for size/position
