@@ -136,6 +136,30 @@ public class ArcTurnHandler {
         inArcTurn = true;
     }
 
+//    private float computeIdealArcRadius(Cell cell, Direction from, Direction to, float cellSize) {
+//        float cx = cell.x;
+//        float cy = cell.y;
+//        float size = cellSize;
+//
+//        float idealX = 0, idealY = 0;
+//
+//        if (from == Direction.RIGHT && to == Direction.UP) { idealX = cx; idealY = cy + size; }
+//        else if (from == Direction.RIGHT && to == Direction.DOWN) { idealX = cx; idealY = cy; }
+//        else if (from == Direction.LEFT && to == Direction.UP) { idealX = cx + size; idealY = cy + size; }
+//        else if (from == Direction.LEFT && to == Direction.DOWN) { idealX = cx + size; idealY = cy; }
+//        else if (from == Direction.UP && to == Direction.RIGHT) { idealX = cx + size; idealY = cy; }
+//        else if (from == Direction.UP && to == Direction.LEFT) { idealX = cx; idealY = cy; }
+//        else if (from == Direction.DOWN && to == Direction.RIGHT) { idealX = cx + size; idealY = cy + size; }
+//        else if (from == Direction.DOWN && to == Direction.LEFT) { idealX = cx; idealY = cy + size; }
+//
+//        float dx = getCenterX() - idealX;
+//        float dy = getCenterY() - idealY;
+//        float r = (float) Math.hypot(dx, dy);
+//
+//        // Clamp to some minimum fraction of cell size instead of 0
+//        return Math.max(r, cellSize * 0.25f);
+//    }
+
 
     private float clamp(float v, float min, float max) {
         return Math.max(min, Math.min(max, v));

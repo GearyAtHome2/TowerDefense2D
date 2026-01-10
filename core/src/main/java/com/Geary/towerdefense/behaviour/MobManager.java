@@ -121,6 +121,13 @@ public class MobManager {
 
         float dx = fx - ex;
         float dy = fy - ey;
+
+
+        //important - this dramatically changes collisions to cause "scrums" - removeable and the collisions work very differently.
+        float bias = Math.abs(f.vx) > Math.abs(f.vy) ? 1f : 0.5f;
+        dx *= bias;
+        dy *= (1f - bias);
+
         float len = (float)Math.sqrt(dx*dx + dy*dy);
         if (len == 0) return;
 
