@@ -124,23 +124,11 @@ public abstract class Mob extends Entity {
         }
 
         float arcMove = speed * delta * cellSize;
-
-        float initxPos = xPos;
-        float inityPos = yPos;
         float[] pos = arcHandler.updateArc(arcMove);
 
         if (pos != null) {
             xPos = pos[0] - size / 2f;
             yPos = pos[1] - size / 2f;
-        }
-
-        if (xPos - initxPos > 40 || yPos - inityPos > 40) {
-
-            System.out.println("teleport possible? Size > 20:");
-            System.out.println(initxPos + ", " + inityPos + "->" + xPos + ", " + yPos);
-            System.out.println("bouncing: " + bouncing);
-            System.out.println("arc progress: " + arcHandler.arcProgress);
-            System.out.println("----------collision log----------");
         }
 
         if (!arcHandler.isInArcTurn()) {
@@ -149,29 +137,51 @@ public abstract class Mob extends Entity {
     }
 
     private void handleLinearMovement(Cell cell, Direction moveDir, float delta, int cellSize) {
-        float move = speed * delta * cellSize;
+        float moveDistance = speed * delta * cellSize;
 
         float oldX = xPos;
         float oldY = yPos;
 
+        // --- Move along main axis ---
         switch (moveDir) {
-            case RIGHT -> xPos += move;
-            case LEFT -> xPos -= move;
-            case UP -> yPos += move;
-            case DOWN -> yPos -= move;
+            case RIGHT -> xPos += moveDistance;
+            case LEFT -> xPos -= moveDistance;
+            case UP -> yPos += moveDistance;
+            case DOWN -> yPos -= moveDistance;
+            default -> {
+            }
         }
 
-        if (moveDir == UP || moveDir == DOWN)
-            xPos += randomMover.computeMovement(getCenterX() - cell.x, delta, ranMoveProb);
-        else
-            yPos += randomMover.computeMovement(getCenterY() - cell.y, delta, ranMoveProb);
+        // --- Random wiggle perpendicular ---
+        float perpendicularOffset = 0f;
+        if (moveDir == UP || moveDir == DOWN) {
+            perpendicularOffset = randomMover.computeMovement(getCenterX() - cell.x, delta, ranMoveProb);
+            xPos += perpendicularOffset;
+        } else if (moveDir == LEFT || moveDir == RIGHT) {
+            perpendicularOffset = randomMover.computeMovement(getCenterY() - cell.y, delta, ranMoveProb);
+            yPos += perpendicularOffset;
+        }
 
+        // --- Apply bounce ---
         vx = (xPos - oldX) / delta;
         vy = (yPos - oldY) / delta;
 
+        // --- Tile progress update ---
         pathNavigator.updateTileProgress(computeTileProgress(cell, moveDir));
-        if (pathNavigator.getTileProgress() >= 1f)
-            pathNavigator.advance();
+        if (pathNavigator.getTileProgress() >= 1f) pathNavigator.advance();
+
+        // --- Spring correction perpendicular to main axis only ---
+        float centerX = cell.x + cellSize / 2f;
+        float centerY = cell.y + cellSize / 2f;
+        float springStrength = 5f;
+
+        if (moveDir == UP || moveDir == DOWN) {
+            float dx = centerX - getCenterX();
+            xPos += dx * springStrength * delta;
+        } else if (moveDir == LEFT || moveDir == RIGHT) {
+            float dy = centerY - getCenterY();
+            yPos += dy * springStrength * delta;
+        }
     }
 
     private void applyKnockback(float delta) {

@@ -32,7 +32,6 @@ public class FriendlySpawner extends Spawner {
     }
 
     public List<Friendly> deathRattleSpawns(){
-        System.out.println("friendly spawner deathrattle");
         List<Friendly> deathrattleSpawns = new ArrayList<>();
         for (int i=0; i< 20; i++){
             deathrattleSpawns.add(spawn());

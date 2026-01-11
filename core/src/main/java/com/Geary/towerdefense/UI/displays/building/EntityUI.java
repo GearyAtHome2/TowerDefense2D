@@ -90,7 +90,6 @@ public class EntityUI {
         float textTopY = y + minHeight - padding * scale;
 
         for (int i = 0; i < infoLines.size(); i++) {
-            System.out.println("Attempting to draw line: "+infoLines.get(i));
             font.draw(batch, infoLines.get(i), x + padding * scale, textTopY - i * rowHeight);
         }
         batch.end();

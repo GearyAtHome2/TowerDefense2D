@@ -60,7 +60,6 @@ public class ResourceManager {
                 abundance = 0.5f;
             }
         }
-        System.out.println("placed mine of abundance: "+abundance);
         cell.resource = new Resource(rawResourceType, abundance);
     }
 

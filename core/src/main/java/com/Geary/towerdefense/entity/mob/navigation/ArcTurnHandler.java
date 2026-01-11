@@ -129,10 +129,6 @@ public class ArcTurnHandler {
         float deltaAngle = arcAngle - arcStartAngle;
         while (deltaAngle > Math.PI) deltaAngle -= 2*Math.PI;
         while (deltaAngle < -Math.PI) deltaAngle += 2*Math.PI;
-        if (currentAngle < -6){
-            System.out.println("found a dodgy currentAngle: "+currentAngle);
-            System.out.println("corrected to deltaAngle: "+deltaAngle);
-        }
 
         // Handle clockwise vs anticlockwise
         float t = currentAngle / totalAngle;

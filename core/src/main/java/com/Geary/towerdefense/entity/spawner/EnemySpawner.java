@@ -32,7 +32,6 @@ public class EnemySpawner extends Spawner {
     }
 
     public List<Enemy> deathRattleSpawns(){
-        System.out.println("enemy spawner deathrattle");
         List<Enemy> deathrattleSpawns = new ArrayList<>();
         for (int i=0; i< 20; i++){
             deathrattleSpawns.add(spawn());

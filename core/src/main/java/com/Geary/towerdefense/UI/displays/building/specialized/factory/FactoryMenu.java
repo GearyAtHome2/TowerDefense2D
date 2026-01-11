@@ -126,7 +126,6 @@ public class FactoryMenu extends Modal {
 
     public void setActiveEntry(RecipeMenuEntry entry) {
         if (activeMenuEntry != null) activeMenuEntry.active = false;
-        System.out.println("setting active recipe: "+entry.recipe.name);
         activeMenuEntry = entry;
         activeMenuEntry.active = true;
         factory.activeRecipe = entry.recipe;
