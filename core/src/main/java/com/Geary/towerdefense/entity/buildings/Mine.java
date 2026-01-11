@@ -11,6 +11,7 @@ public class Mine extends Building {
     public Mine(float x, float y) {
         super(x, y);
         this.resource = new Resource(Resource.RawResourceType.COAL, 0.1f);
+        this.name = "Mine";
     }
 
     public Mine(float x, float y, Resource resource) {
@@ -31,6 +32,7 @@ public class Mine extends Building {
     @Override
     public List<String> getInfoLines() {
         return List.of(
+            this.name,
             "Abundance: " + resource.resourceAbundance
         );
     }

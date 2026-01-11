@@ -5,6 +5,9 @@ import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class Spawner extends Building {
     // Visual inset from tile edges
     protected static final float BUFFER = 8f;
@@ -14,6 +17,7 @@ public abstract class Spawner extends Building {
         this.isConnectedToNetwork = true;
         this.collisionRadius = (GameWorld.cellSize - (2 * BUFFER)) / 2;
         this.health = 8000;
+        this.isDeletable = false;
     }
 
     public void draw(ShapeRenderer sr) {
@@ -44,5 +48,13 @@ public abstract class Spawner extends Building {
 
     protected float getCenterY() {
         return yPos + GameWorld.cellSize / 2f;
+    }
+
+    @Override
+    public List<String> getInfoLines() {
+        List<String> lines = new ArrayList<>();
+        lines.add(this.name);
+        lines.add("Health:" + this.health);
+        return lines;
     }
 }

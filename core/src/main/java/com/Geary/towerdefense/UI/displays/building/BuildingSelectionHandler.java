@@ -2,6 +2,7 @@ package com.Geary.towerdefense.UI.displays.building;
 
 import com.Geary.towerdefense.UI.displays.UIClickManager;
 import com.Geary.towerdefense.entity.buildings.Building;
+import com.Geary.towerdefense.entity.spawner.Spawner;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -41,6 +42,16 @@ public class BuildingSelectionHandler {
         for (Building b : world.factories) {
             if (isClickInsideBuilding(worldClick, b)) {
                 return b;
+            }
+        }
+        for (Spawner s : world.friendlySpawners) {
+            if (isClickInsideBuilding(worldClick, s)) {
+                return s;
+            }
+        }
+        for (Spawner s : world.enemySpawners) {
+            if (isClickInsideBuilding(worldClick, s)) {
+                return s;
             }
         }
         return null;

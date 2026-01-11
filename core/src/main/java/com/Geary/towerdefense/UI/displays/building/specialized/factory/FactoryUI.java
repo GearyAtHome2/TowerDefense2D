@@ -1,7 +1,7 @@
 package com.Geary.towerdefense.UI.displays.building.specialized.factory;
 
 import com.Geary.towerdefense.UI.displays.building.BuildingUI;
-import com.Geary.towerdefense.entity.buildings.Building;
+import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.buildings.Factory;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -15,26 +15,10 @@ public class FactoryUI extends BuildingUI {
     }
 
     @Override
-    protected float getPopupScale(float zoom) {
-        return super.getPopupScale(zoom);
-    }
-
-    @Override
-    protected void addExtraButtons(
-        Building building,
-        float popupX,
-        float popupY,
-        float popupWidth,
-        float popupHeight,
-        float scale
-    ) {
-        addStackedButton(
-            "Open Factory Menu",
-            popupX,
-            popupWidth,
-            scale,
-            0.2f, 0.6f, 1f,
-            () -> world.showFactoryMenu((Factory) building, font)
-        );
+    protected void addExtraButtons(Entity entity, float popupX, float popupY, float popupWidth, float popupHeight, float scale) {
+        if (entity instanceof Factory factory) {
+            addStackedButton("Open Factory Menu", popupX, popupWidth, scale, 0.2f, 0.6f, 1f,
+                () -> world.showFactoryMenu(factory, font));
+        }
     }
 }

@@ -1,7 +1,7 @@
 package com.Geary.towerdefense.world;
 
 import com.Geary.towerdefense.Direction;
-import com.Geary.towerdefense.UI.displays.building.specialized.factory.FactoryMenu;
+import com.Geary.towerdefense.UI.displays.building.specialized.factory.FactoryModal;
 import com.Geary.towerdefense.behaviour.MobManager;
 import com.Geary.towerdefense.behaviour.ResourceManager;
 import com.Geary.towerdefense.behaviour.SparkManager;
@@ -66,7 +66,7 @@ public class GameWorld {
     private SpawnerManager spawnerManager;
     private GameStateManager gameStateManager;
 
-    private FactoryMenu activeFactoryMenu;
+    private FactoryModal activeFactoryModal;
 
     public GameWorld() {
         grid = new Cell[gridWidth][gridHeight];
@@ -244,15 +244,15 @@ public class GameWorld {
     }
 
     public void showFactoryMenu(Factory factory, BitmapFont font) {
-        activeFactoryMenu = new FactoryMenu(factory, font);
+        activeFactoryModal = new FactoryModal(factory, font);
     }
 
     public void closeFactoryMenu() {
-        activeFactoryMenu = null;
+        activeFactoryModal = null;
     }
 
-    public FactoryMenu getActiveFactoryMenu() {
-        return activeFactoryMenu;
+    public FactoryModal getActiveFactoryMenu() {
+        return activeFactoryModal;
     }
 
     public TowerManager getTowerManager() {

@@ -103,6 +103,7 @@ public class Tower extends Building {
     @Override
     public List<String> getInfoLines() {
         return List.of(
+            this.name,
             "Cooldown: " + (int) Math.ceil(cooldown * 10f),
             "Range: " + range
         );

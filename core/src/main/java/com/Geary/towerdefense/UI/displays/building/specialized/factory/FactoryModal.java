@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class FactoryMenu extends Modal {
+public class FactoryModal extends Modal {
 
     private final Factory factory;
     private final ScrollBox scrollBox;
@@ -51,7 +51,7 @@ public class FactoryMenu extends Modal {
 
     private final LayoutConfig layoutCfg = new LayoutConfig();
 
-    public FactoryMenu(Factory factory, BitmapFont font) {
+    public FactoryModal(Factory factory, BitmapFont font) {
         super(font);
         this.factory = factory;
         this.tooltipRenderer = new TooltipRenderer(font);

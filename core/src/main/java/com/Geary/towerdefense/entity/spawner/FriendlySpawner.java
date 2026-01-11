@@ -17,6 +17,7 @@ public class FriendlySpawner extends Spawner {
     public FriendlySpawner(float x, float y) {
         super(x, y);
         isConnectedToNetwork = true;
+        this.name="Friendly spawner";
     }
 
     public Friendly spawn() {

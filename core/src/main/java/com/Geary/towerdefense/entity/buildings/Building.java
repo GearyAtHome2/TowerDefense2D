@@ -3,11 +3,13 @@ package com.Geary.towerdefense.entity.buildings;
 import com.Geary.towerdefense.entity.Entity;
 import com.badlogic.gdx.graphics.Color;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Building extends Entity {
     public boolean isConnectedToNetwork = false;
     public float animationState = 0;
+    public boolean isDeletable = true;
 
     public Building(float x, float y) {
         this.xPos = x;
@@ -19,7 +21,9 @@ public class Building extends Entity {
     }
 
     public List<String> getInfoLines() {
-        return List.of(); // default: empty
+        List<String> lines = new ArrayList<>();
+        lines.add(this.name);
+        return lines;
     }
 
     public Color getInfoTextColor() {

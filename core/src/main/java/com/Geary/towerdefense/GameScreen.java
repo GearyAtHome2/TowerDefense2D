@@ -3,8 +3,12 @@ package com.Geary.towerdefense;
 import com.Geary.towerdefense.UI.CameraController;
 import com.Geary.towerdefense.UI.GameUI;
 import com.Geary.towerdefense.UI.displays.UIClickManager;
-import com.Geary.towerdefense.UI.displays.building.*;
-import com.Geary.towerdefense.UI.displays.building.specialized.factory.FactoryMenu;
+import com.Geary.towerdefense.UI.displays.UIManager;
+import com.Geary.towerdefense.UI.displays.building.BuildingSelectionHandler;
+import com.Geary.towerdefense.UI.displays.building.BuildingUI;
+import com.Geary.towerdefense.UI.displays.building.BuildingUIManager;
+import com.Geary.towerdefense.UI.displays.building.EntityUI;
+import com.Geary.towerdefense.UI.displays.building.specialized.factory.FactoryModal;
 import com.Geary.towerdefense.UI.displays.mob.MobSelectionHandler;
 import com.Geary.towerdefense.UI.render.*;
 import com.Geary.towerdefense.UI.render.icons.IconStore;
@@ -13,12 +17,18 @@ import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.world.GameStateManager;
 import com.Geary.towerdefense.world.GameWorld;
 import com.Geary.towerdefense.world.PlacementHandler;
-import com.badlogic.gdx.*;
-import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.viewport.*;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class GameScreen implements Screen {
 
@@ -150,7 +160,7 @@ public class GameScreen implements Screen {
     }
 
     private void handleWorldClick(int x, int y) {
-        FactoryMenu menu = world.getActiveFactoryMenu();
+        FactoryModal menu = world.getActiveFactoryMenu();
         if (menu != null) {
             menu.handleClick(x, y);
             if (menu.shouldClose()) {
@@ -191,7 +201,7 @@ public class GameScreen implements Screen {
     }
 
     private void updateMenus() {
-        FactoryMenu menu = world.getActiveFactoryMenu();
+        FactoryModal menu = world.getActiveFactoryMenu();
         if (menu != null) {
             menu.update();
             menu.updateHover(Gdx.input.getX(), Gdx.input.getY(), uiViewport);
@@ -275,7 +285,7 @@ public class GameScreen implements Screen {
     }
 
     private void drawFactoryMenu() {
-        FactoryMenu menu = world.getActiveFactoryMenu();
+        FactoryModal menu = world.getActiveFactoryMenu();
         if (menu == null) return;
 
         uiViewport.apply();

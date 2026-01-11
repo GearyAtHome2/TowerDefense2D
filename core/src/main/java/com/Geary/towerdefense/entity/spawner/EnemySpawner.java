@@ -16,6 +16,7 @@ public class EnemySpawner extends Spawner {
 
     public EnemySpawner(float x, float y) {
         super(x, y);
+        this.name="Enemy spawner";
     }
 
     @Override

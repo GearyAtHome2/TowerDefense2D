@@ -15,7 +15,7 @@ import com.badlogic.gdx.math.Vector3;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntityUI {
+public abstract class EntityUI {
 
     protected final GameWorld world;
     protected final ShapeRenderer shapeRenderer;
@@ -27,8 +27,6 @@ public class EntityUI {
     private boolean deleteClickedThisFrame = false;
 
     protected final List<BuildingUIButton> extraButtons = new ArrayList<>();
-
-    // cursor for stacking buttons vertically
     protected float layoutCursorY;
 
     public EntityUI(GameWorld world, ShapeRenderer shapeRenderer, SpriteBatch batch, BitmapFont font) {
@@ -38,9 +36,9 @@ public class EntityUI {
         this.font = font;
     }
 
-    // ===================== DRAW =====================
     public void drawPopup(Entity entity, float worldCameraZoom) {
         if (entity == null) return;
+
         float baseWidth = 140;
         float baseHeight = 120;
         float padding = 8;
@@ -50,35 +48,30 @@ public class EntityUI {
         float minHeight = baseHeight * scale;
         float rowHeight = 24 * scale;
 
-        float x;
-        float y;
-        if (entity instanceof Mob){
-            x = entity.xPos+((Mob) entity).size;
-            y = entity.yPos+((Mob) entity).size;
-        } else {
-            x = entity.xPos + world.cellSize + 5;
-            y = entity.yPos + world.cellSize;
-        }
+        float x = getPopupX(entity);
+        float y = getPopupY(entity);
 
-        // ---- LAYOUT START ----
+        // Highlight entity if needed
+        drawHighlight(entity);
+
+        // Layout cursor
         float deleteButtonHeight = 20 * scale;
         layoutCursorY = y + padding + deleteButtonHeight + 6 * scale;
 
-        // Clear + rebuild extra buttons
+        // Extra buttons
         extraButtons.clear();
         addExtraButtons(entity, x, y, scaledWidth, minHeight, scale);
 
-        // ---- POPUP HEIGHT ----
         float contentHeight = layoutCursorY - y + padding;
         float finalHeight = Math.max(minHeight, contentHeight);
 
-        // ---- POPUP BACKGROUND ----
+        // Background
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(0f, 0f, 0f, 0.8f);
         shapeRenderer.rect(x, y, scaledWidth, finalHeight);
         shapeRenderer.end();
 
-        // ---- TEXT ----
+        // Text
         batch.begin();
         float originalScaleX = font.getData().scaleX;
         float originalScaleY = font.getData().scaleY;
@@ -88,24 +81,64 @@ public class EntityUI {
 
         List<String> infoLines = entity.getInfoLines();
         float textTopY = y + minHeight - padding * scale;
-
         for (int i = 0; i < infoLines.size(); i++) {
-            font.draw(batch, infoLines.get(i), x + padding * scale, textTopY - i * rowHeight);
+            if (infoLines.get(i) != null) {
+                font.draw(batch, infoLines.get(i), x + padding * scale, textTopY - i * rowHeight);
+            }
         }
         batch.end();
 
-        // ---- DELETE BUTTON ----
-        drawDeleteButton(x, y, scaledWidth, scale);
+        // Delete button
+        if (shouldDrawDeleteButton(entity)) {
+            drawDeleteButton(x, y, scaledWidth, scale);
+        }
 
-        // ---- EXTRA BUTTONS ----
         drawExtraButtons();
 
-        // Reset font
         font.getData().setScale(originalScaleX, originalScaleY);
         font.setColor(Color.WHITE);
     }
 
-    // ===================== BUTTONS =====================
+    protected float getPopupX(Entity entity) {
+        // default: next to entity (handles mobs too)
+        return entity.xPos + (entity instanceof Mob mob ? mob.size : world.cellSize) + 5;
+    }
+
+    protected float getPopupY(Entity entity) {
+        return entity.yPos + (entity instanceof Mob mob ? mob.size : world.cellSize);
+    }
+
+    protected abstract void drawHighlight(Entity entity);
+    protected abstract boolean shouldDrawDeleteButton(Entity entity);
+
+    protected void addExtraButtons(Entity entity, float popupX, float popupY, float popupWidth, float popupHeight, float scale) {
+        // override in subclasses
+    }
+
+    protected void addStackedButton(String label, float popupX, float popupWidth, float scale, float r, float g, float b, Runnable onClick) {
+        float padding = 8 * scale;
+        float height = 20 * scale;
+        float width = popupWidth - padding * 2;
+
+        BuildingUIButton button = new BuildingUIButton(label, r, g, b, onClick);
+        button.bounds.set(popupX + padding, layoutCursorY, width, height);
+        layoutCursorY += height + 6 * scale;
+        extraButtons.add(button);
+    }
+
+    private void drawExtraButtons() {
+        for (BuildingUIButton button : extraButtons) {
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(button.r, button.g, button.b, 1f);
+            shapeRenderer.rect(button.bounds.x, button.bounds.y, button.bounds.width, button.bounds.height);
+            shapeRenderer.end();
+
+            batch.begin();
+            font.draw(batch, button.label, button.bounds.x + 4, button.bounds.y + button.bounds.height - 4);
+            batch.end();
+        }
+    }
+
     protected void drawDeleteButton(float x, float y, float width, float scale) {
         float padding = 8 * scale;
         float height = 20 * scale;
@@ -125,44 +158,12 @@ public class EntityUI {
         batch.end();
     }
 
-    /** Subclasses override this */
-    protected void addExtraButtons(Entity entity, float popupX, float popupY, float popupWidth, float popupHeight, float scale) {
-        // default: none
-    }
-
-    /** CURSOR-BASED STACKING (restores FactoryUI support) */
-    protected void addStackedButton(String label, float popupX, float popupWidth, float scale, float r, float g, float b, Runnable onClick) {
-        float padding = 8 * scale;
-        float height = 20 * scale;
-        float width = popupWidth - padding * 2;
-
-        BuildingUIButton button = new BuildingUIButton(label, r, g, b, onClick);
-        button.bounds.set(popupX + padding, layoutCursorY, width, height);
-
-        layoutCursorY += height + 6 * scale;
-        extraButtons.add(button);
-    }
-
-    private void drawExtraButtons() {
-        for (BuildingUIButton button : extraButtons) {
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(button.r, button.g, button.b, 1f);
-            shapeRenderer.rect(button.bounds.x, button.bounds.y, button.bounds.width, button.bounds.height);
-            shapeRenderer.end();
-
-            batch.begin();
-            font.draw(batch, button.label, button.bounds.x + 4, button.bounds.y + button.bounds.height - 4);
-            batch.end();
-        }
-    }
-
-    // ===================== INPUT =====================
+    // Input
     public void handleClick(float screenX, float screenY, OrthographicCamera worldCamera) {
         Vector3 worldClick = new Vector3(screenX, screenY, 0);
         worldCamera.unproject(worldClick);
 
         if (deleteButtonBounds.contains(worldClick.x, worldClick.y)) deleteClickedThisFrame = true;
-
         for (BuildingUIButton button : extraButtons) button.handleClick(worldClick.x, worldClick.y);
     }
 
@@ -180,7 +181,6 @@ public class EntityUI {
         extraButtons.clear();
     }
 
-    // ===================== HELPERS =====================
     protected float getPopupScale(float zoom) {
         float target = 1f + (zoom - 1f) * 0.65f;
         target = MathUtils.clamp(target, 0.5f, 3f);
@@ -188,7 +188,7 @@ public class EntityUI {
         return popupScale;
     }
 
-    // ===================== BUTTON CLASS =====================
+    // Button class
     public static class BuildingUIButton {
         public final Rectangle bounds = new Rectangle();
         public final String label;
