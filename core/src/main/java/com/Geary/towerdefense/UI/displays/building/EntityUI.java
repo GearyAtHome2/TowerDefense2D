@@ -1,5 +1,6 @@
 package com.Geary.towerdefense.UI.displays.building;
 
+import com.Geary.towerdefense.UI.GameUI;
 import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.world.GameWorld;
@@ -26,7 +27,7 @@ public abstract class EntityUI {
     private final Rectangle deleteButtonBounds = new Rectangle();
     private boolean deleteClickedThisFrame = false;
 
-    protected final List<BuildingUIButton> extraButtons = new ArrayList<>();
+    protected final List<UIButton> extraButtons = new ArrayList<>();
     protected float layoutCursorY;
 
     public EntityUI(GameWorld world, ShapeRenderer shapeRenderer, SpriteBatch batch, BitmapFont font) {
@@ -48,22 +49,29 @@ public abstract class EntityUI {
         float minHeight = baseHeight * scale;
         float rowHeight = 24 * scale;
 
-        float x = getPopupX(entity);
-        float y = getPopupY(entity);
+        float x = resolvePopupX(entity, scaledWidth);
+        float preferredY = getPopupY(entity);
 
-        // Highlight entity if needed
-        drawHighlight(entity);
-
-        // Layout cursor
-        float deleteButtonHeight = 20 * scale;
-        layoutCursorY = y + padding + deleteButtonHeight + 6 * scale;
-
-        // Extra buttons
+// ---- MEASURE PASS ----
+        layoutCursorY = padding + 20 * scale + 6 * scale;
         extraButtons.clear();
-        addExtraButtons(entity, x, y, scaledWidth, minHeight, scale);
+        addExtraButtons(entity, x, 0, scaledWidth, minHeight, scale);
 
-        float contentHeight = layoutCursorY - y + padding;
+        float contentHeight = layoutCursorY + padding;
         float finalHeight = Math.max(minHeight, contentHeight);
+
+// ---- RESOLVE Y ----
+        float y = resolvePopupY(preferredY, finalHeight);
+
+// ---- LAYOUT PASS ----
+        float baseY = y + padding + 20 * scale + 6 * scale;
+        float cursor = baseY;
+
+        for (UIButton button : extraButtons) {
+            button.bounds.y = cursor;
+            cursor += button.bounds.height + 6 * scale;
+        }
+        y = resolvePopupY(y, finalHeight);
 
         // Background
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -109,25 +117,40 @@ public abstract class EntityUI {
     }
 
     protected abstract void drawHighlight(Entity entity);
+
     protected abstract boolean shouldDrawDeleteButton(Entity entity);
 
     protected void addExtraButtons(Entity entity, float popupX, float popupY, float popupWidth, float popupHeight, float scale) {
         // override in subclasses
     }
 
-    protected void addStackedButton(String label, float popupX, float popupWidth, float scale, float r, float g, float b, Runnable onClick) {
+    protected void addStackedButton(
+        String label,
+        float popupX,
+        float popupWidth,
+        float scale,
+        float r, float g, float b,
+        Runnable onClick
+    ) {
         float padding = 8 * scale;
         float height = 20 * scale;
         float width = popupWidth - padding * 2;
 
-        BuildingUIButton button = new BuildingUIButton(label, r, g, b, onClick);
-        button.bounds.set(popupX + padding, layoutCursorY, width, height);
+        UIButton button = new UIButton(label, r, g, b, onClick);
+
+        button.bounds.set(
+            popupX + padding,
+            layoutCursorY,
+            width,
+            height
+        );
         layoutCursorY += height + 6 * scale;
         extraButtons.add(button);
     }
 
+
     private void drawExtraButtons() {
-        for (BuildingUIButton button : extraButtons) {
+        for (UIButton button : extraButtons) {
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             shapeRenderer.setColor(button.r, button.g, button.b, 1f);
             shapeRenderer.rect(button.bounds.x, button.bounds.y, button.bounds.width, button.bounds.height);
@@ -158,13 +181,39 @@ public abstract class EntityUI {
         batch.end();
     }
 
-    // Input
     public void handleClick(float screenX, float screenY, OrthographicCamera worldCamera) {
         Vector3 worldClick = new Vector3(screenX, screenY, 0);
         worldCamera.unproject(worldClick);
 
         if (deleteButtonBounds.contains(worldClick.x, worldClick.y)) deleteClickedThisFrame = true;
-        for (BuildingUIButton button : extraButtons) button.handleClick(worldClick.x, worldClick.y);
+        for (UIButton button : extraButtons) button.handleClick(worldClick.x, worldClick.y);
+    }
+
+    protected float resolvePopupX(Entity entity, float popupWidth) {
+        OrthographicCamera camera = world.getWorldCamera();
+
+        float preferredX = getPopupX(entity);
+
+        float worldLeft = camera.position.x - camera.viewportWidth * 0.5f * camera.zoom;
+        float worldRight = camera.position.x + camera.viewportWidth * 0.5f * camera.zoom;
+
+        float minX = worldLeft + 5;
+        float maxX = worldRight - popupWidth - 5;
+
+        return MathUtils.clamp(preferredX, minX, maxX);
+    }
+
+    protected float resolvePopupY(float preferredY, float popupHeight) {
+        OrthographicCamera camera = world.getWorldCamera();
+
+        float worldBottom = camera.position.y - camera.viewportHeight * 0.5f * camera.zoom;
+        float worldTop = camera.position.y + camera.viewportHeight * 0.5f * camera.zoom;
+
+        float minY = worldBottom + 5 + (GameUI.UI_BAR_HEIGHT * camera.zoom);
+        float maxY = worldTop - popupHeight - 5;
+
+        // Clamp safely into view
+        return MathUtils.clamp(preferredY, minY, maxY);
     }
 
     public boolean consumeDeleteRequest() {
@@ -189,13 +238,13 @@ public abstract class EntityUI {
     }
 
     // Button class
-    public static class BuildingUIButton {
+    public static class UIButton {
         public final Rectangle bounds = new Rectangle();
         public final String label;
         public final Runnable onClick;
         public final float r, g, b;
 
-        public BuildingUIButton(String label, float r, float g, float b, Runnable onClick) {
+        public UIButton(String label, float r, float g, float b, Runnable onClick) {
             this.label = label;
             this.onClick = onClick;
             this.r = r;

@@ -68,6 +68,8 @@ public class GameWorld {
 
     private FactoryModal activeFactoryModal;
 
+    private OrthographicCamera worldCamera;
+
     public GameWorld() {
         grid = new Cell[gridWidth][gridHeight];
         occupied = new boolean[gridWidth][gridHeight];
@@ -82,6 +84,7 @@ public class GameWorld {
     }
 
     public void initManagers(OrthographicCamera worldCamera) {
+        this.worldCamera = worldCamera;
         sparkManager = new SparkManager(100);
         towerManager = new TowerManager(this, worldCamera);
         transportManager = new TransportManager(this, worldCamera);
@@ -285,5 +288,9 @@ public class GameWorld {
 
     public GameStateManager getGameStateManager() {
         return gameStateManager;
+    }
+
+    public OrthographicCamera getWorldCamera() {
+        return worldCamera;
     }
 }
