@@ -1,6 +1,6 @@
 package com.Geary.towerdefense.behaviour.targeting;
 
-import com.Geary.towerdefense.entity.mob.Bullet;
+import com.Geary.towerdefense.entity.mob.bullet.Bullet;
 import com.Geary.towerdefense.entity.buildings.Tower;
 import com.Geary.towerdefense.entity.mob.enemy.Enemy;
 import com.Geary.towerdefense.world.GameWorld;
@@ -29,19 +29,25 @@ public class ShootingHelper {
         float centerY = tower.yPos + GameWorld.cellSize / 2f;
 
         float[] lead = tower.calculateLead(target);
-        float dxLead = lead[0] - centerX;
-        float dyLead = lead[1] - centerY;
-        float leadAngle = (float) Math.atan2(dyLead, dxLead);
+        float deltaX = lead[0] - centerX;
+        float deltaY = lead[1] - centerY;
+
+        float leadAngle = (float) Math.atan2(deltaY, deltaX);
         float angleDiff = AimingHelper.shortestAngleDiff(tower.gunAngle, leadAngle);
         float shootThreshold = (float) Math.toRadians(10);
 
         if (Math.abs(angleDiff) > shootThreshold) return null;
 
         float angle = tower.gunAngle;
-        float maxDeviation = (1 - tower.accuracy) * (float) Math.PI / 6f;
-        float deviation = (float) ((Math.random() * 2 - 1) * maxDeviation);
-        angle += deviation;
+        float maxDeviation = (1f - tower.accuracy) * (float) Math.PI / 6f;
+        angle += (Math.random() * 2f - 1f) * maxDeviation;
 
-        return new Bullet(centerX, centerY, angle, tower.damage);
+        return tower.selectedAmmo.createInstance(
+            tower.xPos + GameWorld.cellSize / 2f,
+            tower.yPos + GameWorld.cellSize / 2f,
+            angle,
+            tower.damage
+        );
     }
+
 }

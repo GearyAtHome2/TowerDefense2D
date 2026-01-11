@@ -1,7 +1,7 @@
 package com.Geary.towerdefense.behaviour.buildings.manager;
 
 import com.Geary.towerdefense.entity.buildings.Tower;
-import com.Geary.towerdefense.entity.mob.Bullet;
+import com.Geary.towerdefense.entity.mob.bullet.Bullet;
 import com.Geary.towerdefense.entity.world.Cell;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -59,7 +59,10 @@ public class TowerManager extends BuildingManager<Tower> {
             tower.updateGunAngle(delta);
 
             if (tower.cooldown <= 0 && tower.currentTarget != null && tower.canShoot()) {
-                bullets.add(tower.shoot(tower.currentTarget));
+                Bullet bullet = tower.shoot(tower.currentTarget);
+                if (bullet != null) {
+                    bullets.add(bullet);
+                }
                 tower.cooldown = tower.maxCooldown;
             }
         }

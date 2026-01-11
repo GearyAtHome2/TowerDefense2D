@@ -1,7 +1,7 @@
 package com.Geary.towerdefense.behaviour;
 
 import com.Geary.towerdefense.entity.Entity;
-import com.Geary.towerdefense.entity.mob.Bullet;
+import com.Geary.towerdefense.entity.mob.bullet.Bullet;
 import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.entity.mob.enemy.Enemy;
 import com.Geary.towerdefense.entity.mob.friendly.Friendly;

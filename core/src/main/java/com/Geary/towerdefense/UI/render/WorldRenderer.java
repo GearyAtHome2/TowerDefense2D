@@ -1,7 +1,7 @@
 package com.Geary.towerdefense.UI.render;
 
 import com.Geary.towerdefense.behaviour.SparkManager;
-import com.Geary.towerdefense.entity.mob.Bullet;
+import com.Geary.towerdefense.entity.mob.bullet.Bullet;
 import com.Geary.towerdefense.entity.mob.enemy.Enemy;
 import com.Geary.towerdefense.entity.mob.friendly.Friendly;
 import com.Geary.towerdefense.entity.spawner.EnemySpawner;

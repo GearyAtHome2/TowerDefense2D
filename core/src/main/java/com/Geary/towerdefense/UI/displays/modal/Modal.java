@@ -115,6 +115,7 @@ public abstract class Modal {
     protected abstract boolean handleClickInside(float x, float y);
 
     public boolean shouldClose() {
+        System.out.println("requested factory modal close");
         return closeRequested;
     }
 
