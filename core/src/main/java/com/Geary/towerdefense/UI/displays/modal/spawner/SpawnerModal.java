@@ -63,14 +63,37 @@ public class SpawnerModal extends Modal {
 
     private void populateScrollBoxes() {
         // Top area: active tab entries
-        mobSelectionScrollBox.setEntries(tabEntries.get(tabs.get(activeTabIndex)), 60f);
+        updateTopScrollBox();
 
-        // Queue area (example: empty initially)
-        queueScrollBox.setEntries(new ArrayList<>(), 40f);
+        // Queue area: empty for now, but compute content height dynamically
+        List<MobMenuEntry> queueEntries = new ArrayList<>();
+        float queueTotalHeight = computeContentHeight(queueEntries);
+        queueScrollBox.setEntries(queueEntries, queueTotalHeight);
 
-        // Garrison area (example: empty initially)
-        garrisonScrollBox.setEntries(new ArrayList<>(), 40f);
+        // Garrison area: empty for now
+        List<MobMenuEntry> garrisonEntries = new ArrayList<>();
+        float garrisonTotalHeight = computeContentHeight(garrisonEntries);
+        garrisonScrollBox.setEntries(garrisonEntries, garrisonTotalHeight);
     }
+
+    /** Compute content height from entry list */
+    private float computeContentHeight(List<MobMenuEntry> entries) {
+        float totalHeight = 0f;
+        float spacing = 5f; // must match ScrollBox.updateEntryPositions()
+        for (MobMenuEntry entry : entries) {
+            totalHeight += entry.bounds.height + spacing;
+        }
+        if (!entries.isEmpty()) totalHeight -= spacing; // remove last spacing
+        return totalHeight;
+    }
+
+    /** Call this when setting tab or initially populating top scrollbox */
+    private void updateTopScrollBox() {
+        List<MobMenuEntry> entries = tabEntries.get(tabs.get(activeTabIndex));
+        float totalHeight = computeContentHeight(entries);
+        mobSelectionScrollBox.setEntries(entries, totalHeight);
+    }
+
 
     @Override
     protected void layoutButtons() {
@@ -197,12 +220,7 @@ public class SpawnerModal extends Modal {
             int clickedTab = (int) ((x - bounds.x) / (bounds.width / tabs.size()));
             if (clickedTab >= 0 && clickedTab < tabs.size()) {
                 activeTabIndex = clickedTab;
-
-                List<MobMenuEntry> entries = tabEntries.get(tabs.get(activeTabIndex));
-                float totalHeight = 0f;
-                float spacing = 5f; // same as in ScrollBox.updateEntryPositions()
-                for (MobMenuEntry e : entries) totalHeight += e.bounds.height + spacing;
-                mobSelectionScrollBox.setEntries(entries, totalHeight);
+                updateTopScrollBox(); // recompute entries + contentHeight
                 return true;
             }
         }
