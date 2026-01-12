@@ -1,5 +1,6 @@
 package com.Geary.towerdefense.UI.displays.modal.factory;
 
+import com.Geary.towerdefense.UI.displays.modal.ScrollEntry;
 import com.Geary.towerdefense.UI.render.icons.IconStore;
 import com.Geary.towerdefense.UI.text.TextFormatter;
 import com.Geary.towerdefense.entity.resources.Recipe;
@@ -15,7 +16,7 @@ import com.badlogic.gdx.math.Rectangle;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RecipeMenuEntry {
+public class RecipeMenuEntry implements ScrollEntry {
 
     public final Rectangle bounds = new Rectangle();
     final Recipe recipe;
@@ -51,7 +52,6 @@ public class RecipeMenuEntry {
 
 
 
-        batch.begin();
         float centerY = bounds.y + bounds.height / 2f;
         float textY = centerY + font.getCapHeight() / 2f;
 
@@ -59,7 +59,9 @@ public class RecipeMenuEntry {
 
         // Recipe name
         layout.setText(font, recipe.name);
+        batch.begin();
         font.draw(batch, layout, x, textY);
+        batch.end();
         x += layout.width + GROUP_SPACING;
 
         float inputsEndX;
@@ -79,11 +81,13 @@ public class RecipeMenuEntry {
 
             float iconX = x;
             float iconY = centerY - ICON_SIZE / 2f;
+            batch.begin();
             if (icon != null) batch.draw(icon, iconX, iconY, ICON_SIZE, ICON_SIZE);
-
+            batch.end();
+            batch.begin();
             float textX = iconX + ICON_SIZE + 2f;
             font.draw(batch, layout, textX, textY);
-
+            batch.end();//todo: surely I don't need to do all this batch start and stop?
             // Register hitbox (icon + text)
             float width = ICON_SIZE + 2f + layout.width;
             float height = ICON_SIZE; // align with icon height
@@ -95,6 +99,7 @@ public class RecipeMenuEntry {
         float outX = bounds.x + bounds.width - PADDING;
         outputsStartX = outX;
         TextureRegion arrowIcon = IconStore.getSymbol(IconStore.Icon.ARROW_SYMBOL);
+        batch.begin();
         if (arrowIcon != null) {
             float arrowCenterX = (inputsEndX + outputsStartX) * 0.5f;
             float arrowX = arrowCenterX - ARROW_SIZE / 2f;
@@ -104,6 +109,7 @@ public class RecipeMenuEntry {
             batch.draw(arrowIcon, arrowX, arrowY, ARROW_SIZE, ARROW_SIZE);
             batch.setColor(1f, 1f, 1f, 1f);
         }
+
         for (Map.Entry<ResourceType, Integer> e : recipe.outputs.entrySet()) {
             String count = "x" + TextFormatter.formatResourceAmount(e.getValue());
             layout.setText(font, count);
@@ -132,7 +138,6 @@ public class RecipeMenuEntry {
 
             outX -= ICON_SPACING;
         }
-
         batch.end();
     }
 
@@ -143,4 +148,6 @@ public class RecipeMenuEntry {
         }
         return false;
     }
+
+    public Rectangle bounds(){ return bounds;}
 }

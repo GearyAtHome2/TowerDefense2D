@@ -1,120 +1,225 @@
 package com.Geary.towerdefense.UI.displays.modal.spawner;
 
-import com.Geary.towerdefense.UI.modal.Modal;
+import com.Geary.towerdefense.UI.displays.modal.Modal;
+import com.Geary.towerdefense.UI.displays.modal.ScrollBox;
+import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.entity.spawner.FriendlySpawner;
-import com.Geary.towerdefense.entity.spawner.Spawner;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SpawnerModal extends Modal {
 
-    private final Spawner spawner;
+    private final FriendlySpawner spawner;
+    // Three scrollboxes
+    private final ScrollBox<MobMenuEntry> mobSelectionScrollBox;
+    private final ScrollBox<MobMenuEntry> queueScrollBox;
+    private final ScrollBox<MobMenuEntry> garrisonScrollBox;
 
-    // --- layout config (fractions of modal) ---
-    private static class LayoutConfig {
-        float selectionHeightRatio = 0.6f;
-        float queueHeightRatio = 0.2f;
-        float garrisonHeightRatio = 0.2f;
+    // Top area tabs
+    private final List<String> tabs = List.of("All", "Type1", "Type2");
+    private int activeTabIndex = 0;
+    private final Map<String, List<MobMenuEntry>> tabEntries = new HashMap<>();
 
-        float areaPaddingRatio = 0.03f; // padding inside each area
+    public MobMenuEntry hoveredEntry;
+    public MobMenuEntry activeEntry;
+
+    private final float tabHeightFraction = 0.08f; // 8% of modal height
+
+    public SpawnerModal(FriendlySpawner spawner, BitmapFont font, OrthographicCamera camera) {
+        super(font, camera);
+        this.spawner = spawner;
+
+        mobSelectionScrollBox = new ScrollBox<>(0, 0, 0, 0);
+        queueScrollBox = new ScrollBox<>(0, 0, 0, 0);
+        garrisonScrollBox = new ScrollBox<>(0, 0, 0, 0);
+
+        setupTabEntries();
+        populateScrollBoxes();
     }
 
-    private final LayoutConfig layoutCfg = new LayoutConfig();
+    private void setupTabEntries() {
+        // Create entries for each tab (here just splitting example by "type")
+        for (String tab : tabs) {
+            List<MobMenuEntry> entries = new ArrayList<>();
+            for (Mob mob : spawner.getSpawnableMobs()) {
+                // For now all mobs go into all tabs; type filtering can be added later
+                MobMenuEntry entry = new MobMenuEntry(mob, 0, 0, 60, 60);
+                entry.onClick = () -> {
+                    activeEntry = entry;
+                    spawner.spawn(); // spawn mob by MobStats
+                };
+                entries.add(entry);
+            }
+            tabEntries.put(tab, entries);
+        }
+    }
 
-    // --- area bounds ---
-    private final Rectangle selectionArea = new Rectangle();
-    private final Rectangle queueArea = new Rectangle();
-    private final Rectangle garrisonArea = new Rectangle();
+    private void populateScrollBoxes() {
+        // Top area: active tab entries
+        mobSelectionScrollBox.setEntries(tabEntries.get(tabs.get(activeTabIndex)), 60f);
 
-    public SpawnerModal(FriendlySpawner spawner, BitmapFont font) {
-        super(font);
-        this.spawner = spawner;
+        // Queue area (example: empty initially)
+        queueScrollBox.setEntries(new ArrayList<>(), 40f);
+
+        // Garrison area (example: empty initially)
+        garrisonScrollBox.setEntries(new ArrayList<>(), 40f);
     }
 
     @Override
     protected void layoutButtons() {
-        layoutAreas();
-    }
+        float horizontalPadding = bounds.width * 0.02f;
+        float spacingFraction = 0.02f;
+        float spacing = bounds.height * spacingFraction;
 
-    private void layoutAreas() {
-        float padding = bounds.width * layoutCfg.areaPaddingRatio;
+        float topFraction = 0.6f;
+        float queueFraction = 0.2f;
+        float garrisonFraction = 0.18f;
 
-        float y = bounds.y + bounds.height;
+        float totalSpacing = spacing * 3;
+        float availableHeight = bounds.height - totalSpacing;
+        float topHeight = availableHeight * topFraction;
+        float queueHeight = availableHeight * queueFraction;
+        float garrisonHeight = availableHeight * garrisonFraction;
 
-        // --- Selection area (top) ---
-        float selectionHeight = bounds.height * layoutCfg.selectionHeightRatio;
-        y -= selectionHeight;
+        // Reserve tab area above top scrollbox
+        float tabHeight = bounds.height * tabHeightFraction;
+        float topScrollHeight = topHeight - tabHeight; // actual scrollbox height
 
-        selectionArea.set(
-            bounds.x + padding,
-            y + padding,
-            bounds.width - padding * 2,
-            selectionHeight - padding * 2
+        float garrisonY = bounds.y + spacing;
+        float queueY = garrisonY + garrisonHeight + spacing;
+        float topY = queueY + queueHeight + spacing;
+
+        // Top scrollbox (mob selection), shifted down by tabHeight
+        mobSelectionScrollBox.bounds.set(
+            bounds.x + horizontalPadding,
+            topY, // y is bottom-left
+            bounds.width - 2 * horizontalPadding,
+            topScrollHeight
         );
+        mobSelectionScrollBox.relayout();
 
-        // --- Queue area (middle) ---
-        float queueHeight = bounds.height * layoutCfg.queueHeightRatio;
-        y -= queueHeight;
-
-        queueArea.set(
-            bounds.x + padding,
-            y + padding,
-            bounds.width - padding * 2,
-            queueHeight - padding * 2
+        // Queue area
+        queueScrollBox.bounds.set(
+            bounds.x + horizontalPadding,
+            queueY,
+            bounds.width - 2 * horizontalPadding,
+            queueHeight
         );
+        queueScrollBox.relayout();
 
-        // --- Garrison area (bottom) ---
-        float garrisonHeight = bounds.height * layoutCfg.garrisonHeightRatio;
-        y -= garrisonHeight;
-
-        garrisonArea.set(
-            bounds.x + padding,
-            y + padding,
-            bounds.width - padding * 2,
-            garrisonHeight - padding * 2
+        // Garrison area
+        garrisonScrollBox.bounds.set(
+            bounds.x + horizontalPadding,
+            garrisonY,
+            bounds.width - 2 * horizontalPadding,
+            garrisonHeight
         );
+        garrisonScrollBox.relayout();
     }
 
     @Override
-    protected void drawContent(ShapeRenderer shapeRenderer, SpriteBatch batch) {
+    protected void drawContent(ShapeRenderer renderer, SpriteBatch batch) {
+        mobSelectionScrollBox.draw(renderer, batch, font, camera);
+        queueScrollBox.draw(renderer, batch, font, camera);
+        garrisonScrollBox.draw(renderer, batch, font, camera);
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        // shapeRenderer calls remain outside for backgrounds
+        renderer.begin(ShapeRenderer.ShapeType.Filled);
+        // draw tabs or other backgrounds
+        renderer.end();
+    }
 
-        // Selection area
-        shapeRenderer.setColor(0.18f, 0.25f, 0.35f, 1f);
-        shapeRenderer.rect(
-            selectionArea.x,
-            selectionArea.y,
-            selectionArea.width,
-            selectionArea.height
+    private void drawTabs(ShapeRenderer renderer, SpriteBatch batch) {
+        float tabHeight = bounds.height * tabHeightFraction;
+        float tabWidth = bounds.width / tabs.size();
+
+        // Draw tabs slightly higher: aligned to top of modal
+        float tabY = bounds.y + bounds.height - tabHeight;
+
+        // Draw tab backgrounds (optional: highlight active tab lightly)
+        renderer.begin(ShapeRenderer.ShapeType.Filled);
+        for (int i = 0; i < tabs.size(); i++) {
+            if (i == activeTabIndex) {
+                renderer.setColor(0.8f, 0.8f, 0.8f, 1f); // just a subtle highlight
+            } else {
+                renderer.setColor(0.6f, 0.6f, 0.6f, 1f);
+            }
+
+            renderer.rect(bounds.x + i * tabWidth, tabY, tabWidth, tabHeight);
+        }
+        renderer.end();
+        switch (activeTabIndex) {
+            case 0 -> mobSelectionScrollBox.setBackgroundColor(0.2f, 0.2f, 0.3f, 1f);
+            case 1 -> mobSelectionScrollBox.setBackgroundColor(0.3f, 0.2f, 0.2f, 1f);
+            case 2 -> mobSelectionScrollBox.setBackgroundColor(0.2f, 0.3f, 0.2f, 1f);
+        }
+
+        // Draw labels
+        batch.begin();
+        for (int i = 0; i < tabs.size(); i++) {
+            String tab = tabs.get(i);
+            font.setColor(0.1f, 0.1f, 0.1f, 1f); // dark label for contrast
+            font.draw(batch, tab,
+                bounds.x + i * tabWidth + 10,
+                tabY + tabHeight * 0.7f);
+        }
+        batch.end();
+
+        // Now draw the top scrollbox background based on active tab
+        renderer.begin(ShapeRenderer.ShapeType.Filled);
+        switch (activeTabIndex) {
+            case 0: renderer.setColor(0.9f, 0.9f, 1f, 1f); break; // All tab
+            case 1: renderer.setColor(0.9f, 1f, 0.9f, 1f); break; // Type1 tab
+            case 2: renderer.setColor(1f, 0.9f, 0.9f, 1f); break; // Type2 tab
+            default: renderer.setColor(0.9f, 0.9f, 0.9f, 1f); break;
+        }
+        renderer.rect(
+            mobSelectionScrollBox.bounds.x,
+            mobSelectionScrollBox.bounds.y,
+            mobSelectionScrollBox.bounds.width,
+            mobSelectionScrollBox.bounds.height
         );
-
-        // Queue area
-        shapeRenderer.setColor(0.25f, 0.25f, 0.18f, 1f);
-        shapeRenderer.rect(
-            queueArea.x,
-            queueArea.y,
-            queueArea.width,
-            queueArea.height
-        );
-
-        // Garrison area
-        shapeRenderer.setColor(0.25f, 0.18f, 0.18f, 1f);
-        shapeRenderer.rect(
-            garrisonArea.x,
-            garrisonArea.y,
-            garrisonArea.width,
-            garrisonArea.height
-        );
-
-        shapeRenderer.end();
+        renderer.end();
     }
 
     @Override
     protected boolean handleClickInside(float x, float y) {
-        // No interaction yet
+        // Check tabs first
+        float tabHeight = bounds.height * tabHeightFraction;
+        if (y > bounds.y + bounds.height - tabHeight) {
+            int clickedTab = (int) ((x - bounds.x) / (bounds.width / tabs.size()));
+            if (clickedTab >= 0 && clickedTab < tabs.size()) {
+                activeTabIndex = clickedTab;
+
+                List<MobMenuEntry> entries = tabEntries.get(tabs.get(activeTabIndex));
+                float totalHeight = 0f;
+                float spacing = 5f; // same as in ScrollBox.updateEntryPositions()
+                for (MobMenuEntry e : entries) totalHeight += e.bounds.height + spacing;
+                mobSelectionScrollBox.setEntries(entries, totalHeight);
+                return true;
+            }
+        }
+
+        // Check scrollboxes
+        if (mobSelectionScrollBox.contains(x, y) && mobSelectionScrollBox.click(x, y) != null) return true;
+        if (queueScrollBox.contains(x, y) && queueScrollBox.click(x, y) != null) return true;
+        if (garrisonScrollBox.contains(x, y) && garrisonScrollBox.click(x, y) != null) return true;
+
+        return false;
+    }
+
+    @Override
+    protected boolean handleScrollInside(float x, float y, float amountY) {
+        if (mobSelectionScrollBox.contains(x, y)) mobSelectionScrollBox.scroll(amountY * 10f);
+        if (queueScrollBox.contains(x, y)) queueScrollBox.scroll(amountY * 10f);
+        if (garrisonScrollBox.contains(x, y)) garrisonScrollBox.scroll(amountY * 10f);
         return true;
     }
 }

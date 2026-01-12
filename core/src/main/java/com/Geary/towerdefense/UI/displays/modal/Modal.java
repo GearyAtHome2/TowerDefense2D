@@ -1,9 +1,9 @@
-package com.Geary.towerdefense.UI.modal;
+package com.Geary.towerdefense.UI.displays.modal;
 
-import com.Geary.towerdefense.UI.displays.modal.ModalButton;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -16,13 +16,15 @@ import java.util.List;
 
 public abstract class Modal {
 
+    protected OrthographicCamera camera;
     protected final BitmapFont font;
     protected final Rectangle bounds = new Rectangle();
     private boolean closeRequested = false;
     protected final List<ModalButton> buttons = new ArrayList<>();
 
-    public Modal(BitmapFont font) {
+    public Modal(BitmapFont font,OrthographicCamera camera) {
         this.font = font;
+        this.camera = camera;
     }
 
     /** Called every frame to handle modal logic */

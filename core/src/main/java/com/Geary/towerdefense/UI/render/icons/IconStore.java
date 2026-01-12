@@ -5,12 +5,15 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 
 public class IconStore {
 
     private static final Map<Resource.RawResourceType, TextureRegion> RAW_ICONS = new EnumMap<>(Resource.RawResourceType.class);
     private static final Map<Resource.RefinedResourceType, TextureRegion> REFINED_ICONS = new EnumMap<>(Resource.RefinedResourceType.class);
+    private static final Map<String, TextureRegion> MOB_ICONS = new HashMap<>();
+
     private static final Map<Icon, TextureRegion> SYMBOL_ICONS = new EnumMap<>(Icon.class);
 
     public static void load() {
@@ -48,6 +51,24 @@ public class IconStore {
 
     public static TextureRegion refinedResource(Resource.RefinedResourceType type) {
         return REFINED_ICONS.get(type);
+    }
+
+    public static TextureRegion mob(String mobName) {
+        if (mobName == null) return null;
+
+        String key = mobName.toLowerCase().replace(" ", "_");
+        TextureRegion icon = MOB_ICONS.get(key);
+        if (icon != null) return icon;
+
+        try {
+            Texture texture = new Texture("icons/mobs/" + key + ".png");
+            icon = new TextureRegion(texture);
+            MOB_ICONS.put(key, icon);
+            return icon;
+        } catch (Exception e) {
+            System.err.println("Missing mob icon: " + key);
+            return null;
+        }
     }
 
 

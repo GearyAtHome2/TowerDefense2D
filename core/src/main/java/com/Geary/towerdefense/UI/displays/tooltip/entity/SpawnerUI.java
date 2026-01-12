@@ -3,14 +3,15 @@ package com.Geary.towerdefense.UI.displays.tooltip.entity;
 import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.spawner.FriendlySpawner;
 import com.Geary.towerdefense.world.GameWorld;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-public class SpawnerUI extends EntityUI {
+public class SpawnerUI extends DefaultEntityUI {
 
-    public SpawnerUI(GameWorld world, ShapeRenderer shapeRenderer, SpriteBatch batch, BitmapFont font) {
-        super(world, shapeRenderer, batch, font);
+    public SpawnerUI(GameWorld world, ShapeRenderer shapeRenderer, SpriteBatch batch, BitmapFont font, OrthographicCamera camera) {
+        super(world, shapeRenderer, batch, font, camera);
     }
 
     @Override
@@ -24,7 +25,7 @@ public class SpawnerUI extends EntityUI {
             // example: add a "Target" button for hostile mobs
             addStackedButton("Open Spawner Menu", popupX, popupWidth, scale, 0.2f, 0.6f, 1f,
                 () -> {
-                    world.showSpawnerMenu(spawner, font);
+                    world.showSpawnerMenu(spawner, font, camera);
                 });
         }
     }

@@ -8,6 +8,7 @@ import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.buildings.Factory;
 import com.Geary.towerdefense.entity.spawner.FriendlySpawner;
 import com.Geary.towerdefense.world.GameWorld;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -17,25 +18,17 @@ import java.util.Map;
 
 public class UIManager {
 
-    private final GameWorld world;
-    private final ShapeRenderer shapeRenderer;
-    private final SpriteBatch batch;
-    private final BitmapFont font;
 
     private final EntityUI defaultUI;
     private final Map<Class<?>, EntityUI> specializedUIs = new HashMap<>();
 
-    public UIManager(GameWorld world, ShapeRenderer shapeRenderer, SpriteBatch batch, BitmapFont font) {
-        this.world = world;
-        this.shapeRenderer = shapeRenderer;
-        this.batch = batch;
-        this.font = font;
+    public UIManager(GameWorld world, ShapeRenderer shapeRenderer, SpriteBatch batch, BitmapFont font, OrthographicCamera camera) {
 
-        defaultUI = new DefaultEntityUI(world, shapeRenderer, batch, font);
+        defaultUI = new DefaultEntityUI(world, shapeRenderer, batch, font, camera);
 
         // Register specialized UIs
-        specializedUIs.put(Factory.class, new FactoryUI(world, shapeRenderer, batch, font));
-        specializedUIs.put(FriendlySpawner.class, new SpawnerUI(world, shapeRenderer, batch, font));
+        specializedUIs.put(Factory.class, new FactoryUI(world, shapeRenderer, batch, font, camera));
+        specializedUIs.put(FriendlySpawner.class, new SpawnerUI(world, shapeRenderer, batch, font, camera));
         // Add more: TowerUI, MineUI, etc.
     }
 

@@ -2,6 +2,7 @@ package com.Geary.towerdefense;
 
 import com.Geary.towerdefense.UI.CameraController;
 import com.Geary.towerdefense.UI.GameUI;
+import com.Geary.towerdefense.UI.displays.modal.Modal;
 import com.Geary.towerdefense.UI.displays.tooltip.UIClickManager;
 import com.Geary.towerdefense.UI.displays.tooltip.UIManager;
 import com.Geary.towerdefense.UI.displays.tooltip.entity.EntitySelectionHandler;
@@ -129,7 +130,7 @@ public class GameScreen implements Screen {
             world.getTransportManager(),
             world.getGameStateManager()
         );
-        uiManager = new UIManager(world, shapeRenderer, batch, uiFont);
+        uiManager = new UIManager(world, shapeRenderer, batch, uiFont, uiCamera);
     }
 
     private void initInputProcessor() {
@@ -149,7 +150,7 @@ public class GameScreen implements Screen {
     }
 
     private void handleWorldClick(int x, int y) {
-        com.Geary.towerdefense.UI.modal.Modal modal = world.getActiveModal();
+        Modal modal = world.getActiveModal();
         if (modal != null) {
             modal.handleClick(x, y);
             if (modal.shouldClose()) {
@@ -193,7 +194,7 @@ public class GameScreen implements Screen {
     }
 
     private void updateMenus() {
-        com.Geary.towerdefense.UI.modal.Modal modal = world.getActiveModal();
+        Modal modal = world.getActiveModal();
         if (modal != null) {
             modal.update();
 
@@ -284,7 +285,7 @@ public class GameScreen implements Screen {
 
 
     private void drawModal() {
-        com.Geary.towerdefense.UI.modal.Modal menu = world.getActiveModal();
+        Modal menu = world.getActiveModal();
         if (menu == null) return;
 
         uiViewport.apply();

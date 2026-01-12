@@ -1,11 +1,12 @@
 package com.Geary.towerdefense.UI.displays.modal.factory;
 
+import com.Geary.towerdefense.UI.displays.modal.Modal;
 import com.Geary.towerdefense.UI.displays.modal.ScrollBox;
-import com.Geary.towerdefense.UI.modal.Modal;
 import com.Geary.towerdefense.UI.render.icons.TooltipRenderer;
 import com.Geary.towerdefense.entity.buildings.Factory;
 import com.Geary.towerdefense.entity.resources.Recipe;
 import com.Geary.towerdefense.entity.resources.mapEntity.ResourceType;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -21,7 +22,7 @@ import java.util.Map;
 public class FactoryModal extends Modal {
 
     private final Factory factory;
-    private final ScrollBox scrollBox;
+    private final ScrollBox<RecipeMenuEntry> scrollBox;
     public RecipeMenuEntry activeMenuEntry;
 
     private RecipeMenuEntry hoveredEntry;
@@ -51,8 +52,8 @@ public class FactoryModal extends Modal {
 
     private final LayoutConfig layoutCfg = new LayoutConfig();
 
-    public FactoryModal(Factory factory, BitmapFont font) {
-        super(font);
+    public FactoryModal(Factory factory, BitmapFont font, OrthographicCamera camera) {
+        super(font, camera);
         this.factory = factory;
         this.tooltipRenderer = new TooltipRenderer(font);
         scrollBox = new ScrollBox(0, 0, 0, 0);
@@ -67,7 +68,7 @@ public class FactoryModal extends Modal {
 
     @Override
     protected void drawContent(ShapeRenderer shapeRenderer, SpriteBatch batch) {
-        scrollBox.draw(shapeRenderer, batch, font);
+        scrollBox.draw(shapeRenderer, batch, font, camera);
         drawScrollHoods(shapeRenderer);
         drawTitle(batch);
         if (hoveredEntry != null) {

@@ -1,6 +1,7 @@
 package com.Geary.towerdefense;
 
 import com.Geary.towerdefense.UI.CameraController;
+import com.Geary.towerdefense.UI.displays.modal.Modal;
 import com.Geary.towerdefense.behaviour.buildings.manager.FactoryManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.MineManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TowerManager;
@@ -26,7 +27,7 @@ public class GameInputProcessor extends InputAdapter {
     private WorldClickListener worldClickListener;
     private UiClickListener uiClickListener;
 
-    private com.Geary.towerdefense.UI.modal.Modal activeModal = null;
+    private Modal activeModal = null;
     private OrthographicCamera worldCameraRef = null;
 
 
@@ -50,7 +51,7 @@ public class GameInputProcessor extends InputAdapter {
         this.uiClickListener = listener;
     }
 
-    public void setActiveModal(com.Geary.towerdefense.UI.modal.Modal modal, OrthographicCamera worldCamera) {
+    public void setActiveModal(Modal modal, OrthographicCamera worldCamera) {
         this.activeModal = modal;
         this.worldCameraRef = worldCamera;
     }

@@ -312,4 +312,12 @@ public abstract class Mob extends Entity {
     public Color getInfoTextColor() {
         return Color.WHITE; // default
     }
+
+    public enum MobType {
+        ARROW_SYMBOL;
+
+        public String getName() {
+            return this.name();
+        }
+    }
 }

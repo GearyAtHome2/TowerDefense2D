@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 
 public class Serf extends Friendly {
 
-    private static final MobStats STATS = new MobStats(
+    public static final MobStats STATS = new MobStats(
         "Serf",
         0.1f,
         220,   // health
