@@ -31,6 +31,7 @@ public class Tower extends Building {
         super(x, y);
         // Default bullet type (prototype)
         this.selectedAmmo = new BasicBullet(0,0,0,0);
+        this.name = "Tower";
     }
 
     // --- Targeting ---

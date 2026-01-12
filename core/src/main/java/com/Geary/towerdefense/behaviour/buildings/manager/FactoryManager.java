@@ -29,8 +29,8 @@ public class FactoryManager extends BuildingManager<Factory> {
     protected void handleLeftClick(Cell cell, int x, int y) {
         if (canPlaceAt(cell, x, y)) {
             Factory f = new Factory(
-                x * world.cellSize + world.cellSize / 2f,
-                y * world.cellSize + world.cellSize / 2f
+                x * world.cellSize,
+                y * world.cellSize
             );
             world.factories.add(f);
             cell.building = f;
@@ -43,8 +43,8 @@ public class FactoryManager extends BuildingManager<Factory> {
     protected void updateGhost(Cell cell, int x, int y) {
         if (world.ghostFactory == null) {
             world.ghostFactory = new Factory(
-                x * world.cellSize + world.cellSize / 2f,
-                y * world.cellSize + world.cellSize / 2f
+                x * world.cellSize,
+                y * world.cellSize
             );
         } else {
             world.ghostFactory.xPos = x * world.cellSize + world.cellSize / 2f;

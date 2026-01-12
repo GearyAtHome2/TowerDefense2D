@@ -32,6 +32,7 @@ public class Factory extends Building {
     @Override
     public List<String> getInfoLines() {
         List infoLines = new ArrayList<>();
+        infoLines.add(this.name);
         if (activeRecipe != null){
             infoLines.add(activeRecipe.name);
         }

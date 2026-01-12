@@ -32,8 +32,8 @@ public class MineManager extends BuildingManager<Mine> {
     protected void updateGhost(Cell cell, int x, int y) {
         if (world.ghostMine == null) world.ghostMine = new Mine(x * world.cellSize, y * world.cellSize);
         else {
-            world.ghostMine.xPos = x * world.cellSize;
-            world.ghostMine.yPos = y * world.cellSize;
+            world.ghostMine.xPos = x * world.cellSize + world.cellSize / 2f;
+            world.ghostMine.yPos = y * world.cellSize + world.cellSize / 2f;
         }
     }
 

@@ -19,8 +19,8 @@ public class Building extends Entity {
         this.collisionRadius = this.size / 2;
 
         // place building in the center of the tile
-        this.xPos = tileX + cellSize / 2f;
-        this.yPos = tileY + cellSize / 2f;
+        this.xPos = tileX + GameWorld.cellSize / 2f;
+        this.yPos = tileY + GameWorld.cellSize / 2f;
     }
 
     public boolean contains(float x, float y, float cellSize) {

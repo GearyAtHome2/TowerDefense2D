@@ -32,8 +32,9 @@ public class TowerManager extends BuildingManager<Tower> {
     protected void updateGhost(Cell cell, int x, int y) {
         if (world.ghostTower == null) world.ghostTower = new Tower(x * world.cellSize, y * world.cellSize);
         else {
-            world.ghostTower.xPos = x * world.cellSize;
-            world.ghostTower.yPos = y * world.cellSize;
+            //maybe create a building updateposition method?
+            world.ghostTower.xPos = x * world.cellSize + world.cellSize / 2f;
+            world.ghostTower.yPos = y * world.cellSize + world.cellSize / 2f;
         }
     }
 

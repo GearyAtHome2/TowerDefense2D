@@ -54,8 +54,8 @@ public class TransportManager extends BuildingManager<Transport> {
             world.ghostTransport = new Transport(x * world.cellSize, y * world.cellSize, adjacent);
         else {
             world.ghostTransport.directions = adjacent;
-            world.ghostTransport.xPos = x * world.cellSize;
-            world.ghostTransport.yPos = y * world.cellSize;
+            world.ghostTransport.xPos = x * world.cellSize + world.cellSize / 2f;
+            world.ghostTransport.yPos = y * world.cellSize + world.cellSize / 2f;
         }
     }
 
