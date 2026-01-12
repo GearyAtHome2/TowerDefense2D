@@ -1,4 +1,4 @@
-package com.Geary.towerdefense.UI.displays.building;
+package com.Geary.towerdefense.UI.displays.tooltip.entity;
 
 import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.buildings.Building;
@@ -29,4 +29,5 @@ public class DefaultEntityUI extends EntityUI {
         }
         return false;
     }
+
 }

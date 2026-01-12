@@ -1,6 +1,6 @@
-package com.Geary.towerdefense.UI.displays.mob;
+package com.Geary.towerdefense.UI.displays.tooltip.entity;
 
-import com.Geary.towerdefense.UI.displays.UIClickManager;
+import com.Geary.towerdefense.UI.displays.tooltip.UIClickManager;
 import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.entity.mob.enemy.Enemy;
@@ -98,11 +98,4 @@ public class EntitySelectionHandler {
             y >= entity.yPos - r &&
             y <= entity.yPos + r;
     }
-
-//    private boolean isInsideBuilding(float x, float y, Building b) {
-//        return x >= b.xPos &&
-//            x <= b.xPos + world.cellSize &&
-//            y >= b.yPos &&
-//            y <= b.yPos + world.cellSize;
-//    }
 }

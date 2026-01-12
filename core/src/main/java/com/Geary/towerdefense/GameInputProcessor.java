@@ -1,7 +1,7 @@
 package com.Geary.towerdefense;
 
 import com.Geary.towerdefense.UI.CameraController;
-import com.Geary.towerdefense.UI.displays.building.specialized.factory.FactoryModal;
+import com.Geary.towerdefense.UI.displays.modal.factory.FactoryModal;
 import com.Geary.towerdefense.behaviour.buildings.manager.FactoryManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.MineManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TowerManager;

@@ -2,11 +2,11 @@ package com.Geary.towerdefense;
 
 import com.Geary.towerdefense.UI.CameraController;
 import com.Geary.towerdefense.UI.GameUI;
-import com.Geary.towerdefense.UI.displays.UIClickManager;
-import com.Geary.towerdefense.UI.displays.building.EntityUI;
-import com.Geary.towerdefense.UI.displays.building.UIManager;
-import com.Geary.towerdefense.UI.displays.building.specialized.factory.FactoryModal;
-import com.Geary.towerdefense.UI.displays.mob.EntitySelectionHandler;
+import com.Geary.towerdefense.UI.displays.tooltip.UIClickManager;
+import com.Geary.towerdefense.UI.displays.tooltip.UIManager;
+import com.Geary.towerdefense.UI.displays.tooltip.entity.EntityUI;
+import com.Geary.towerdefense.UI.displays.tooltip.entity.EntitySelectionHandler;
+import com.Geary.towerdefense.UI.displays.modal.factory.FactoryModal;
 import com.Geary.towerdefense.UI.render.*;
 import com.Geary.towerdefense.UI.render.icons.IconStore;
 import com.Geary.towerdefense.entity.Entity;
@@ -263,6 +263,7 @@ public class GameScreen implements Screen {
             factoryRenderer
         );
 
+        drawEntityHighlights();
         // --- Selected entity UI ---
         if (selectedEntity != null) {
             if (selectedEntity instanceof Mob mob && !mob.isAlive()) {
@@ -272,8 +273,6 @@ public class GameScreen implements Screen {
             }
         }
 
-        // --- Entity highlights (hover + selected) ---
-        drawEntityHighlights();
 
         // --- Modal UI ---
         drawFactoryMenu();

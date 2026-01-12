@@ -1,10 +1,12 @@
-package com.Geary.towerdefense.UI.displays.building;
+package com.Geary.towerdefense.UI.displays.tooltip;
 
-import com.Geary.towerdefense.UI.displays.building.specialized.factory.FactoryUI;
-import com.Geary.towerdefense.UI.displays.mob.MobUI;
+import com.Geary.towerdefense.UI.displays.tooltip.entity.DefaultEntityUI;
+import com.Geary.towerdefense.UI.displays.tooltip.entity.EntityUI;
+import com.Geary.towerdefense.UI.displays.tooltip.entity.FactoryUI;
+import com.Geary.towerdefense.UI.displays.tooltip.entity.SpawnerUI;
 import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.buildings.Factory;
-import com.Geary.towerdefense.entity.mob.Mob;
+import com.Geary.towerdefense.entity.spawner.FriendlySpawner;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -33,7 +35,7 @@ public class UIManager {
 
         // Register specialized UIs
         specializedUIs.put(Factory.class, new FactoryUI(world, shapeRenderer, batch, font));
-        specializedUIs.put(Mob.class, new MobUI(world, shapeRenderer, batch, font));
+        specializedUIs.put(FriendlySpawner.class, new SpawnerUI(world, shapeRenderer, batch, font));
         // Add more: TowerUI, MineUI, etc.
     }
 

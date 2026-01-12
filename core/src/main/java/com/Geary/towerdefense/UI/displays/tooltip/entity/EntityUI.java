@@ -1,4 +1,4 @@
-package com.Geary.towerdefense.UI.displays.building;
+package com.Geary.towerdefense.UI.displays.tooltip.entity;
 
 import com.Geary.towerdefense.UI.GameUI;
 import com.Geary.towerdefense.entity.Entity;
@@ -39,72 +39,86 @@ public abstract class EntityUI {
     public void drawPopup(Entity entity, float worldCameraZoom) {
         if (entity == null) return;
 
-        float baseWidth = 140;
-        float baseHeight = 120;
+        float baseWidth = 10;   // Minimum width
         float padding = 8;
         float scale = getPopupScale(worldCameraZoom);
-
-        float scaledWidth = baseWidth * scale;
-        float minHeight = baseHeight * scale;
         float rowHeight = 24 * scale;
 
+        // ---- Measure widest text line with proper scale ----
+        List<String> infoLines = entity.getInfoLines();
+        com.badlogic.gdx.graphics.g2d.GlyphLayout layout = new com.badlogic.gdx.graphics.g2d.GlyphLayout();
+        float widestText = 0;
+        for (String line : infoLines) {
+            if (line != null) {
+                layout.setText(font, line);
+                float scaledLineWidth = layout.width * scale * 1.3f; // match drawing scale
+                widestText = Math.max(widestText, scaledLineWidth);
+            }
+        }
+
+        float scaledWidth = Math.max(baseWidth, widestText + padding * 2);
         float x = resolvePopupX(entity, scaledWidth);
-        float preferredY = getPopupY(entity);
 
-// ---- MEASURE PASS ----
-        layoutCursorY = padding + 20 * scale + 6 * scale;
+        // ---- Measure total height ----
+        layoutCursorY = padding;
+        float textHeight = infoLines.size() * rowHeight;
+        layoutCursorY += textHeight + padding; // padding below text
+
         extraButtons.clear();
-        addExtraButtons(entity, x, 0, scaledWidth, minHeight, scale);
+        addExtraButtons(entity, x, 0, scaledWidth, 0, scale); // buttons increment layoutCursorY internally
 
-        float contentHeight = layoutCursorY + padding;
-        float finalHeight = Math.max(minHeight, contentHeight);
+        if (shouldDrawDeleteButton(entity)) {
+            layoutCursorY += 20 * scale + padding;
+        }
 
-// ---- RESOLVE Y ----
+        float finalHeight = layoutCursorY;
+        float preferredY = getPopupY(entity);
         float y = resolvePopupY(preferredY, finalHeight);
 
-// ---- LAYOUT PASS ----
-        float baseY = y + padding + 20 * scale + 6 * scale;
-        float cursor = baseY;
+        // ---- LAYOUT PASS ----
+        float cursorY = y + finalHeight - padding;
 
-        for (UIButton button : extraButtons) {
-            button.bounds.y = cursor;
-            cursor += button.bounds.height + 6 * scale;
-        }
-//        y = resolvePopupY(y, finalHeight);
-
-        // Background
+        // Draw background
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(0f, 0f, 0f, 0.8f);
         shapeRenderer.rect(x, y, scaledWidth, finalHeight);
         shapeRenderer.end();
 
-        // Text
+        // Draw text
         batch.begin();
         float originalScaleX = font.getData().scaleX;
         float originalScaleY = font.getData().scaleY;
-
         font.setColor(entity.getInfoTextColor());
         font.getData().setScale(originalScaleX * scale * 1.3f, originalScaleY * scale * 1.3f);
 
-        List<String> infoLines = entity.getInfoLines();
-        float textTopY = y + minHeight - padding * scale;
-        for (int i = 0; i < infoLines.size(); i++) {
-            if (infoLines.get(i) != null) {
-                font.draw(batch, infoLines.get(i), x + padding * scale, textTopY - i * rowHeight);
+        for (String line : infoLines) {
+            if (line != null) {
+                font.draw(batch, line, x + padding, cursorY);
+                cursorY -= rowHeight;
             }
         }
         batch.end();
 
-        // Delete button
-        if (shouldDrawDeleteButton(entity)) {
-            drawDeleteButton(x, y, scaledWidth, scale);
+        // Draw extra buttons stacked below text
+        cursorY -= padding; // spacing between text and buttons
+        for (UIButton button : extraButtons) {
+            button.bounds.y = cursorY - button.bounds.height;
+            cursorY -= button.bounds.height + 6 * scale;
         }
 
         drawExtraButtons();
 
+        // Draw delete button at bottom
+        if (shouldDrawDeleteButton(entity)) {
+            drawDeleteButton(x, y, scaledWidth, scale);
+        }
+
+        // Reset font
         font.getData().setScale(originalScaleX, originalScaleY);
         font.setColor(Color.WHITE);
     }
+
+
 
     protected float getPopupX(Entity entity) {
         // default: next to entity (handles mobs too)

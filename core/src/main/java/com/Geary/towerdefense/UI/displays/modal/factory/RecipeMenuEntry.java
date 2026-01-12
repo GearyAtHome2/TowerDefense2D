@@ -1,4 +1,4 @@
-package com.Geary.towerdefense.UI.displays.building.specialized.factory;
+package com.Geary.towerdefense.UI.displays.modal.factory;
 
 import com.Geary.towerdefense.UI.render.icons.IconStore;
 import com.Geary.towerdefense.UI.text.TextFormatter;

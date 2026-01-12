@@ -1,12 +1,13 @@
 package com.Geary.towerdefense.behaviour;
 
 import com.Geary.towerdefense.entity.Entity;
-import com.Geary.towerdefense.entity.mob.bullet.Bullet;
 import com.Geary.towerdefense.entity.mob.Mob;
+import com.Geary.towerdefense.entity.mob.bullet.Bullet;
 import com.Geary.towerdefense.entity.mob.enemy.Enemy;
 import com.Geary.towerdefense.entity.mob.friendly.Friendly;
 import com.Geary.towerdefense.entity.spawner.EnemySpawner;
 import com.Geary.towerdefense.entity.spawner.FriendlySpawner;
+import com.Geary.towerdefense.entity.spawner.Spawner;
 import com.Geary.towerdefense.world.GameWorld;
 
 public class MobManager {
@@ -90,11 +91,11 @@ public class MobManager {
 
 
     //todo: this doesn't seem to work when I pass it two mobs?
-    private boolean overlaps(Entity a, Entity b) {
+    private boolean overlaps(Entity a, Spawner b) {
         float ax = a.xPos + a.collisionRadius;
         float ay = a.yPos + a.collisionRadius;
-        float bx = b.xPos + b.collisionRadius;
-        float by = b.yPos + b.collisionRadius;
+        float bx = b.xPos;
+        float by = b.yPos;
         float dx = ax - bx;
         float dy = ay - by;
         float r = a.collisionRadius + b.collisionRadius;

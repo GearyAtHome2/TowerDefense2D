@@ -1,6 +1,6 @@
 package com.Geary.towerdefense.UI.displays.modal;
 
-import com.Geary.towerdefense.UI.displays.building.specialized.factory.RecipeMenuEntry;
+import com.Geary.towerdefense.UI.displays.modal.factory.RecipeMenuEntry;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;

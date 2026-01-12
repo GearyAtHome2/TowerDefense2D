@@ -31,7 +31,6 @@ public class Mine extends Building {
 
     @Override
     public List<String> getInfoLines() {
-        System.out.println("pulling Mine name:" + this.name);
         return List.of(
             this.name,
             "Abundance: " + resource.resourceAbundance

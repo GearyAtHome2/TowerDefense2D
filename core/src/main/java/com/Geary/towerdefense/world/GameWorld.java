@@ -1,7 +1,7 @@
 package com.Geary.towerdefense.world;
 
 import com.Geary.towerdefense.Direction;
-import com.Geary.towerdefense.UI.displays.building.specialized.factory.FactoryModal;
+import com.Geary.towerdefense.UI.displays.modal.factory.FactoryModal;
 import com.Geary.towerdefense.behaviour.MobManager;
 import com.Geary.towerdefense.behaviour.ResourceManager;
 import com.Geary.towerdefense.behaviour.SparkManager;
@@ -247,8 +247,12 @@ public class GameWorld {
     }
 
     public void showFactoryMenu(Factory factory, BitmapFont font) {
-        System.out.println("factory menu click registered");
         activeFactoryModal = new FactoryModal(factory, font);
+    }
+
+    public void showSpawnerMenu(FriendlySpawner spawner, BitmapFont font) {
+        System.out.println("spawner menu click registered");
+//        activeFactoryModal = new FactoryModal(spawner, font);
     }
 
     public void closeFactoryMenu() {

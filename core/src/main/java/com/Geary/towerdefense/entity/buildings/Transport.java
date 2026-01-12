@@ -21,8 +21,10 @@ public class Transport extends Building {
 
     @Override
     public List<String> getInfoLines() {
+        String networkConnectivity = isConnectedToNetwork? "Connected" : "Not connected to network";
         return List.of(
-            this.name
+            this.name,
+            networkConnectivity
         );
     }
 }

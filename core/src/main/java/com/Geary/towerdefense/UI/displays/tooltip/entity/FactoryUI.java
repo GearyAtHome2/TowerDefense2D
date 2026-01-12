@@ -1,6 +1,5 @@
-package com.Geary.towerdefense.UI.displays.building.specialized.factory;
+package com.Geary.towerdefense.UI.displays.tooltip.entity;
 
-import com.Geary.towerdefense.UI.displays.building.DefaultEntityUI;
 import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.buildings.Factory;
 import com.Geary.towerdefense.world.GameWorld;
@@ -19,7 +18,6 @@ public class FactoryUI extends DefaultEntityUI {
         if (entity instanceof Factory factory) {
             addStackedButton("Open Factory Menu", popupX, popupWidth, scale, 0.2f, 0.6f, 1f,
                 () -> {
-                System.out.println("recognised factory menu button click");
                 world.showFactoryMenu(factory, font);
             });
         }

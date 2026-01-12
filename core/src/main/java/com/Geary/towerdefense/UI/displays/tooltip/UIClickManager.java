@@ -1,4 +1,4 @@
-package com.Geary.towerdefense.UI.displays;
+package com.Geary.towerdefense.UI.displays.tooltip;
 
 import com.Geary.towerdefense.UI.GameUI;
 import com.badlogic.gdx.Gdx;
