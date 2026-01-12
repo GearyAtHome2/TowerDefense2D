@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,5 +121,9 @@ public abstract class Modal {
 
     public void requestClose() {
         closeRequested = true;
+    }
+
+    public void updateHover(float x, float y, Viewport viewport) {
+        // default: no-op
     }
 }

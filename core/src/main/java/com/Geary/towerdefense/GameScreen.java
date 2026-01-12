@@ -4,14 +4,12 @@ import com.Geary.towerdefense.UI.CameraController;
 import com.Geary.towerdefense.UI.GameUI;
 import com.Geary.towerdefense.UI.displays.tooltip.UIClickManager;
 import com.Geary.towerdefense.UI.displays.tooltip.UIManager;
-import com.Geary.towerdefense.UI.displays.tooltip.entity.EntityUI;
 import com.Geary.towerdefense.UI.displays.tooltip.entity.EntitySelectionHandler;
-import com.Geary.towerdefense.UI.displays.modal.factory.FactoryModal;
+import com.Geary.towerdefense.UI.displays.tooltip.entity.EntityUI;
 import com.Geary.towerdefense.UI.render.*;
 import com.Geary.towerdefense.UI.render.icons.IconStore;
 import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.buildings.Building;
-import com.Geary.towerdefense.entity.buildings.Factory;
 import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.world.GameStateManager;
 import com.Geary.towerdefense.world.GameWorld;
@@ -151,11 +149,11 @@ public class GameScreen implements Screen {
     }
 
     private void handleWorldClick(int x, int y) {
-        FactoryModal menu = world.getActiveFactoryMenu();
-        if (menu != null) {
-            menu.handleClick(x, y);
-            if (menu.shouldClose()) {
-                world.closeFactoryMenu();
+        com.Geary.towerdefense.UI.modal.Modal modal = world.getActiveModal();
+        if (modal != null) {
+            modal.handleClick(x, y);
+            if (modal.shouldClose()) {
+                world.closeModal();
             }
             return;
         }
@@ -195,18 +193,24 @@ public class GameScreen implements Screen {
     }
 
     private void updateMenus() {
-        FactoryModal menu = world.getActiveFactoryMenu();
-        if (menu != null) {
-            menu.update();
-            menu.updateHover(Gdx.input.getX(), Gdx.input.getY(), uiViewport);
-            inputProcessor.setActiveModal(menu, worldCamera);
+        com.Geary.towerdefense.UI.modal.Modal modal = world.getActiveModal();
+        if (modal != null) {
+            modal.update();
+
+            modal.updateHover(
+                Gdx.input.getX(),
+                Gdx.input.getY(),
+                uiViewport
+            );
+
+            inputProcessor.setActiveModal(modal, worldCamera);
         } else {
             inputProcessor.setActiveModal(null, null);
         }
     }
 
     private void updatePlacement() {
-        if (world.getActiveFactoryMenu() != null) return;
+        if (world.getActiveModal() != null) return;
 
         placementHandler.handlePlacements();
         placementHandler.handleKeyboardInput(
@@ -275,12 +279,12 @@ public class GameScreen implements Screen {
 
 
         // --- Modal UI ---
-        drawFactoryMenu();
+        drawModal();
     }
 
 
-    private void drawFactoryMenu() {
-        FactoryModal menu = world.getActiveFactoryMenu();
+    private void drawModal() {
+        com.Geary.towerdefense.UI.modal.Modal menu = world.getActiveModal();
         if (menu == null) return;
 
         uiViewport.apply();
@@ -324,9 +328,6 @@ public class GameScreen implements Screen {
         selectedEntity = entity;
         activeEntityUI = uiManager.getUIFor(entity);
 
-        if (entity instanceof Factory factory) {
-//            world.showFactoryMenu(factory, uiFont);
-        }
     }
 
     private void clearEntitySelection() {

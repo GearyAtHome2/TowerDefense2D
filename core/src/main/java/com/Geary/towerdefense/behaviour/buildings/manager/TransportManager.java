@@ -112,17 +112,18 @@ public class TransportManager extends BuildingManager<Transport> {
         allBuildings.addAll(world.transports);
         allBuildings.addAll(world.towers);
         allBuildings.addAll(world.mines);
+        allBuildings.addAll(world.factories);
 
-        for (Building b : allBuildings) b.isConnectedToNetwork = false;
+        for (Building b : allBuildings)
+            b.isConnectedToNetwork = false;
 
         boolean changed;
         do {
             changed = false;
-            for (Transport t : world.transports) changed |= updateIfConnected(t);
-            for (Tower t : world.towers) changed |= updateIfConnected(t);
-            for (Mine m : world.mines) changed |= updateIfConnected(m);
-            for (Factory f : world.factories) changed |= updateIfConnected(f);
+            for (Building b : allBuildings)
+                changed |= updateIfConnected(b);
         } while (changed);
+
     }
 
     private boolean updateIfConnected(Building b) {

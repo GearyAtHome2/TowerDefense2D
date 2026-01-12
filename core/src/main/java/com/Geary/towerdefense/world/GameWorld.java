@@ -2,6 +2,7 @@ package com.Geary.towerdefense.world;
 
 import com.Geary.towerdefense.Direction;
 import com.Geary.towerdefense.UI.displays.modal.factory.FactoryModal;
+import com.Geary.towerdefense.UI.displays.modal.spawner.SpawnerModal;
 import com.Geary.towerdefense.behaviour.MobManager;
 import com.Geary.towerdefense.behaviour.ResourceManager;
 import com.Geary.towerdefense.behaviour.SparkManager;
@@ -66,7 +67,7 @@ public class GameWorld {
     private SpawnerManager spawnerManager;
     private GameStateManager gameStateManager;
 
-    private FactoryModal activeFactoryModal;
+    private com.Geary.towerdefense.UI.modal.Modal activeModal;
 
     private OrthographicCamera worldCamera;
 
@@ -247,20 +248,23 @@ public class GameWorld {
     }
 
     public void showFactoryMenu(Factory factory, BitmapFont font) {
-        activeFactoryModal = new FactoryModal(factory, font);
+        activeModal = new FactoryModal(factory, font);
     }
 
     public void showSpawnerMenu(FriendlySpawner spawner, BitmapFont font) {
-        System.out.println("spawner menu click registered");
-//        activeFactoryModal = new FactoryModal(spawner, font);
+        activeModal = new SpawnerModal(spawner, font);
     }
 
-    public void closeFactoryMenu() {
-        activeFactoryModal = null;
+    public void setActiveModal(com.Geary.towerdefense.UI.modal.Modal modal) {
+        this.activeModal = modal;
     }
 
-    public FactoryModal getActiveFactoryMenu() {
-        return activeFactoryModal;
+    public void closeModal() {
+        this.activeModal = null;
+    }
+
+    public com.Geary.towerdefense.UI.modal.Modal getActiveModal() {
+        return activeModal;
     }
 
     public TowerManager getTowerManager() {
