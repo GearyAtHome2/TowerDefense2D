@@ -22,11 +22,6 @@ public class DefaultEntityUI extends EntityUI {
     }
 
     @Override
-    protected void drawHighlight(Entity entity) {
-
-    }
-
-    @Override
     protected boolean shouldDrawDeleteButton(Entity entity) {
         return false;
     }

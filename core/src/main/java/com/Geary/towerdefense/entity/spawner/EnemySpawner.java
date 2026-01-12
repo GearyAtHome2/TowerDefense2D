@@ -15,7 +15,7 @@ public class EnemySpawner extends Spawner {
     public float cooldown = maxCooldown;
 
     public EnemySpawner(float x, float y) {
-        super(x, y);
+        super(x+BUFFER, y+BUFFER);
         this.name="Enemy spawner";
     }
 

@@ -15,7 +15,7 @@ public class FriendlySpawner extends Spawner {
     public float cooldown = maxCooldown;
 
     public FriendlySpawner(float x, float y) {
-        super(x, y);
+        super(x+BUFFER, y+BUFFER);
         isConnectedToNetwork = true;
         this.name="Friendly spawner";
     }

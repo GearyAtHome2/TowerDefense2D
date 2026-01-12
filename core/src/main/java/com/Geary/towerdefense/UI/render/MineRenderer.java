@@ -8,10 +8,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 public class MineRenderer {
 
     private final GameWorld world;
-
-    public static final float CELL_MARGIN = 8f;
-    public static final float CELL_SIZE = GameWorld.cellSize - 2 * CELL_MARGIN;
-
     private final ShapeRenderer sr;
 
     public MineRenderer(GameWorld world, ShapeRenderer sr) {
@@ -20,12 +16,12 @@ public class MineRenderer {
     }
 
     public void drawMines() {
-        for (Mine t : world.mines) {
-            drawMine(t, false); // real tower
+        for (Mine mine : world.mines) {
+            drawMine(mine, false); // real mine
         }
 
         if (world.ghostMine != null) {
-            drawMine(world.ghostMine, true); // ghost tower
+            drawMine(world.ghostMine, true); // ghost mine
         }
     }
 
@@ -36,10 +32,10 @@ public class MineRenderer {
         Color frameColor = ghost ? new Color(0.2f, 0.4f, 0.2f, 0.4f) : Color.GREEN;
         Color fanColor   = ghost ? new Color(0.3f, 0f, 0f, 0.4f) : Color.RED;
 
-        float centerX = mine.xPos + CELL_MARGIN + CELL_SIZE / 2f;
-        float centerY = mine.yPos + CELL_MARGIN + CELL_SIZE / 2f;
+        float centerX = mine.xPos; // now xPos is center
+        float centerY = mine.yPos; // now yPos is center
 
-        float squareSize = CELL_SIZE * 0.8f;
+        float squareSize = mine.size; // use mine’s size
         float frameSize  = squareSize / 2f;
 
         // --- Draw frame ---
@@ -73,4 +69,3 @@ public class MineRenderer {
         sr.end();
     }
 }
-

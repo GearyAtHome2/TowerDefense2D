@@ -23,15 +23,6 @@ public class BuildingUI extends EntityUI {
     }
 
     @Override
-    protected void drawHighlight(com.Geary.towerdefense.entity.Entity entity) {
-        Building building = (Building) entity;
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(1f, 1f, 0f, 1f);
-        shapeRenderer.rect(building.xPos, building.yPos, world.cellSize, world.cellSize);
-        shapeRenderer.end();
-    }
-
-    @Override
     protected boolean shouldDrawDeleteButton(com.Geary.towerdefense.entity.Entity entity) {
         return ((Building) entity).isDeletable;
     }

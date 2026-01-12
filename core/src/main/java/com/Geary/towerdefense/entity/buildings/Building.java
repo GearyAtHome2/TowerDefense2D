@@ -1,6 +1,7 @@
 package com.Geary.towerdefense.entity.buildings;
 
 import com.Geary.towerdefense.entity.Entity;
+import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.Color;
 
 import java.util.ArrayList;
@@ -10,10 +11,16 @@ public class Building extends Entity {
     public boolean isConnectedToNetwork = false;
     public float animationState = 0;
     public boolean isDeletable = true;
+    public float size;
 
-    public Building(float x, float y) {
-        this.xPos = x;
-        this.yPos = y;
+    public Building(float tileX, float tileY) {
+        float cellSize = GameWorld.cellSize;
+        this.size = cellSize * 0.8f;
+        this.collisionRadius = this.size / 2;
+
+        // place building in the center of the tile
+        this.xPos = tileX + cellSize / 2f;
+        this.yPos = tileY + cellSize / 2f;
     }
 
     public boolean contains(float x, float y, float cellSize) {

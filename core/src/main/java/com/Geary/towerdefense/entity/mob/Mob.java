@@ -8,7 +8,6 @@ import com.Geary.towerdefense.entity.mob.navigation.TileRandomMover;
 import com.Geary.towerdefense.entity.world.Cell;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import java.util.ArrayList;
@@ -18,9 +17,7 @@ import static com.Geary.towerdefense.Direction.*;
 
 public abstract class Mob extends Entity {
 
-    public Texture texture;
     public float size;
-    public float collisionRadius;
     public int health;
     public int damage;
     public Color color;

@@ -29,7 +29,6 @@ public class MobSelectionHandler {
         return getMobAtWorld(worldClick.x, worldClick.y);
     }
 
-
     public Mob getMobAtWorld(float worldX, float worldY) {
         for (Friendly friendly : world.friends) {
             if (isInsideMob(worldX, worldY, friendly)) {

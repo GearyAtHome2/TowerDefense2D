@@ -103,7 +103,7 @@ public class GameInputProcessor extends InputAdapter {
 
         if (!isAnyPlacementActive() && !isDraggingCamera) {
             if (worldClickListener != null) {
-                worldClickListener.onTowerClick(screenX, screenY);
+                worldClickListener.onClick(screenX, screenY);
             }
             return true;
         }
@@ -132,7 +132,7 @@ public class GameInputProcessor extends InputAdapter {
     }
 
     public interface WorldClickListener {
-        void onTowerClick(int screenX, int screenY);
+        void onClick(int screenX, int screenY);
     }
 
     public interface UiClickListener {

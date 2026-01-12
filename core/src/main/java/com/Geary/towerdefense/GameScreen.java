@@ -4,15 +4,13 @@ import com.Geary.towerdefense.UI.CameraController;
 import com.Geary.towerdefense.UI.GameUI;
 import com.Geary.towerdefense.UI.displays.UIClickManager;
 import com.Geary.towerdefense.UI.displays.UIManager;
-import com.Geary.towerdefense.UI.displays.building.BuildingSelectionHandler;
-import com.Geary.towerdefense.UI.displays.building.BuildingUI;
 import com.Geary.towerdefense.UI.displays.building.BuildingUIManager;
 import com.Geary.towerdefense.UI.displays.building.EntityUI;
 import com.Geary.towerdefense.UI.displays.building.specialized.factory.FactoryModal;
-import com.Geary.towerdefense.UI.displays.mob.MobSelectionHandler;
+import com.Geary.towerdefense.UI.displays.mob.EntitySelectionHandler;
 import com.Geary.towerdefense.UI.render.*;
 import com.Geary.towerdefense.UI.render.icons.IconStore;
-import com.Geary.towerdefense.entity.buildings.Building;
+import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.world.GameStateManager;
 import com.Geary.towerdefense.world.GameWorld;
@@ -47,8 +45,7 @@ public class GameScreen implements Screen {
     private ResourceRenderer resourceRenderer;
 
     private PlacementHandler placementHandler;
-    private BuildingSelectionHandler buildingSelectionHandler;
-    private MobSelectionHandler mobSelectionHandler;
+    private EntitySelectionHandler entitySelectionHandler;
 
     private OrthographicCamera worldCamera;
     private Viewport worldViewport;
@@ -64,12 +61,9 @@ public class GameScreen implements Screen {
     private BuildingUIManager buildingUIManager;
     private UIManager uiManager;
 
-    private Building selectedBuilding;
-    private BuildingUI activeBuildingUI;
-
-    private Mob selectedMob;
-    private Mob highlightedMob;
-    private EntityUI activeMobUI;
+    private Entity selectedEntity;
+    private Entity highlightedEntity;
+    private EntityUI activeEntityUI;
 
     private GameInputProcessor inputProcessor;
     private final Vector3 mouseWorld = new Vector3();
@@ -112,9 +106,7 @@ public class GameScreen implements Screen {
             world.getMineManager(),
             world.getFactoryManager()
         );
-
-        buildingSelectionHandler = new BuildingSelectionHandler(world, worldViewport);
-        mobSelectionHandler = new MobSelectionHandler(world, worldViewport);
+        entitySelectionHandler = new EntitySelectionHandler(world, worldViewport);
     }
 
     private void initRenderers() {
@@ -169,17 +161,22 @@ public class GameScreen implements Screen {
             return;
         }
 
-        if (selectedBuilding != null && activeBuildingUI != null) {
-            activeBuildingUI.handleClick(x, y, worldCamera);
-            if (activeBuildingUI.consumeDeleteRequest()) {
-                world.deleteBuilding(selectedBuilding);
-                clearBuildingSelection();
-                return;
-            }
-        }
+//        if (selectedEntity != null && activeEntityUI != null) {
+//            activeEntityUI.handleClick(x, y, worldCamera);
+//            if (selectedEntity instanceof Building){
+//                Building building = (Building) selectedEntity;
+//                if (activeEntityUI.consumeDeleteRequest()) {
+//                    world.deleteBuilding(building);
+//                    clearEntitySelection();
+//                    return;
+//                }
+//            }
+//
+//        }
 
-        selectBuilding(x, y);
-        selectMob(x, y);
+//        selectBuilding(x, y);
+//        selectMob(x, y);
+        selectEntity(x, y);
     }
 
     @Override
@@ -238,16 +235,16 @@ public class GameScreen implements Screen {
 
     private void updateHover() {
         if (!UIClickManager.isClickInGameArea(Gdx.input.getY())) {
-            highlightedMob = null;
+            highlightedEntity = null;
             return;
         }
 
-        applyWorldCamera();
-        mouseWorld.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-        worldViewport.unproject(mouseWorld);
-
-        highlightedMob = mobSelectionHandler.getMobAtWorld(mouseWorld.x, mouseWorld.y);
+        highlightedEntity = entitySelectionHandler.getEntityAtScreen(
+            Gdx.input.getX(),
+            Gdx.input.getY()
+        );
     }
+
 
     private void drawWorld() {
         applyWorldCamera();
@@ -255,6 +252,7 @@ public class GameScreen implements Screen {
         batch.setProjectionMatrix(worldCamera.combined);
         shapeRenderer.setProjectionMatrix(worldCamera.combined);
 
+        // --- World layers ---
         worldRenderer.drawGridLines();
         worldRenderer.drawCells();
         resourceRenderer.drawResources();
@@ -268,21 +266,22 @@ public class GameScreen implements Screen {
             factoryRenderer
         );
 
-        if (selectedBuilding != null && activeBuildingUI != null) {
-            activeBuildingUI.drawPopup(selectedBuilding, worldCamera.zoom);
-        }
-
-        if (selectedMob != null) {
-            if (selectedMob.health < 1) {
-                clearMobSelection();
-            } else {
-                activeMobUI.drawPopup(selectedMob, worldCamera.zoom);
+        // --- Selected entity UI ---
+        if (selectedEntity != null) {
+            if (selectedEntity instanceof Mob mob && !mob.isAlive()) {
+                clearEntitySelection();
+            } else if (activeEntityUI != null) {
+                activeEntityUI.drawPopup(selectedEntity, worldCamera.zoom);
             }
         }
 
-        drawHighlightedMob();
+        // --- Entity highlights (hover + selected) ---
+        drawEntityHighlights();
+
+        // --- Modal UI ---
         drawFactoryMenu();
     }
+
 
     private void drawFactoryMenu() {
         FactoryModal menu = world.getActiveFactoryMenu();
@@ -296,50 +295,43 @@ public class GameScreen implements Screen {
         menu.draw(shapeRenderer, batch);
     }
 
-    private void drawHighlightedMob() {
-        if (highlightedMob == null || highlightedMob == selectedMob) return;
-
-        float r = highlightedMob.collisionRadius;
-
+    private void drawEntityHighlights() {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Color.YELLOW);
-        shapeRenderer.rect(
-            highlightedMob.xPos - r,
-            highlightedMob.yPos - r,
-            r * 2f,
-            r * 2f
-        );
+        if (highlightedEntity != null) {
+            drawEntityHighlight(highlightedEntity, new Color(1, 1, 0, 0.25f));
+        }
+        if (selectedEntity != null) {
+            drawEntityHighlight(selectedEntity, new Color(1, 1, 1, 0.35f));
+        }
         shapeRenderer.end();
     }
 
-    private void selectBuilding(int x, int y) {
-        Building b = buildingSelectionHandler.getBuildingAtScreen(x, y);
-        if (b == null) {
-            clearBuildingSelection();
+    private void drawEntityHighlight(Entity entity, Color color) {
+        shapeRenderer.setColor(color);
+        float r = entity.collisionRadius;
+        shapeRenderer.rect(
+            entity.xPos - r,
+            entity.yPos - r,
+            r * 2f,
+            r * 2f
+        );
+    }
+
+    private void selectEntity(int x, int y) {
+        Entity entity = entitySelectionHandler.getEntityAtScreen(x, y);
+
+        if (entity == null) {
+            clearEntitySelection();
             return;
         }
-        selectedBuilding = b;
-        activeBuildingUI = buildingUIManager.getUIFor(b);
+
+        selectedEntity = entity;
+        activeEntityUI = uiManager.getUIFor(entity);
     }
 
-    private void selectMob(int x, int y) {
-        Mob mob = mobSelectionHandler.getMobAtScreen(x, y);
-        if (mob == null) {
-            clearMobSelection();
-            return;
-        }
-        selectedMob = mob;
-        activeMobUI = uiManager.getUIFor(mob);
-    }
-
-    private void clearBuildingSelection() {
-        selectedBuilding = null;
-        activeBuildingUI = null;
-    }
-
-    private void clearMobSelection() {
-        selectedMob = null;
-        activeMobUI = null;
+    private void clearEntitySelection() {
+        selectedEntity = null;
+        activeEntityUI = null;
     }
 
     private void setupWorldCamera() {
@@ -382,14 +374,23 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     }
 
-    @Override public void resize(int width, int height) {
+    @Override
+    public void resize(int width, int height) {
         worldViewport.update(width, height, true);
         uiViewport.update(width, height, true);
     }
 
-    @Override public void pause() {}
-    @Override public void resume() {}
-    @Override public void hide() {}
+    @Override
+    public void pause() {
+    }
+
+    @Override
+    public void resume() {
+    }
+
+    @Override
+    public void hide() {
+    }
 
     @Override
     public void dispose() {

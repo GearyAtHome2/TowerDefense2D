@@ -26,8 +26,8 @@ public abstract class Spawner extends Building {
 
         float size = collisionRadius * 2;
         sr.rect(
-            xPos + BUFFER,
-            yPos + BUFFER,
+            xPos,
+            yPos,
             size,
             size
         );

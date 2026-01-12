@@ -32,13 +32,12 @@ public class FactoryRenderer {
     }
 
     private void drawFactory(Factory factory, boolean ghost) {
-        float centerX = factory.xPos + CELL_MARGIN + CELL_SIZE / 2f;
-        float centerY = factory.yPos + CELL_MARGIN + CELL_SIZE / 2f;
+        float centerX = factory.xPos;
+        float centerY = factory.yPos;
 
-        float frameSize = CELL_SIZE * 0.8f;
-        float gap = 3f; // gap between outer squares
+        float frameSize = factory.size; // use building’s size
+        float gap = 3f;
 
-        // --- Colors ---
         Color outerColor = ghost
             ? new Color(0.4f, 0.3f, 0.2f, 0.4f)
             : (factory.isConnectedToNetwork ? new Color(0.7f, 0.5f, 0.3f, 1f) : new Color(0.4f, 0.3f, 0.2f, 1f));
@@ -46,7 +45,6 @@ public class FactoryRenderer {
             ? new Color(0.5f, 0.5f, 0.5f, 0.4f)
             : (factory.isConnectedToNetwork ? new Color(0.9f, 0.8f, 0.5f, 1f) : new Color(0.6f, 0.6f, 0.6f, 1f));
 
-        // --- Draw outer frame (two squares) ---
         sr.begin(ShapeRenderer.ShapeType.Line);
         sr.setColor(outerColor);
         sr.rect(centerX - frameSize / 2f, centerY - frameSize / 2f, frameSize, frameSize);
@@ -54,7 +52,7 @@ public class FactoryRenderer {
             frameSize - 2 * gap, frameSize - 2 * gap);
         sr.end();
 
-        // --- Draw three gears ---
+        // Draw gears (offsets from center)
         sr.begin(ShapeRenderer.ShapeType.Filled);
         sr.setColor(gearColor);
 
@@ -75,7 +73,6 @@ public class FactoryRenderer {
             float spokeLength = radius * 0.8f;
             float spokeWidth = 2f;
 
-            // rotation only if connected to network
             float rotation = factory.isConnectedToNetwork ? factory.animationState * 360f * speedMultiplier : 0f;
 
             for (int i = 0; i < numSpokes; i++) {

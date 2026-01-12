@@ -71,7 +71,7 @@ public abstract class EntityUI {
             button.bounds.y = cursor;
             cursor += button.bounds.height + 6 * scale;
         }
-        y = resolvePopupY(y, finalHeight);
+//        y = resolvePopupY(y, finalHeight);
 
         // Background
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -116,11 +116,9 @@ public abstract class EntityUI {
         return entity.yPos + (entity instanceof Mob mob ? mob.size : world.cellSize);
     }
 
-    protected abstract void drawHighlight(Entity entity);
-
     protected abstract boolean shouldDrawDeleteButton(Entity entity);
 
-    protected void addExtraButtons(Entity entity, float popupX, float popupY, float popupWidth, float popupHeight, float scale) {
+    protected void addExtraButtons(Entity entity, float popupX, float unusedPopupY, float popupWidth, float popupHeight, float scale) {
         // override in subclasses
     }
 
