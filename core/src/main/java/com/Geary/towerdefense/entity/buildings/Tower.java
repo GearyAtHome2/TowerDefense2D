@@ -6,7 +6,6 @@ import com.Geary.towerdefense.behaviour.targeting.TargetingHelper;
 import com.Geary.towerdefense.entity.mob.bullet.BasicBullet;
 import com.Geary.towerdefense.entity.mob.bullet.Bullet;
 import com.Geary.towerdefense.entity.mob.enemy.Enemy;
-import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.Color;
 
 import java.util.List;
@@ -60,15 +59,15 @@ public class Tower extends Building {
 
     // --- Utility ---
     public float getDistanceTo(Enemy enemy) {
-        float dx = (xPos + GameWorld.cellSize / 2f) - enemy.getCenterX();
-        float dy = (yPos + GameWorld.cellSize / 2f) - enemy.getCenterY();
+        float dx = (xPos) - enemy.getCenterX();
+        float dy = (yPos) - enemy.getCenterY();
         return (float) Math.sqrt(dx * dx + dy * dy);
     }
 
     // --- Lead calculation ---
     public float[] calculateLead(Enemy e) {
-        float startX = xPos + GameWorld.cellSize / 2f;
-        float startY = yPos + GameWorld.cellSize / 2f;
+        float startX = xPos;
+        float startY = yPos;
 
         float targetX = e.getCenterX();
         float targetY = e.getCenterY();

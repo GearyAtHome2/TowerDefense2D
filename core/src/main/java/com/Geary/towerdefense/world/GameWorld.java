@@ -247,6 +247,7 @@ public class GameWorld {
     }
 
     public void showFactoryMenu(Factory factory, BitmapFont font) {
+        System.out.println("factory menu click registered");
         activeFactoryModal = new FactoryModal(factory, font);
     }
 

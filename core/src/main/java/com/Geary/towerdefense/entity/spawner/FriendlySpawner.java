@@ -15,15 +15,15 @@ public class FriendlySpawner extends Spawner {
     public float cooldown = maxCooldown;
 
     public FriendlySpawner(float x, float y) {
-        super(x+BUFFER, y+BUFFER);
+        super(x, y);
         isConnectedToNetwork = true;
         this.name="Friendly spawner";
     }
 
     public Friendly spawn() {
         return new Serf(
-            getCenterX() - (int) (random()*14),
-            getCenterY() - (int) (random()*14)
+            getCenterX() - (int) (random()*14)+7,
+            getCenterY() - (int) (random()*14)+7
         );
     }
 

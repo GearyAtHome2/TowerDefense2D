@@ -41,6 +41,7 @@ public abstract class Mob extends Entity {
 
     protected float knockbackDamping;
     public float collisionCooldown = 0f;
+    private boolean isBouncing;
 
     protected Mob(float xPos, float yPos, MobStats stats) {
         this.xPos = xPos;
@@ -97,18 +98,22 @@ public abstract class Mob extends Entity {
         }
     }
 
+    public boolean isBouncing(){
+        return isBouncing;
+    }
+
     private void handleMovement(Cell cell, Direction moveDir, float delta, int cellSize) {
-        boolean bouncing = Math.abs(bounceVX) > 0.01f || Math.abs(bounceVY) > 0.01f;
+        this.isBouncing = Math.abs(bounceVX) > 0.01f || Math.abs(bounceVY) > 0.01f;
 
         if (arcHandler.isInArcTurn()) {
-            handleArcMovement(cell, delta, bouncing, cellSize);
+            handleArcMovement(cell, delta, cellSize);
         } else {
             handleLinearMovement(cell, moveDir, delta, cellSize);
         }
     }
 
-    private void handleArcMovement(Cell cell, float delta, boolean bouncing, int cellSize) {
-        if (bouncing) {
+    private void handleArcMovement(Cell cell, float delta, int cellSize) {
+        if (isBouncing) {
             Direction[] turn = computeTurnDirections(cell);
             arcHandler.rebuildArcPreserveProgress(
                 cell,

@@ -3,14 +3,15 @@ package com.Geary.towerdefense;
 import com.Geary.towerdefense.UI.CameraController;
 import com.Geary.towerdefense.UI.GameUI;
 import com.Geary.towerdefense.UI.displays.UIClickManager;
-import com.Geary.towerdefense.UI.displays.UIManager;
-import com.Geary.towerdefense.UI.displays.building.BuildingUIManager;
 import com.Geary.towerdefense.UI.displays.building.EntityUI;
+import com.Geary.towerdefense.UI.displays.building.UIManager;
 import com.Geary.towerdefense.UI.displays.building.specialized.factory.FactoryModal;
 import com.Geary.towerdefense.UI.displays.mob.EntitySelectionHandler;
 import com.Geary.towerdefense.UI.render.*;
 import com.Geary.towerdefense.UI.render.icons.IconStore;
 import com.Geary.towerdefense.entity.Entity;
+import com.Geary.towerdefense.entity.buildings.Building;
+import com.Geary.towerdefense.entity.buildings.Factory;
 import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.world.GameStateManager;
 import com.Geary.towerdefense.world.GameWorld;
@@ -27,6 +28,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
 
 public class GameScreen implements Screen {
 
@@ -58,7 +60,6 @@ public class GameScreen implements Screen {
     private MineRenderer mineRenderer;
     private FactoryRenderer factoryRenderer;
 
-    private BuildingUIManager buildingUIManager;
     private UIManager uiManager;
 
     private Entity selectedEntity;
@@ -130,8 +131,6 @@ public class GameScreen implements Screen {
             world.getTransportManager(),
             world.getGameStateManager()
         );
-
-        buildingUIManager = new BuildingUIManager(world, shapeRenderer, batch, uiFont);
         uiManager = new UIManager(world, shapeRenderer, batch, uiFont);
     }
 
@@ -161,23 +160,21 @@ public class GameScreen implements Screen {
             return;
         }
 
-//        if (selectedEntity != null && activeEntityUI != null) {
-//            activeEntityUI.handleClick(x, y, worldCamera);
-//            if (selectedEntity instanceof Building){
-//                Building building = (Building) selectedEntity;
-//                if (activeEntityUI.consumeDeleteRequest()) {
-//                    world.deleteBuilding(building);
-//                    clearEntitySelection();
-//                    return;
-//                }
-//            }
-//
-//        }
+        // --- forward clicks to active entity UI buttons ---
+        if (selectedEntity != null && activeEntityUI != null) {
+            activeEntityUI.handleClick(x, y, worldCamera);
+            if (selectedEntity instanceof Building building) {
+                if (activeEntityUI.consumeDeleteRequest()) {
+                    world.deleteBuilding(building);
+                    clearEntitySelection();
+                    return;
+                }
+            }
+        }
 
-//        selectBuilding(x, y);
-//        selectMob(x, y);
         selectEntity(x, y);
     }
+
 
     @Override
     public void render(float delta) {
@@ -327,6 +324,10 @@ public class GameScreen implements Screen {
 
         selectedEntity = entity;
         activeEntityUI = uiManager.getUIFor(entity);
+
+        if (entity instanceof Factory factory) {
+//            world.showFactoryMenu(factory, uiFont);
+        }
     }
 
     private void clearEntitySelection() {

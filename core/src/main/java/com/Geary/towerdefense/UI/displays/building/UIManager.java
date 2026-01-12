@@ -1,7 +1,5 @@
-package com.Geary.towerdefense.UI.displays;
+package com.Geary.towerdefense.UI.displays.building;
 
-import com.Geary.towerdefense.UI.displays.building.DefaultEntityUI;
-import com.Geary.towerdefense.UI.displays.building.EntityUI;
 import com.Geary.towerdefense.UI.displays.building.specialized.factory.FactoryUI;
 import com.Geary.towerdefense.UI.displays.mob.MobUI;
 import com.Geary.towerdefense.entity.Entity;
@@ -42,7 +40,6 @@ public class UIManager {
     public EntityUI getUIFor(Entity entity) {
         if (entity == null) throw new IllegalArgumentException("UIManager.getUIFor() called with null entity");
 
-        // Check exact class or superclass
         for (Map.Entry<Class<?>, EntityUI> entry : specializedUIs.entrySet()) {
             if (entry.getKey().isAssignableFrom(entity.getClass())) {
                 return entry.getValue();

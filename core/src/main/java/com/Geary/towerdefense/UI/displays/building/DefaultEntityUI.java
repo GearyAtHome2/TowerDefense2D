@@ -1,6 +1,7 @@
 package com.Geary.towerdefense.UI.displays.building;
 
 import com.Geary.towerdefense.entity.Entity;
+import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -23,6 +24,9 @@ public class DefaultEntityUI extends EntityUI {
 
     @Override
     protected boolean shouldDrawDeleteButton(Entity entity) {
+        if (entity instanceof Building building){
+            return building.isDeletable;
+        }
         return false;
     }
 }

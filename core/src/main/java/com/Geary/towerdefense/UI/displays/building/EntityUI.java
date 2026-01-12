@@ -2,7 +2,6 @@ package com.Geary.towerdefense.UI.displays.building;
 
 import com.Geary.towerdefense.UI.GameUI;
 import com.Geary.towerdefense.entity.Entity;
-import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -109,11 +108,11 @@ public abstract class EntityUI {
 
     protected float getPopupX(Entity entity) {
         // default: next to entity (handles mobs too)
-        return entity.xPos + (entity instanceof Mob mob ? mob.size : world.cellSize) + 5;
+        return entity.xPos  + 5;
     }
 
     protected float getPopupY(Entity entity) {
-        return entity.yPos + (entity instanceof Mob mob ? mob.size : world.cellSize);
+        return entity.yPos;
     }
 
     protected abstract boolean shouldDrawDeleteButton(Entity entity);

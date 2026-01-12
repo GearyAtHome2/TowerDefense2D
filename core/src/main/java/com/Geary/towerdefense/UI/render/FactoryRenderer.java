@@ -77,6 +77,7 @@ public class FactoryRenderer {
 
             for (int i = 0; i < numSpokes; i++) {
                 float angleDeg = rotation + i * (360f / numSpokes) + gear[5];
+                sr.circle(gx, gy,spokeLength*0.8f);
                 sr.rectLine(
                     gx, gy,
                     gx + spokeLength * (float)Math.cos(Math.toRadians(angleDeg)),

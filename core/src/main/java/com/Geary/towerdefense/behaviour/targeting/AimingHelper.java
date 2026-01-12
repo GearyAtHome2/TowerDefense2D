@@ -14,8 +14,8 @@ public class AimingHelper {
     public static float updateGunAngle(Tower tower, float delta) {
         if (tower.currentTarget == null) return tower.gunAngle;
 
-        float centerX = tower.xPos + com.Geary.towerdefense.world.GameWorld.cellSize / 2f;
-        float centerY = tower.yPos + com.Geary.towerdefense.world.GameWorld.cellSize / 2f;
+        float centerX = tower.xPos;
+        float centerY = tower.yPos;
 
         float[] lead = tower.calculateLead(tower.currentTarget);
         float dx = lead[0] - centerX;

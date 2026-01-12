@@ -26,8 +26,8 @@ public abstract class Spawner extends Building {
 
         float size = collisionRadius * 2;
         sr.rect(
-            xPos,
-            yPos,
+            xPos - size / 2f,
+            yPos - size / 2f,
             size,
             size
         );
@@ -43,11 +43,11 @@ public abstract class Spawner extends Building {
      * World-space center of this tile
      */
     protected float getCenterX() {
-        return xPos + GameWorld.cellSize / 2f;
+        return xPos;
     }
 
     protected float getCenterY() {
-        return yPos + GameWorld.cellSize / 2f;
+        return yPos;
     }
 
     @Override
