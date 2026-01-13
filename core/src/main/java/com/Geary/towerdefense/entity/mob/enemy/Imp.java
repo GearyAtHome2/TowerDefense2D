@@ -4,7 +4,7 @@ import com.Geary.towerdefense.entity.mob.MobStats;
 import com.badlogic.gdx.graphics.Color;
 
 
-public class Groblin extends Enemy {
+public class Imp extends Enemy {
 
     private static final MobStats STATS = new MobStats(
         0.1f,
@@ -13,13 +13,13 @@ public class Groblin extends Enemy {
         0.8f, // speed
         6f,    // knockback damping
         0.45f,
-        Color.RED//random movement probability
+        Color.FIREBRICK
     );
 
-    public Groblin(float x, float y) {
+    public Imp(float x, float y) {
         super(x, y, STATS);
-        this.name = "Groblin";
-        this.effectText = "";
-        this.flavourText = "Less fortunate cousin of the Goblin, more fortunate cousin of the Grob.";
+        this.name = "Imp";
+        this.effectText = "Demonic";
+        this.flavourText = "Lorem impsum dolor sit amet";
     }
 }

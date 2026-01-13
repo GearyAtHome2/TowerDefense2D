@@ -2,6 +2,7 @@ package com.Geary.towerdefense.entity.spawner;
 
 import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.entity.mob.friendly.Friendly;
+import com.Geary.towerdefense.entity.mob.friendly.ManAtArms;
 import com.Geary.towerdefense.entity.mob.friendly.Serf;
 import com.badlogic.gdx.graphics.Color;
 
@@ -22,8 +23,11 @@ public class FriendlySpawner extends Spawner {
         this.name = "Friendly spawner";
 
         // safe default: existing Serf
-        for (int i=0; i< 20 ; i++) {
+        for (int i=0; i< 7 ; i++) {
             spawnableMobs.add(new Serf(0,0)); // Serf must have a public static MobStats STATS
+        }
+        for (int i=0; i<7 ; i++) {
+            spawnableMobs.add(new ManAtArms(0,0)); // Serf must have a public static MobStats STATS
         }
     }
 

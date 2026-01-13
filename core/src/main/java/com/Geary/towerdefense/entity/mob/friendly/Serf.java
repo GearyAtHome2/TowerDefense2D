@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Color;
 public class Serf extends Friendly {
 
     public static final MobStats STATS = new MobStats(
-        "Serf",
         0.1f,
         220,   // health
         5,   // damage
@@ -19,5 +18,8 @@ public class Serf extends Friendly {
 
     public Serf(float x, float y) {
         super(x, y, STATS);
+        this.name = "Serf";
+        this.effectText = "Serf Effect text. Lorem ipsum sit dolor amet";
+        this.flavourText = "Expendable, dependable, and commendable. We love serfs.";
     }
 }

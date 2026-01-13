@@ -19,8 +19,11 @@ public abstract class Mob extends Entity {
 
     public float size;
     public int health;
+    public int armour = 0;
     public int damage;
     public Color color;
+    public String effectText = "default Mob effect text";
+    public String flavourText = "default Mob flavourtext";
 
     public float bounceVX = 0f;
     public float bounceVY = 0f;
@@ -47,7 +50,6 @@ public abstract class Mob extends Entity {
         this.xPos = xPos;
         this.yPos = yPos;
 
-        this.name = stats.name();
         this.size = GameWorld.cellSize * stats.size();
         this.health = stats.health();
         this.damage = stats.damage();
