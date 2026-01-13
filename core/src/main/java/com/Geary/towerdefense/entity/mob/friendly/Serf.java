@@ -21,5 +21,6 @@ public class Serf extends Friendly {
         this.name = "Serf";
         this.effectText = "Serf Effect text. Lorem ipsum sit dolor amet";
         this.flavourText = "Expendable, dependable, and commendable. We love serfs.";
+        this.spawnTime = 2;
     }
 }

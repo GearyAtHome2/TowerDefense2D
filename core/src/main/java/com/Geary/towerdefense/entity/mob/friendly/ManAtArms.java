@@ -13,7 +13,7 @@ public class ManAtArms extends Friendly {
         0.69f, // speed
         12f,    // knockback damping
         0.2f, //random movement
-        Color.GREEN
+        Color.OLIVE
     );
 
     public ManAtArms(float x, float y) {
@@ -22,5 +22,6 @@ public class ManAtArms extends Friendly {
         this.armour = 4;
         this.effectText = "";
         this.flavourText = "This man has been given access to arms, and he is At Them.";
+        this.spawnTime = 4;
     }
 }

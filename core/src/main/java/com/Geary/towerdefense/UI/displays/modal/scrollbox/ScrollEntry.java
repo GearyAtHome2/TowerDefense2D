@@ -1,4 +1,4 @@
-package com.Geary.towerdefense.UI.displays.modal;
+package com.Geary.towerdefense.UI.displays.modal.scrollbox;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;

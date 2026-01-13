@@ -1,6 +1,6 @@
 package com.Geary.towerdefense.UI.displays.modal.spawner;
 
-import com.Geary.towerdefense.UI.displays.modal.ScrollEntry;
+import com.Geary.towerdefense.UI.displays.modal.scrollbox.ScrollEntry;
 import com.Geary.towerdefense.UI.render.icons.IconStore;
 import com.Geary.towerdefense.entity.mob.Mob;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -11,71 +11,109 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class MobMenuEntry implements ScrollEntry {
 
+    public interface MobEntryListener {
+        void onRecruitClicked(MobMenuEntry entry);
+        void onGarrisonClicked(MobMenuEntry entry);
+    }
+
     public final Mob templateMob;
     public final String name;
     public final Rectangle bounds = new Rectangle();
     public Runnable onClick;
 
+    // Button bounds
+    private final Rectangle recruitButton = new Rectangle();
+    private final Rectangle garrisonButton = new Rectangle();
+
+    private final MobEntryListener listener;
+
     private static final GlyphLayout layout = new GlyphLayout();
 
-    public MobMenuEntry(Mob templateMob, float x, float y, float width, float height) {
+    public MobMenuEntry(Mob templateMob, float x, float y, float width, float height, MobEntryListener listener) {
         this.templateMob = templateMob;
         this.name = templateMob.name;
         bounds.set(x, y, width, height);
+        this.listener = listener;
     }
 
     public void draw(ShapeRenderer renderer, SpriteBatch batch, BitmapFont font) {
-        // Background
-        renderer.begin(ShapeRenderer.ShapeType.Filled);
-        renderer.setColor(0.2f, 0.3f, 0.4f, 1f);
-        renderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
-        renderer.end();
-
-        batch.begin();
-
         float x = bounds.x;
         float y = bounds.y;
         float h = bounds.height;
         float w = bounds.width;
 
-        // --- Icon ---
-        var icon = IconStore.mob(templateMob.name);
-        if (icon != null) {
-            batch.draw(icon, x + 4, y + 4, h - 8, h - 8);
-        }
+        // --- Background ---
+        renderer.begin(ShapeRenderer.ShapeType.Filled);
+        renderer.setColor(0.2f, 0.3f, 0.4f, 1f);
+        renderer.rect(x, y, w, h);
+        renderer.end();
 
-        // --- Name ---
+        // --- Icon & Name & Stats ---
+        batch.begin();
+
+        var icon = IconStore.mob(templateMob.name);
+        if (icon != null) batch.draw(icon, x + 4, y + 4, h - 8, h - 8);
+
         float nameX = x + h + 6;
         font.draw(batch, name, nameX, y + h * 0.7f);
 
-        // Measure name width
         GlyphLayout nameLayout = new GlyphLayout(font, name);
         float nameW = nameLayout.width;
 
-// --- Stats block (directly after name) ---
         float statsX = nameX + nameW + 12f;
-        float statsW = w * 0.22f; // slightly smaller, so effect text can use more space
+        float statsW = w * 0.22f;
 
         String statsText = "Health: " + templateMob.health + "\n" +
-            "Damage: " + templateMob.damage + "\n";
-
-        if (templateMob.armour > 0){
-            System.out.println("adding armour to text");
-            statsText+="Armour: " + templateMob.armour;
-        }
+            "Damage: " + templateMob.damage;
+        if (templateMob.armour > 0) statsText += "\nArmour: " + templateMob.armour;
 
         drawScaledText(font, batch, statsText, statsX, y, statsW, h, 0.7f, 1.0f);
 
-// --- Effect text (take up remaining right-hand side) ---
-        float effectX = statsX + statsW + 6f;
-        float effectW = (x + w) - effectX - 6f; // from effectX to right edge minus padding
+        batch.end();
 
+        // --- Buttons ---
+        float buttonWidth = 60f;
+        float buttonHeight = (h - 6f) / 2f;
+        float buttonX = x + w - buttonWidth - 6f;
+        float buttonYTop = y + h - buttonHeight - 3f;
+        float buttonYBottom = y + 3f;
+
+        // Update button rectangles
+        recruitButton.set(buttonX, buttonYTop, buttonWidth, buttonHeight);
+        garrisonButton.set(buttonX, buttonYBottom, buttonWidth, buttonHeight);
+
+        renderer.begin(ShapeRenderer.ShapeType.Filled);
+        renderer.setColor(0.1f, 0.7f, 0.1f, 1f); // Recruit
+        renderer.rect(recruitButton.x, recruitButton.y, recruitButton.width, recruitButton.height);
+        renderer.setColor(0.5f, 0.5f, 0.5f, 1f); // Garrison
+        renderer.rect(garrisonButton.x, garrisonButton.y, garrisonButton.width, garrisonButton.height);
+        renderer.end();
+
+        // --- Effect text ---
+        batch.begin();
+        float effectX = statsX + statsW + 6f;
+        float effectW = buttonX - effectX - 6f; // leave padding for buttons
         drawScaledText(font, batch, templateMob.effectText, effectX, y, effectW, h, 0.7f, 1.0f);
+
+        // --- Button labels ---
+        drawScaledText(font, batch, "Recruit", buttonX + 2, buttonYTop, buttonWidth, buttonHeight, 0.5f, 1f);
+        drawScaledText(font, batch, "Garrison", buttonX + 2, buttonYBottom, buttonWidth, buttonHeight, 0.5f, 0.7f);
 
         batch.end();
     }
 
     public boolean click(float x, float y) {
+        // Buttons first
+        if (recruitButton.contains(x, y)) {
+            if (listener != null) listener.onRecruitClicked(this);
+            return true;
+        }
+        if (garrisonButton.contains(x, y)) {
+            if (listener != null) listener.onGarrisonClicked(this);
+            return true;
+        }
+
+        // Entry click
         if (bounds.contains(x, y)) {
             if (onClick != null) onClick.run();
             return true;
@@ -96,17 +134,14 @@ public class MobMenuEntry implements ScrollEntry {
         scale = Math.max(scale, minScale);
 
         font.getData().setScale(scale);
-
         layout.setText(font, text, font.getColor(), width, com.badlogic.gdx.utils.Align.left, true);
 
-        // Apply alpha
         float oldA = font.getColor().a;
         font.setColor(font.getColor().r, font.getColor().g, font.getColor().b, alpha);
 
         float textY = y + (height / 2f) + (layout.height / 2f);
         font.draw(batch, layout, x, textY);
 
-        // Restore
         font.setColor(font.getColor().r, font.getColor().g, font.getColor().b, oldA);
         font.getData().setScale(1f);
     }

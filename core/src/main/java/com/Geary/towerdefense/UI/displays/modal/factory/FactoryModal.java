@@ -1,7 +1,7 @@
 package com.Geary.towerdefense.UI.displays.modal.factory;
 
 import com.Geary.towerdefense.UI.displays.modal.Modal;
-import com.Geary.towerdefense.UI.displays.modal.ScrollBox;
+import com.Geary.towerdefense.UI.displays.modal.scrollbox.ScrollBox;
 import com.Geary.towerdefense.UI.render.icons.TooltipRenderer;
 import com.Geary.towerdefense.entity.buildings.Factory;
 import com.Geary.towerdefense.entity.resources.Recipe;

@@ -1,4 +1,4 @@
-package com.Geary.towerdefense.UI.displays.modal;
+package com.Geary.towerdefense.UI.displays.modal.scrollbox;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -111,5 +111,9 @@ public class ScrollBox<T extends ScrollEntry> {
 
     public void relayout() {
         updateEntryPositions();
+    }
+
+    public List<T> getEntries() {
+        return entries;
     }
 }
