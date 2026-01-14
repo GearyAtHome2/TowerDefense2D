@@ -3,7 +3,7 @@ package com.Geary.towerdefense.world;
 import com.Geary.towerdefense.Direction;
 import com.Geary.towerdefense.UI.displays.modal.Modal;
 import com.Geary.towerdefense.UI.displays.modal.factory.FactoryModal;
-import com.Geary.towerdefense.UI.displays.modal.spawner.SpawnerModal;
+import com.Geary.towerdefense.UI.displays.modal.spawner.SpawnerModalManager;
 import com.Geary.towerdefense.behaviour.MobManager;
 import com.Geary.towerdefense.behaviour.ResourceManager;
 import com.Geary.towerdefense.behaviour.SparkManager;
@@ -67,8 +67,10 @@ public class GameWorld {
     private SparkManager sparkManager;
     private SpawnerManager spawnerManager;
     private GameStateManager gameStateManager;
+    private SpawnerModalManager spawnerModalManager;
 
     private Modal activeModal;
+
 
     private OrthographicCamera worldCamera;
 
@@ -95,6 +97,7 @@ public class GameWorld {
         mobManager = new MobManager(this, sparkManager); // no camera
         spawnerManager = new SpawnerManager(this);       // no camera
         gameStateManager = new GameStateManager();
+        spawnerModalManager = new SpawnerModalManager();
     }
 
     private void generateWorld(Map<Resource.RawResourceType, Integer> resourceAllocation) {
@@ -216,6 +219,7 @@ public class GameWorld {
         factoryManager.animateFactories(delta);
         mineManager.calculateResourcesGenerated(delta);
         factoryManager.handleFactoryProduction(delta);
+        spawnerModalManager.updateQueues();
     }
 
     public void deleteBuilding(Building building) {
@@ -253,7 +257,7 @@ public class GameWorld {
     }
 
     public void showSpawnerMenu(FriendlySpawner spawner, BitmapFont font, OrthographicCamera uiCamera) {
-        activeModal = new SpawnerModal(spawner, font, uiCamera);
+        activeModal = spawnerModalManager.getSpawnerModal(spawner, font, uiCamera);
     }
 
     public void setActiveModal(Modal modal) {

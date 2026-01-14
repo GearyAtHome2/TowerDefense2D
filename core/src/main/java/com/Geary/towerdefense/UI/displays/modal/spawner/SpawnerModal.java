@@ -140,7 +140,7 @@ public class SpawnerModal extends Modal {
         float tabY = bounds.y + bounds.height - tabHeight;
 
         if (y >= tabY) {
-            int idx = (int)((x - bounds.x) / (bounds.width / tabs.getTabs().size()));
+            int idx = (int) ((x - bounds.x) / (bounds.width / tabs.getTabs().size()));
             tabs.setActiveTabIndex(idx);
             applyActiveTab();
             return true;
@@ -182,7 +182,7 @@ public class SpawnerModal extends Modal {
         for (int i = 0; i < entries.size(); i++) entries.get(i).isLeftmost = (i == 0);
     }
 
-    private void processQueueCooldowns() {
+    public void processQueueCooldowns() {
         List<QueueEntry> queue = new ArrayList<>(queueScrollBox.getEntries());
         if (queue.isEmpty()) return;
 
@@ -194,6 +194,8 @@ public class SpawnerModal extends Modal {
                 List<QueueEntry> garrison = new ArrayList<>(garrisonScrollBox.getEntries());
                 garrison.add(new QueueEntry(first.mob, 0, 0, 50f, true));
                 garrisonScrollBox.setEntries(garrison);
+            } else {
+                spawner.spawn();
             }
 
             if (!queue.isEmpty()) queue.get(0).isLeftmost = true;

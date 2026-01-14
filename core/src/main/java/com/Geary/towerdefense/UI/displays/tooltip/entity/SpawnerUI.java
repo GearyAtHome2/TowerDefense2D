@@ -22,7 +22,6 @@ public class SpawnerUI extends DefaultEntityUI {
     @Override
     protected void addExtraButtons(com.Geary.towerdefense.entity.Entity entity, float popupX, float popupY, float popupWidth, float popupHeight, float scale) {
         if (entity instanceof FriendlySpawner spawner) {
-            // example: add a "Target" button for hostile mobs
             addStackedButton("Open Spawner Menu", popupX, popupWidth, scale, 0.2f, 0.6f, 1f,
                 () -> {
                     world.showSpawnerMenu(spawner, font, camera);

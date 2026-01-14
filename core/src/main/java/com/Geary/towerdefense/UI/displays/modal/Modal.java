@@ -117,6 +117,10 @@ public abstract class Modal {
 
     protected abstract boolean handleClickInside(float x, float y);
 
+    public void setToOpen() {
+        closeRequested = false;
+    }
+
     public boolean shouldClose() {
         return closeRequested;
     }
