@@ -8,7 +8,6 @@ import com.Geary.towerdefense.entity.spawner.FriendlySpawner;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
@@ -25,6 +24,7 @@ public class SpawnerModal extends Modal {
     private final HorizontalScrollBox<QueueEntry> garrisonScrollBox;
 
     private final SpawnerTabs tabs;
+    private final SpawnerTabRenderer<SpawnerTabs.OrderTab> tabRenderer;
 
     public SpawnerModal(FriendlySpawner spawner, BitmapFont font, OrthographicCamera camera) {
         super(font, camera);
@@ -38,6 +38,8 @@ public class SpawnerModal extends Modal {
         garrisonScrollBox.setEntries(new ArrayList<>());
 
         tabs = new SpawnerTabs(spawner, listener);
+        tabRenderer = new SpawnerTabRenderer<>(font, camera);
+
         applyActiveTab();
     }
 
@@ -61,10 +63,13 @@ public class SpawnerModal extends Modal {
     private void applyActiveTab() {
         float totalHeight = tabs.getActiveEntriesTotalHeight(5f);
         Color c = tabs.getActiveTabColor();
-
         mobScrollBox.setBackgroundColor(c.r, c.g, c.b, c.a);
         mobScrollBox.setEntries(tabs.getActiveEntries(), totalHeight);
     }
+
+    /* =========================
+       Layout
+       ========================= */
 
     @Override
     protected void layoutButtons() {
@@ -103,7 +108,16 @@ public class SpawnerModal extends Modal {
 
     @Override
     protected void drawContent(ShapeRenderer renderer, SpriteBatch batch) {
-        drawTabs(renderer, batch);
+        tabRenderer.draw(
+            renderer,
+            batch,
+            bounds,
+            TAB_HEIGHT_FRAC,
+            tabs.getTabs(),
+            tabs.getActiveTabIndex(),
+            tabs.getTabColors()
+        );
+
         mobScrollBox.draw(renderer, batch, font, camera);
 
         float delta = com.badlogic.gdx.Gdx.graphics.getDeltaTime();
@@ -114,48 +128,6 @@ public class SpawnerModal extends Modal {
 
         queueScrollBox.draw(renderer, batch, font, camera);
         garrisonScrollBox.draw(renderer, batch, font, camera);
-    }
-
-    private void drawTabs(ShapeRenderer renderer, SpriteBatch batch) {
-        float tabHeight = bounds.height * TAB_HEIGHT_FRAC;
-        float tabWidth = bounds.width / tabs.getTabs().size();
-        float y = bounds.y + bounds.height - tabHeight;
-
-        renderer.begin(ShapeRenderer.ShapeType.Filled);
-        for (int i = 0; i < tabs.getTabs().size(); i++) {
-            var tab = tabs.getTabs().get(i);
-            Color base = tabs.getTabColor(tab);
-            Color draw = new Color(base);
-
-            if (i == tabs.getActiveTabIndex()) {
-                if (tab.name().equals("LIGHT")) draw.set(Color.WHITE);
-                else draw.lerp(Color.WHITE, 0.3f);
-            }
-
-            renderer.setColor(draw);
-            renderer.rect(bounds.x + i * tabWidth, y, tabWidth, tabHeight);
-        }
-        renderer.end();
-
-        batch.begin();
-        for (int i = 0; i < tabs.getTabs().size(); i++) {
-            var tab = tabs.getTabs().get(i);
-            String text = tab.name();
-
-            GlyphLayout layout = new GlyphLayout(font, text);
-            float scale = Math.min(1f, (tabWidth - 10f) / layout.width);
-            font.getData().setScale(scale);
-
-            Color base = tabs.getTabColor(tab);
-            float brightness = 0.299f * base.r + 0.587f * base.g + 0.114f * base.b;
-            font.setColor(brightness > 0.6f ? Color.BLACK : Color.WHITE);
-
-            float textX = bounds.x + i * tabWidth + (tabWidth - layout.width * scale) / 2f;
-            float textY = y + tabHeight * 0.7f;
-            font.draw(batch, text, textX, textY);
-        }
-        batch.end();
-        font.getData().setScale(1f);
     }
 
     /* =========================
@@ -190,7 +162,7 @@ public class SpawnerModal extends Modal {
     }
 
     /* =========================
-       Queue logic (UNCHANGED)
+       Queue logic
        ========================= */
 
     private void add(HorizontalScrollBox<QueueEntry> box, Mob mob, boolean toGarrison) {
@@ -199,18 +171,15 @@ public class SpawnerModal extends Modal {
 
         if (box == queueScrollBox && !entries.isEmpty()) {
             entries.get(0).isLeftmost = true;
-            if (entries.get(0).cooldownElapsed == 0f) {
-                entries.get(0).resetCooldown();
-            }
+            if (entries.get(0).cooldownElapsed == 0f) entries.get(0).resetCooldown();
         }
+
         box.setEntries(entries);
     }
 
     private void updateQueueLeftmost() {
         List<QueueEntry> entries = queueScrollBox.getEntries();
-        for (int i = 0; i < entries.size(); i++) {
-            entries.get(i).isLeftmost = (i == 0);
-        }
+        for (int i = 0; i < entries.size(); i++) entries.get(i).isLeftmost = (i == 0);
     }
 
     private void processQueueCooldowns() {

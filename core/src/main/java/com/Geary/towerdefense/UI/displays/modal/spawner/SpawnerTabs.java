@@ -114,4 +114,6 @@ public class SpawnerTabs {
     public Color getTabColor(OrderTab tab) {
         return tabColors.getOrDefault(tab, new Color(0.6f, 0.6f, 0.6f, 1f));
     }
+
+    public Map<OrderTab, Color> getTabColors(){ return tabColors;}
 }
