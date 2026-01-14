@@ -120,11 +120,8 @@ public class SpawnerModal extends Modal {
 
         mobScrollBox.draw(renderer, batch, font, camera);
 
-        float delta = com.badlogic.gdx.Gdx.graphics.getDeltaTime();
-        for (QueueEntry entry : queueScrollBox.getEntries()) {
-            entry.update(delta);
-        }
-        processQueueCooldowns();
+
+//        processQueueCooldowns();
 
         queueScrollBox.draw(renderer, batch, font, camera);
         garrisonScrollBox.draw(renderer, batch, font, camera);
@@ -182,7 +179,10 @@ public class SpawnerModal extends Modal {
         for (int i = 0; i < entries.size(); i++) entries.get(i).isLeftmost = (i == 0);
     }
 
-    public void processQueueCooldowns() {
+    public void processQueueCooldowns(float delta) {
+        for (QueueEntry entry : queueScrollBox.getEntries()) {
+            entry.update(delta);
+        }
         List<QueueEntry> queue = new ArrayList<>(queueScrollBox.getEntries());
         if (queue.isEmpty()) return;
 
@@ -195,7 +195,7 @@ public class SpawnerModal extends Modal {
                 garrison.add(new QueueEntry(first.mob, 0, 0, 50f, true));
                 garrisonScrollBox.setEntries(garrison);
             } else {
-                spawner.spawn();
+                spawner.requestSpawn(List.of(first.mob));
             }
 
             if (!queue.isEmpty()) queue.get(0).isLeftmost = true;

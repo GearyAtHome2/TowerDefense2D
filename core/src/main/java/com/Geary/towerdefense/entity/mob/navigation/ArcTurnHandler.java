@@ -130,9 +130,9 @@ public class ArcTurnHandler {
         while (deltaAngle > Math.PI) deltaAngle -= 2*Math.PI;
         while (deltaAngle < -Math.PI) deltaAngle += 2*Math.PI;
 
-        float t = deltaAngle / totalAngle;   // use deltaAngle instead of currentAngle directly
-        t = clamp(t, 0f, 1f);
-//        arcProgress = t * arcRadius * Math.abs(totalAngle);
+        // Handle clockwise vs anticlockwise
+        float t = currentAngle / totalAngle;
+//        t = clamp(t, 0f, 1f);
 
         float arcLength = arcRadius * Math.abs(totalAngle);
         arcProgress = t * arcLength;

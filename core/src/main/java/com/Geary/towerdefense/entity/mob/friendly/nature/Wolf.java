@@ -17,7 +17,7 @@ public class Wolf extends FNature {
     );
 
     public Wolf(float x, float y) {
-        super(x, y, STATS);
+        super(x, y, STATS, Wolf.class);
         // No more manual assignments here!
     }
 }

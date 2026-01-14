@@ -10,11 +10,11 @@ public class SpawnerModalManager {
     public SpawnerModalManager() {
     }
 
-    public void updateQueues(){
+    public void updateQueues(float delta) {
         if (this.spawnerModal == null) {
             return;
         }
-        this.spawnerModal.processQueueCooldowns();
+        this.spawnerModal.processQueueCooldowns(delta);
     }
 
     public SpawnerModal getSpawnerModal(FriendlySpawner spawner, BitmapFont font, OrthographicCamera camera) {

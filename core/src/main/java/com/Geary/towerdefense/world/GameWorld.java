@@ -219,7 +219,7 @@ public class GameWorld {
         factoryManager.animateFactories(delta);
         mineManager.calculateResourcesGenerated(delta);
         factoryManager.handleFactoryProduction(delta);
-        spawnerModalManager.updateQueues();
+        spawnerModalManager.updateQueues(delta);
     }
 
     public void deleteBuilding(Building building) {

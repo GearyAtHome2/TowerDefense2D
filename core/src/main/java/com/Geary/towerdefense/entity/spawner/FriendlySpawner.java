@@ -20,6 +20,7 @@ public class FriendlySpawner extends Spawner {
     public float cooldown = maxCooldown;
 
     private final List<Mob> spawnableMobs = new ArrayList<>();
+    private List<Mob> requestedSpawns = new ArrayList<>();
 
     public FriendlySpawner(float x, float y) {
         super(x, y);
@@ -27,16 +28,16 @@ public class FriendlySpawner extends Spawner {
         this.name = "Friendly spawner";
 
         // safe default: existing Serf
-        for (int i=0; i< 7 ; i++) {
-            spawnableMobs.add(new Serf(0,0));
+        for (int i = 0; i < 7; i++) {
+            spawnableMobs.add(new Serf(0, 0));
         }
-        for (int i=0; i<7 ; i++) {
-            spawnableMobs.add(new ManAtArms(0,0));
+        for (int i = 0; i < 7; i++) {
+            spawnableMobs.add(new ManAtArms(0, 0));
         }
-        spawnableMobs.add(new Wolf(0,0));
-        spawnableMobs.add(new DodgyGangster(0,0));
-        spawnableMobs.add(new ServantOfLight(0,0));
-        spawnableMobs.add(new SlapperBot(0,0));
+        spawnableMobs.add(new Wolf(0, 0));
+        spawnableMobs.add(new DodgyGangster(0, 0));
+        spawnableMobs.add(new ServantOfLight(0, 0));
+        spawnableMobs.add(new SlapperBot(0, 0));
     }
 
     @Override
@@ -44,23 +45,34 @@ public class FriendlySpawner extends Spawner {
         return Color.GREEN;
     }
 
-    public Friendly spawn() {
-        return new Serf(
-            getCenterX() - (int) (random()*14)+7,
-            getCenterY() - (int) (random()*14)+7
-        );
+    public Mob spawn() {
+        Mob spawn = requestedSpawns.get(0).copy();
+        spawn.setPosition(getCenterX() - (int) (random() * 14) + 7,
+            getCenterY() - (int) (random() * 14) + 7);
+        requestedSpawns.remove(0);
+        return spawn;
     }
 
     public List<Friendly> deathRattleSpawns() {
         List<Friendly> deathrattleSpawns = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
-            deathrattleSpawns.add(spawn());
+//            deathrattleSpawns.add(spawn());
         }
         return deathrattleSpawns;
     }
 
-    /** Minimal new method: let modal query spawnable mobs */
+    /**
+     * Minimal new method: let modal query spawnable mobs
+     */
     public List<Mob> getSpawnableMobs() {
         return spawnableMobs;
+    }
+
+    public boolean canSpawn() {
+        return !requestedSpawns.isEmpty();
+    }
+
+    public void requestSpawn(List<Mob> mobs) {
+        requestedSpawns.addAll(mobs);
     }
 }

@@ -15,7 +15,7 @@ import java.util.List;
 
 import static com.Geary.towerdefense.Direction.*;
 
-public abstract class Mob extends Entity {
+public abstract class Mob extends Entity implements Cloneable {
 
     public final Order order;
     public float size;
@@ -85,6 +85,8 @@ public abstract class Mob extends Entity {
         return faction != other.faction;
     }
 
+    public abstract Mob copy();
+
     public void update(float delta) {
         if (!canUpdate()) return;
 
@@ -114,6 +116,11 @@ public abstract class Mob extends Entity {
 
     public boolean isBouncing(){
         return isBouncing;
+    }
+
+    public void setPosition(float x, float y){
+        this.xPos = x;
+        this.yPos = y;
     }
 
     private void handleMovement(Cell cell, Direction moveDir, float delta, int cellSize) {

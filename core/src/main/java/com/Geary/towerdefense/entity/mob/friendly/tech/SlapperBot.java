@@ -17,6 +17,6 @@ public class SlapperBot extends FTech {
     );
 
     public SlapperBot(float x, float y) {
-        super(x, y, STATS);
+        super(x, y, STATS, SlapperBot.class);
     }
 }

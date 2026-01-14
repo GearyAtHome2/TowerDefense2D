@@ -17,7 +17,6 @@ public class ManAtArms extends FNeutral {
     );
 
     public ManAtArms(float x, float y) {
-        super(x, y, STATS);
-        // No more manual assignments here!
+        super(x, y, STATS, ManAtArms.class);
     }
 }

@@ -17,7 +17,7 @@ public class ServantOfLight extends FLight {
     );
 
     public ServantOfLight(float x, float y) {
-        super(x, y, STATS);
+        super(x, y, STATS, ServantOfLight.class);
         // No more manual assignments here!
     }
 }

@@ -24,10 +24,8 @@ public class SpawnerManager {
             }
         }
         for (FriendlySpawner friendSpawner : world.friendlySpawners) {
-            friendSpawner.cooldown -= delta;
-            if (friendSpawner.cooldown <= 0) {
-                spawnFriendly(friendSpawner.spawn());
-                friendSpawner.cooldown += friendSpawner.maxCooldown;
+            if (friendSpawner.canSpawn()) {
+                spawnFriendly((Friendly) friendSpawner.spawn());
             }
         }
         removeDeadSpawners();
