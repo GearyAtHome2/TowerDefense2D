@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScrollBox<T extends ScrollEntry> {
+public class VerticalScrollBox<T extends ScrollEntry> {
 
     public final Rectangle bounds = new Rectangle();
     public float scrollOffset = 0f;
@@ -21,7 +21,7 @@ public class ScrollBox<T extends ScrollEntry> {
     // New: background color for scrollbox
     private float bgR = 0.2f, bgG = 0.2f, bgB = 0.2f, bgA = 1f;
 
-    public ScrollBox(float x, float y, float width, float height) {
+    public VerticalScrollBox(float x, float y, float width, float height) {
         bounds.set(x, y, width, height);
     }
 
@@ -78,10 +78,11 @@ public class ScrollBox<T extends ScrollEntry> {
             scissors
         );
 
+        batch.flush();
         if (ScissorStack.pushScissors(scissors)) {
             // Draw clipped content here
             for (T entry : entries) {
-                entry.draw(renderer, batch, font);
+                entry.draw(renderer, batch, font, camera);
             }
 
             ScissorStack.popScissors();
@@ -91,6 +92,35 @@ public class ScrollBox<T extends ScrollEntry> {
         renderer.begin(ShapeRenderer.ShapeType.Line);
         renderer.setColor(1f, 1f, 1f, 1f);
         renderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
+        renderer.end();
+        drawScrollIndicators(renderer);
+    }
+
+    private void drawScrollIndicators(ShapeRenderer renderer) {
+        float arrowSize = 20f;
+        renderer.begin(ShapeRenderer.ShapeType.Filled);
+        renderer.setColor(1f, 1f, 1f, 0.6f); // Semi-transparent white
+
+        float arrowY = bounds.y+bounds.height*0.98f;
+        float arrowX = bounds.x + bounds.width/2;
+
+        // Left Arrow (Show if we have scrolled right at all)
+        if (scrollOffset > 0) {
+            renderer.triangle(
+                arrowX, arrowY + arrowSize / 2f,
+                arrowX + arrowSize / 2f, arrowY,
+                arrowX  - arrowSize / 2f, arrowY
+            );
+        }
+        arrowY = bounds.y+bounds.height*0.02f;
+        // Right Arrow (Show if there is more content to the right)
+        if (scrollOffset < contentHeight - bounds.height - 1f) { // -1f to avoid float precision flickering
+            renderer.triangle(
+                arrowX, arrowY - arrowSize / 2f,
+                arrowX + arrowSize / 2f, arrowY,
+                arrowX - arrowSize / 2f, arrowY
+            );
+        }
         renderer.end();
     }
 

@@ -1,9 +1,11 @@
 package com.Geary.towerdefense.UI.displays.modal.scrollbox;
 
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,31 +64,64 @@ public class HorizontalScrollBox<T extends ScrollEntry> {
         clampScroll();
     }
 
-
-    //todo: apply scissor stack here.
-    /** Draw entries clipped to the scrollbox area */
-    public void draw(ShapeRenderer renderer, SpriteBatch batch, BitmapFont font) {
-        // Draw background
+    public void draw(ShapeRenderer renderer, SpriteBatch batch, BitmapFont font, Camera camera) {
+        // 1. Draw Background
         renderer.begin(ShapeRenderer.ShapeType.Filled);
         renderer.setColor(backgroundR, backgroundG, backgroundB, backgroundA);
         renderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
         renderer.end();
 
-        // Draw entries with scroll offset
-//        batch.begin();
-        for (T entry : entries) {
-            Rectangle eBounds = entry.bounds();
-            float drawX = eBounds.x - scrollX;
-            if (drawX + eBounds.width < bounds.x) continue; // left of visible area
-            if (drawX > bounds.x + bounds.width) continue; // right of visible area
+        // 2. Scissors logic
+        Rectangle scissors = new Rectangle();
+        ScissorStack.calculateScissors(camera, batch.getTransformMatrix(), bounds, scissors);
 
-            // Temporarily shift the entry
-            float oldX = eBounds.x;
-            eBounds.x = drawX;
-            entry.draw(renderer, batch, font);
-            eBounds.x = oldX; // restore
+        batch.flush(); // Essential before pushing scissors
+        if (ScissorStack.pushScissors(scissors)) {
+            for (T entry : entries) {
+                Rectangle eBounds = entry.bounds();
+                float drawX = eBounds.x - scrollX;
+
+                if (drawX + eBounds.width < bounds.x || drawX > bounds.x + bounds.width) continue;
+
+                float oldX = eBounds.x;
+                eBounds.x = drawX;
+                // Updated call with camera
+                entry.draw(renderer, batch, font, camera);
+                eBounds.x = oldX;
+            }
+            batch.flush();
+            ScissorStack.popScissors();
         }
-//        batch.end();
+        drawScrollIndicators(renderer);
+    }
+
+    private void drawScrollIndicators(ShapeRenderer renderer) {
+        float arrowSize = 10f;
+        float padding = 5f;
+        renderer.begin(ShapeRenderer.ShapeType.Filled);
+        renderer.setColor(1f, 1f, 1f, 0.6f); // Semi-transparent white
+
+        float arrowHeight = bounds.y+bounds.height*0.85f;
+        float arrowX = bounds.x + padding;
+
+        // Left Arrow (Show if we have scrolled right at all)
+        if (scrollX > 0) {
+            renderer.triangle(
+                arrowX, arrowHeight,
+                arrowX + arrowSize, arrowHeight + arrowSize / 2f,
+                arrowX + arrowSize, arrowHeight - arrowSize / 2f
+            );
+        }
+        arrowX = bounds.x + bounds.width - padding;
+        // Right Arrow (Show if there is more content to the right)
+        if (scrollX < contentWidth - bounds.width - 1f) { // -1f to avoid float precision flickering
+            renderer.triangle(
+                arrowX, arrowHeight,
+                arrowX - arrowSize, arrowHeight + arrowSize / 2f,
+                arrowX - arrowSize, arrowHeight - arrowSize / 2f
+            );
+        }
+        renderer.end();
     }
 
     /** Scroll horizontally by delta pixels */

@@ -3,6 +3,7 @@ package com.Geary.towerdefense.UI.displays.modal.spawner;
 import com.Geary.towerdefense.UI.displays.modal.scrollbox.ScrollEntry;
 import com.Geary.towerdefense.UI.render.icons.IconStore;
 import com.Geary.towerdefense.entity.mob.Mob;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -20,7 +21,7 @@ public class QueueEntry implements ScrollEntry {
     }
 
     @Override
-    public void draw(ShapeRenderer renderer, SpriteBatch batch, BitmapFont font) {
+    public void draw(ShapeRenderer renderer, SpriteBatch batch, BitmapFont font, Camera camera) {
         // Background
         renderer.begin(ShapeRenderer.ShapeType.Filled);
         renderer.setColor(0.2f, 0.2f, 0.2f, 1f);

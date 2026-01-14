@@ -2,7 +2,7 @@ package com.Geary.towerdefense.UI.displays.modal.spawner;
 
 import com.Geary.towerdefense.UI.displays.modal.Modal;
 import com.Geary.towerdefense.UI.displays.modal.scrollbox.HorizontalScrollBox;
-import com.Geary.towerdefense.UI.displays.modal.scrollbox.ScrollBox;
+import com.Geary.towerdefense.UI.displays.modal.scrollbox.VerticalScrollBox;
 import com.Geary.towerdefense.UI.displays.modal.scrollbox.ScrollEntry;
 import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.entity.spawner.FriendlySpawner;
@@ -20,7 +20,7 @@ public class SpawnerModal extends Modal {
 
     private final FriendlySpawner spawner;
 
-    private final ScrollBox<MobMenuEntry> mobSelectionScrollBox;
+    private final VerticalScrollBox<MobMenuEntry> mobSelectionVerticalScrollBox;
     private final HorizontalScrollBox<QueueEntry> queueScrollBox;
     private final HorizontalScrollBox<QueueEntry> garrisonScrollBox;
 
@@ -49,7 +49,7 @@ public class SpawnerModal extends Modal {
         super(font, camera);
         this.spawner = spawner;
 
-        mobSelectionScrollBox = new ScrollBox<>(0, 0, 0, 0);
+        mobSelectionVerticalScrollBox = new VerticalScrollBox<>(0, 0, 0, 0);
         queueScrollBox = new HorizontalScrollBox<>(0, 0, 0, 0);
         garrisonScrollBox = new HorizontalScrollBox<>(0, 0, 0, 0);
 
@@ -76,7 +76,7 @@ public class SpawnerModal extends Modal {
     private void populateTopScrollBox() {
         List<MobMenuEntry> entries = tabEntries.get(tabs.get(activeTabIndex));
         float totalHeight = computeVerticalContentHeight(entries);
-        mobSelectionScrollBox.setEntries(entries, totalHeight);
+        mobSelectionVerticalScrollBox.setEntries(entries, totalHeight);
     }
 
     private float computeVerticalContentHeight(List<? extends ScrollEntry> entries) {
@@ -112,8 +112,8 @@ public class SpawnerModal extends Modal {
         float queueY = garrisonY + garrisonHeight + spacing;
         float topY = queueY + queueHeight + spacing;
 
-        mobSelectionScrollBox.bounds.set(bounds.x + hPad, topY, bounds.width - 2 * hPad, topScrollHeight);
-        mobSelectionScrollBox.relayout();
+        mobSelectionVerticalScrollBox.bounds.set(bounds.x + hPad, topY, bounds.width - 2 * hPad, topScrollHeight);
+        mobSelectionVerticalScrollBox.relayout();
 
         queueScrollBox.bounds.set(bounds.x + hPad, queueY, bounds.width - 2 * hPad, queueHeight);
         garrisonScrollBox.bounds.set(bounds.x + hPad, garrisonY, bounds.width - 2 * hPad, garrisonHeight);
@@ -121,9 +121,9 @@ public class SpawnerModal extends Modal {
 
     @Override
     protected void drawContent(ShapeRenderer renderer, SpriteBatch batch) {
-        mobSelectionScrollBox.draw(renderer, batch, font, camera);
-        queueScrollBox.draw(renderer, batch, font);
-        garrisonScrollBox.draw(renderer, batch, font);
+        mobSelectionVerticalScrollBox.draw(renderer, batch, font, camera);
+        queueScrollBox.draw(renderer, batch, font, camera);
+        garrisonScrollBox.draw(renderer, batch, font, camera);
     }
 
     private void drawTabs(ShapeRenderer renderer, SpriteBatch batch) {
@@ -187,7 +187,7 @@ public class SpawnerModal extends Modal {
             }
         }
 
-        if (mobSelectionScrollBox.contains(x, y) && mobSelectionScrollBox.click(x, y) != null) return true;
+        if (mobSelectionVerticalScrollBox.contains(x, y) && mobSelectionVerticalScrollBox.click(x, y) != null) return true;
         if (queueScrollBox.contains(x, y) && queueScrollBox.click(x, y) != null) return true;
         if (garrisonScrollBox.contains(x, y) && garrisonScrollBox.click(x, y) != null) return true;
 
@@ -196,7 +196,7 @@ public class SpawnerModal extends Modal {
 
     @Override
     protected boolean handleScrollInside(float x, float y, float amountY) {
-        if (mobSelectionScrollBox.contains(x, y)) mobSelectionScrollBox.scroll(amountY * 10f);
+        if (mobSelectionVerticalScrollBox.contains(x, y)) mobSelectionVerticalScrollBox.scroll(amountY * 10f);
         if (queueScrollBox.contains(x, y)) queueScrollBox.scroll(amountY * 10f);
         if (garrisonScrollBox.contains(x, y)) garrisonScrollBox.scroll(amountY * 10f);
         return true;

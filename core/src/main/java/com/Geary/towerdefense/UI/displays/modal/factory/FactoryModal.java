@@ -1,7 +1,7 @@
 package com.Geary.towerdefense.UI.displays.modal.factory;
 
 import com.Geary.towerdefense.UI.displays.modal.Modal;
-import com.Geary.towerdefense.UI.displays.modal.scrollbox.ScrollBox;
+import com.Geary.towerdefense.UI.displays.modal.scrollbox.VerticalScrollBox;
 import com.Geary.towerdefense.UI.render.icons.TooltipRenderer;
 import com.Geary.towerdefense.entity.buildings.Factory;
 import com.Geary.towerdefense.entity.resources.Recipe;
@@ -22,7 +22,7 @@ import java.util.Map;
 public class FactoryModal extends Modal {
 
     private final Factory factory;
-    private final ScrollBox<RecipeMenuEntry> scrollBox;
+    private final VerticalScrollBox<RecipeMenuEntry> verticalScrollBox;
     public RecipeMenuEntry activeMenuEntry;
 
     private RecipeMenuEntry hoveredEntry;
@@ -56,7 +56,7 @@ public class FactoryModal extends Modal {
         super(font, camera);
         this.factory = factory;
         this.tooltipRenderer = new TooltipRenderer(font);
-        scrollBox = new ScrollBox(0, 0, 0, 0);
+        verticalScrollBox = new VerticalScrollBox(0, 0, 0, 0);
         populateScrollBox();
     }
 
@@ -68,7 +68,7 @@ public class FactoryModal extends Modal {
 
     @Override
     protected void drawContent(ShapeRenderer shapeRenderer, SpriteBatch batch) {
-        scrollBox.draw(shapeRenderer, batch, font, camera);
+        verticalScrollBox.draw(shapeRenderer, batch, font, camera);
         drawScrollHoods(shapeRenderer);
         drawTitle(batch);
         if (hoveredEntry != null) {
@@ -76,26 +76,47 @@ public class FactoryModal extends Modal {
         }
     }
 
-    public void updateHover(float screenX, float screenY, Viewport uiViewport) {
-        Vector3 uiPos = uiViewport.unproject(new Vector3(screenX, screenY, 0));
+    public void updateHover(float x, float y, Viewport viewport) {
+        Vector3 uiPos = viewport.unproject(new Vector3(x, y, 0));
         mouseX = uiPos.x;
         mouseY = uiPos.y;
 
-        updateHoveredEntry(mouseX, mouseY);
+        hoveredEntry = null;
+        hoveredResource = null;
+
+        if (verticalScrollBox.contains(mouseX, mouseY)) {
+            for (RecipeMenuEntry entry : verticalScrollBox.getEntries()) {
+                if (entry.bounds().contains(mouseX, mouseY)) {
+                    hoveredEntry = entry;
+
+                    hoveredResource = entry.getResourceAt(mouseX, mouseY);
+
+                    if (hoveredResource != null) {
+                        resourceQuantity =
+                            entry.recipe.inputs.getOrDefault(
+                                hoveredResource,
+                                entry.recipe.outputs.getOrDefault(hoveredResource, 0)
+                            );
+                    }
+                    return;
+                }
+            }
+        }
     }
+
 
     @Override
     protected boolean handleClickInside(float x, float y) {
-        if (!scrollBox.contains(x, y)) return false;
-        RecipeMenuEntry clicked = scrollBox.click(x, y);
+        if (!verticalScrollBox.contains(x, y)) return false;
+        RecipeMenuEntry clicked = verticalScrollBox.click(x, y);
         if (clicked != null) setActiveEntry(clicked);
         return true;
     }
 
     @Override
     protected boolean handleScrollInside(float x, float y, float amountY) {
-        if (scrollBox.contains(x, y)) {
-            scrollBox.scroll(amountY * 10f); // scroll speed
+        if (verticalScrollBox.contains(x, y)) {
+            verticalScrollBox.scroll(amountY * 10f); // scroll speed
             return true;
         }
         return false;
@@ -121,7 +142,7 @@ public class FactoryModal extends Modal {
             entries.add(entry);
         }
 
-        scrollBox.setEntries(entries, entries.size() * 40f);
+        verticalScrollBox.setEntries(entries, entries.size() * 40f);
     }
 
 
@@ -161,7 +182,7 @@ public class FactoryModal extends Modal {
     private void layoutScrollBox() {
         float xPadding = modalXPadding();
 
-        scrollBox.bounds.set(
+        verticalScrollBox.bounds.set(
             bounds.x + xPadding,
             scrollboxBottom(),
             bounds.width - xPadding * 2,
@@ -170,34 +191,34 @@ public class FactoryModal extends Modal {
     }
 
     private void layoutScrollEntries() {
-        float entryHeight = scrollBox.bounds.height * layoutCfg.entryHeightRatio;
-        float entrySpacing = scrollBox.bounds.height * layoutCfg.entrySpacingRatio;
-        float sidePadding = scrollBox.bounds.width * layoutCfg.entrySidePaddingRatio;
+        float entryHeight = verticalScrollBox.bounds.height * layoutCfg.entryHeightRatio;
+        float entrySpacing = verticalScrollBox.bounds.height * layoutCfg.entrySpacingRatio;
+        float sidePadding = verticalScrollBox.bounds.width * layoutCfg.entrySidePaddingRatio;
 
         float totalHeight = 0f;
 
-        for (RecipeMenuEntry entry : scrollBox.entries) {
-            entry.bounds.x = scrollBox.bounds.x + sidePadding;
-            entry.bounds.width = scrollBox.bounds.width - sidePadding * 2;
+        for (RecipeMenuEntry entry : verticalScrollBox.entries) {
+            entry.bounds.x = verticalScrollBox.bounds.x + sidePadding;
+            entry.bounds.width = verticalScrollBox.bounds.width - sidePadding * 2;
             entry.bounds.height = entryHeight;
 
             totalHeight += entryHeight + entrySpacing;
         }
 
-        if (!scrollBox.entries.isEmpty()) {
+        if (!verticalScrollBox.entries.isEmpty()) {
             totalHeight -= entrySpacing;
         }
 
         // bottom padding for hood masking
-        float bottomPadding = scrollBox.bounds.height * layoutCfg.hoodHeightRatio;
+        float bottomPadding = verticalScrollBox.bounds.height * layoutCfg.hoodHeightRatio;
         totalHeight += bottomPadding * 2;
 
-        scrollBox.setContentHeight(totalHeight);
-        scrollBox.relayout();
+        verticalScrollBox.setContentHeight(totalHeight);
+        verticalScrollBox.relayout();
     }
 
     private void drawScrollHoods(ShapeRenderer shapeRenderer) {
-        float hoodHeight = scrollBox.bounds.height * layoutCfg.hoodHeightRatio;
+        float hoodHeight = verticalScrollBox.bounds.height * layoutCfg.hoodHeightRatio;
         float hoodOverlap = bounds.height * layoutCfg.hoodOverlapRatio;
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -205,17 +226,17 @@ public class FactoryModal extends Modal {
 
         // Top hood
         shapeRenderer.rect(
-            scrollBox.bounds.x,
-            scrollBox.bounds.y + scrollBox.bounds.height + hoodOverlap,
-            scrollBox.bounds.width,
+            verticalScrollBox.bounds.x,
+            verticalScrollBox.bounds.y + verticalScrollBox.bounds.height + hoodOverlap,
+            verticalScrollBox.bounds.width,
             hoodHeight
         );
 
         // Bottom hood
         shapeRenderer.rect(
-            scrollBox.bounds.x,
-            scrollBox.bounds.y - hoodHeight,
-            scrollBox.bounds.width,
+            verticalScrollBox.bounds.x,
+            verticalScrollBox.bounds.y - hoodHeight,
+            verticalScrollBox.bounds.width,
             hoodHeight
         );
 
@@ -247,7 +268,7 @@ public class FactoryModal extends Modal {
         hoveredEntry = null;
         hoveredResource = null;
 
-        for (RecipeMenuEntry entry : scrollBox.entries) {
+        for (RecipeMenuEntry entry : verticalScrollBox.entries) {
             if (entry.bounds.contains(x, y)) {
                 hoveredEntry = entry;
 
@@ -279,7 +300,6 @@ public class FactoryModal extends Modal {
             + titleHeight() * 0.5f
             + bounds.height * layoutCfg.titlePaddingYRatio;
     }
-
 
     private float modalXPadding() {
         return bounds.width * layoutCfg.xPaddingRatio;

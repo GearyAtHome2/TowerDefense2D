@@ -6,6 +6,7 @@ import com.Geary.towerdefense.UI.text.TextFormatter;
 import com.Geary.towerdefense.entity.resources.Recipe;
 import com.Geary.towerdefense.entity.resources.Resource;
 import com.Geary.towerdefense.entity.resources.mapEntity.ResourceType;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -41,7 +42,7 @@ public class RecipeMenuEntry implements ScrollEntry {
         this.onClick = onClick;
     }
 
-    public void draw(ShapeRenderer renderer, SpriteBatch batch, BitmapFont font) {
+    public void draw(ShapeRenderer renderer, SpriteBatch batch, BitmapFont font, Camera camera) {
         // Clear previous hitboxes
         resourceHitboxes.clear();
 
@@ -49,8 +50,6 @@ public class RecipeMenuEntry implements ScrollEntry {
         renderer.setColor(active ? 0.2f : 0.3f, active ? 0.6f : 0.3f, 0.7f, 1f);
         renderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
         renderer.end();
-
-
 
         float centerY = bounds.y + bounds.height / 2f;
         float textY = centerY + font.getCapHeight() / 2f;
@@ -139,6 +138,15 @@ public class RecipeMenuEntry implements ScrollEntry {
             outX -= ICON_SPACING;
         }
         batch.end();
+    }
+
+    public ResourceType getResourceAt(float x, float y) {
+        for (Map.Entry<ResourceType, Rectangle> entry : resourceHitboxes.entrySet()) {
+            if (entry.getValue().contains(x, y)) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 
     public boolean click(float worldX, float worldY) {

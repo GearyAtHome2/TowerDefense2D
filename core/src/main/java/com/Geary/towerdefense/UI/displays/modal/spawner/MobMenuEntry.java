@@ -3,6 +3,7 @@ package com.Geary.towerdefense.UI.displays.modal.spawner;
 import com.Geary.towerdefense.UI.displays.modal.scrollbox.ScrollEntry;
 import com.Geary.towerdefense.UI.render.icons.IconStore;
 import com.Geary.towerdefense.entity.mob.Mob;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -36,7 +37,7 @@ public class MobMenuEntry implements ScrollEntry {
         this.listener = listener;
     }
 
-    public void draw(ShapeRenderer renderer, SpriteBatch batch, BitmapFont font) {
+    public void draw(ShapeRenderer renderer, SpriteBatch batch, BitmapFont font, Camera camera) {
         float x = bounds.x;
         float y = bounds.y;
         float h = bounds.height;
