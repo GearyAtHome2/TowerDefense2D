@@ -135,7 +135,7 @@ public class MobManager {
         dx /= len;
         dy /= len;
 
-        float strength = 170f;
+        float strength = 120f;
 
         f.bounceVX += dx * strength;
         f.bounceVY += dy * strength;
