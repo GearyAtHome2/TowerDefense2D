@@ -6,20 +6,17 @@ import com.badlogic.gdx.graphics.Color;
 
 public class Groblin extends Enemy {
 
-    private static final MobStats STATS = new MobStats(
-        0.1f,
-        180,   // health
-        5,   // damage
-        0.8f, // speed
-        6f,    // knockback damping
-        0.45f,
-        Color.RED//random movement probability
+    public static final MobStats STATS = new MobStats(
+        "Groblin",
+        "",
+        "Less fortunate cousin of the Goblin, more fortunate cousin of the Grob",
+        0.1f, 220, 5, 0.65f, 8f, 0.25f,
+        Color.FIREBRICK,
+        2, // spawnTime
+        0  // armour
     );
 
     public Groblin(float x, float y) {
         super(x, y, STATS);
-        this.name = "Groblin";
-        this.effectText = "";
-        this.flavourText = "Less fortunate cousin of the Goblin, more fortunate cousin of the Grob.";
     }
 }

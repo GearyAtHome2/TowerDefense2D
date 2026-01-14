@@ -7,21 +7,17 @@ import com.badlogic.gdx.graphics.Color;
 public class ManAtArms extends Friendly {
 
     public static final MobStats STATS = new MobStats(
-        0.13f,
-        220,   // health
-        5,   // damage
-        0.69f, // speed
-        12f,    // knockback damping
-        0.2f, //random movement
-        Color.OLIVE
+        "Man At Arms",
+        "",
+        "This man has been given access to arms, and he is At Them.",
+        0.13f, 220, 5, 0.69f, 12f, 0.2f,
+        Color.OLIVE,
+        2, // spawnTime
+        0  // armour
     );
 
     public ManAtArms(float x, float y) {
         super(x, y, STATS);
-        this.name = "Man At Arms";
-        this.armour = 4;
-        this.effectText = "";
-        this.flavourText = "This man has been given access to arms, and he is At Them.";
-        this.spawnTime = 4;
+        // No more manual assignments here!
     }
 }

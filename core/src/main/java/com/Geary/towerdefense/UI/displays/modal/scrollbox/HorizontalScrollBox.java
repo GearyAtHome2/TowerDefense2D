@@ -62,6 +62,8 @@ public class HorizontalScrollBox<T extends ScrollEntry> {
         clampScroll();
     }
 
+
+    //todo: apply scissor stack here.
     /** Draw entries clipped to the scrollbox area */
     public void draw(ShapeRenderer renderer, SpriteBatch batch, BitmapFont font) {
         // Draw background

@@ -50,6 +50,12 @@ public abstract class Mob extends Entity {
         this.xPos = xPos;
         this.yPos = yPos;
 
+        // Metadata
+        this.name = stats.name();
+        this.effectText = stats.effectText();
+        this.flavourText = stats.flavourText();
+
+        // Combat/Physics
         this.size = GameWorld.cellSize * stats.size();
         this.health = stats.health();
         this.damage = stats.damage();
@@ -57,6 +63,8 @@ public abstract class Mob extends Entity {
         this.color = stats.color();
         this.knockbackDamping = stats.knockbackDamping();
         this.ranMoveProb = stats.ranMoveProb();
+        this.armour = stats.armour();
+
         this.collisionRadius = size * 0.5f;
     }
 
