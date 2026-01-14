@@ -1,23 +1,22 @@
-package com.Geary.towerdefense.entity.mob.friendly;
+package com.Geary.towerdefense.entity.mob.friendly.tech;
 
 import com.Geary.towerdefense.entity.mob.MobStats;
 import com.badlogic.gdx.graphics.Color;
 
 
-public class Serf extends Friendly {
+public class SlapperBot extends FTech {
 
     public static final MobStats STATS = new MobStats(
-        "Serf",
+        "Slapper Bot",
         "Serf Effect text...",
         "Expendable, dependable...",
-        0.1f, 220, 5, 0.71f, 8f, 0.3f,
-        Color.GREEN,
+        0.14f, 220, 2, 0.71f, 18f, 0.9f,
+        Color.LIME,
         2, // spawnTime
         0  // armour
     );
 
-    public Serf(float x, float y) {
+    public SlapperBot(float x, float y) {
         super(x, y, STATS);
-        // No more manual assignments here!
     }
 }

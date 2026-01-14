@@ -1,0 +1,23 @@
+package com.Geary.towerdefense.entity.mob.friendly.dark;
+
+import com.Geary.towerdefense.entity.mob.MobStats;
+import com.badlogic.gdx.graphics.Color;
+
+
+public class DodgyGangster extends FDark {
+
+    public static final MobStats STATS = new MobStats(
+        "Dodgy Gangster",
+        "",
+        "Good at bad things",
+        0.118f, 220, 5, 0.63f, 9f, 0.28f,
+        Color.FOREST,
+        2, // spawnTime
+        0  // armour
+    );
+
+    public DodgyGangster(float x, float y) {
+        super(x, y, STATS);
+        // No more manual assignments here!
+    }
+}

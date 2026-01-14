@@ -4,6 +4,7 @@ import com.Geary.towerdefense.UI.displays.modal.scrollbox.ScrollEntry;
 import com.Geary.towerdefense.UI.render.icons.IconStore;
 import com.Geary.towerdefense.entity.mob.Mob;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -45,7 +46,8 @@ public class MobMenuEntry implements ScrollEntry {
 
         // --- Background ---
         renderer.begin(ShapeRenderer.ShapeType.Filled);
-        renderer.setColor(0.2f, 0.3f, 0.4f, 1f);
+        Color bg = computeBackgroundColor(templateMob.order);
+        renderer.setColor(bg);
         renderer.rect(x, y, w, h);
         renderer.end();
 
@@ -149,5 +151,18 @@ public class MobMenuEntry implements ScrollEntry {
 
     public Rectangle bounds() {
         return bounds;
+    }
+
+    private Color computeBackgroundColor(Mob.Order order) {
+        Color base = switch (order) {
+            case NEUTRAL -> new Color(0.45f, 0.45f, 0.45f, 1f);
+            case TECH    -> new Color(0.3f, 0.35f, 0.5f, 1f);
+            case NATURE  -> new Color(0.15f, 0.55f, 0.15f, 1f);
+            case DARK    -> new Color(0.05f, 0.05f, 0.05f, 1f);
+            case LIGHT   -> new Color(0.65f, 0.65f, 0.45f, 1f);
+            case FIRE    -> new Color(0.65f, 0.15f, 0.1f, 1f);
+            case WATER   -> new Color(0.15f, 0.3f, 0.65f, 1f);
+        };
+        return base;
     }
 }

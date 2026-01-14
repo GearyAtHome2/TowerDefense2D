@@ -6,7 +6,7 @@ import com.Geary.towerdefense.entity.mob.MobStats;
 public abstract class Enemy extends Mob {
 
     public Enemy(float startX, float startY, MobStats stats) {
-        super(startX, startY, stats);
+        super(startX, startY, stats, Order.NEUTRAL);
         this.useCustomTurnLogic = true;
     }
 }

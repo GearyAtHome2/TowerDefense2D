@@ -2,8 +2,12 @@ package com.Geary.towerdefense.entity.spawner;
 
 import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.entity.mob.friendly.Friendly;
-import com.Geary.towerdefense.entity.mob.friendly.ManAtArms;
-import com.Geary.towerdefense.entity.mob.friendly.Serf;
+import com.Geary.towerdefense.entity.mob.friendly.dark.DodgyGangster;
+import com.Geary.towerdefense.entity.mob.friendly.light.ServantOfLight;
+import com.Geary.towerdefense.entity.mob.friendly.nature.Wolf;
+import com.Geary.towerdefense.entity.mob.friendly.neutral.ManAtArms;
+import com.Geary.towerdefense.entity.mob.friendly.neutral.Serf;
+import com.Geary.towerdefense.entity.mob.friendly.tech.SlapperBot;
 import com.badlogic.gdx.graphics.Color;
 
 import java.util.ArrayList;
@@ -24,11 +28,15 @@ public class FriendlySpawner extends Spawner {
 
         // safe default: existing Serf
         for (int i=0; i< 7 ; i++) {
-            spawnableMobs.add(new Serf(0,0)); // Serf must have a public static MobStats STATS
+            spawnableMobs.add(new Serf(0,0));
         }
         for (int i=0; i<7 ; i++) {
-            spawnableMobs.add(new ManAtArms(0,0)); // Serf must have a public static MobStats STATS
+            spawnableMobs.add(new ManAtArms(0,0));
         }
+        spawnableMobs.add(new Wolf(0,0));
+        spawnableMobs.add(new DodgyGangster(0,0));
+        spawnableMobs.add(new ServantOfLight(0,0));
+        spawnableMobs.add(new SlapperBot(0,0));
     }
 
     @Override

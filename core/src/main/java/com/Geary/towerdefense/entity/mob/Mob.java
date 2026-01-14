@@ -17,6 +17,7 @@ import static com.Geary.towerdefense.Direction.*;
 
 public abstract class Mob extends Entity {
 
+    public final Order order;
     public float size;
     public int health;
     public int armour = 0;
@@ -24,6 +25,7 @@ public abstract class Mob extends Entity {
     public Color color;
     public String effectText = "default Mob effect text";
     public String flavourText = "default Mob flavourtext";
+    public float spawnTime;
 
     public float bounceVX = 0f;
     public float bounceVY = 0f;
@@ -46,10 +48,11 @@ public abstract class Mob extends Entity {
     public float collisionCooldown = 0f;
     private boolean isBouncing;
 
-    protected Mob(float xPos, float yPos, MobStats stats) {
+    protected Mob(float xPos, float yPos, MobStats stats, Order order) {
         this.xPos = xPos;
         this.yPos = yPos;
 
+        this.order = order;
         // Metadata
         this.name = stats.name();
         this.effectText = stats.effectText();
@@ -64,6 +67,7 @@ public abstract class Mob extends Entity {
         this.knockbackDamping = stats.knockbackDamping();
         this.ranMoveProb = stats.ranMoveProb();
         this.armour = stats.armour();
+        this.spawnTime = stats.spawnTime();
 
         this.collisionRadius = size * 0.5f;
     }
@@ -323,11 +327,13 @@ public abstract class Mob extends Entity {
         return Color.WHITE; // default
     }
 
-    public enum MobType {
-        ARROW_SYMBOL;
-
-        public String getName() {
-            return this.name();
-        }
+    public enum Order {
+        NEUTRAL,
+        TECH,
+        NATURE,
+        DARK,
+        LIGHT,
+        FIRE,
+        WATER
     }
 }
