@@ -5,12 +5,14 @@ import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.mob.navigation.ArcTurnHandler;
 import com.Geary.towerdefense.entity.mob.navigation.MobPathNavigator;
 import com.Geary.towerdefense.entity.mob.navigation.TileRandomMover;
+import com.Geary.towerdefense.entity.resources.Resource;
 import com.Geary.towerdefense.entity.world.Cell;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 
 import static com.Geary.towerdefense.Direction.*;
@@ -25,7 +27,11 @@ public abstract class Mob extends Entity implements Cloneable {
     public Color color;
     public String effectText = "default Mob effect text";
     public String flavourText = "default Mob flavourtext";
+
     public float spawnTime;
+    public EnumMap<Resource.RawResourceType, Double> rawResourceCost = new EnumMap<>(Resource.RawResourceType.class);
+    public EnumMap<Resource.RefinedResourceType, Double> refinedResourceCost = new EnumMap<>(Resource.RefinedResourceType.class);
+    public int coinCost;
 
     public float bounceVX = 0f;
     public float bounceVY = 0f;
@@ -332,6 +338,26 @@ public abstract class Mob extends Entity implements Cloneable {
     @Override
     public Color getInfoTextColor() {
         return Color.WHITE; // default
+    }
+
+    public String getCostText() {
+        StringBuilder sb = new StringBuilder();
+
+        if (coinCost > 0) {
+            sb.append("Coins: ").append(coinCost);
+        }
+
+        for (var e : rawResourceCost.entrySet()) {
+            if (sb.length() > 0) sb.append("\n");
+            sb.append(e.getKey().name()).append(": ").append(e.getValue().intValue());
+        }
+
+        for (var e : refinedResourceCost.entrySet()) {
+            if (sb.length() > 0) sb.append("\n");
+            sb.append(e.getKey().name()).append(": ").append(e.getValue().intValue());
+        }
+
+        return sb.length() == 0 ? "Free" : sb.toString();
     }
 
     public enum Order {

@@ -7,7 +7,7 @@ public abstract class FDark extends Friendly {
     private final Class<? extends FDark> clazz;  // store concrete class
 
     public FDark(float startX, float startY, MobStats stats, Class<? extends FDark> clazz) {
-        super(startX, startY, stats, Order.NEUTRAL);
+        super(startX, startY, stats, Order.DARK);
         this.clazz = clazz;
     }
 

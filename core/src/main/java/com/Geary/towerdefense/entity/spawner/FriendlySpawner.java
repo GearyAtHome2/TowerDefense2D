@@ -28,10 +28,10 @@ public class FriendlySpawner extends Spawner {
         this.name = "Friendly spawner";
 
         // safe default: existing Serf
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 4; i++) {
             spawnableMobs.add(new Serf(0, 0));
         }
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 4; i++) {
             spawnableMobs.add(new ManAtArms(0, 0));
         }
         spawnableMobs.add(new Wolf(0, 0));

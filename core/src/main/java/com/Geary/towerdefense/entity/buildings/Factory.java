@@ -13,11 +13,18 @@ public class Factory extends Building {
 
     public Factory(float x, float y) {
         super(x, y);
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 4; i++) {
             Recipe recipe = new Recipe("Recipe " + i);
             recipe.addInput(Resource.RawResourceType.IRON, 1);
             recipe.addInput(Resource.RawResourceType.STONE, 1);
             recipe.addOutput(Resource.RefinedResourceType.BASIC_AMMO, 200);
+            recipes.add(recipe);
+        }
+        for (int i = 0; i < 4; i++) {
+            Recipe recipe = new Recipe("Recipe " + i);
+            recipe.addInput(Resource.RawResourceType.IRON, 1);
+            recipe.addInput(Resource.RawResourceType.STONE, 1);
+            recipe.addOutput(Resource.RefinedResourceType.BASIC_WEAPONS, 1);
             recipes.add(recipe);
         }
         this.name = "parent factory object";

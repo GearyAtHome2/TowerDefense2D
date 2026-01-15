@@ -4,7 +4,9 @@ import com.Geary.towerdefense.UI.displays.modal.Modal;
 import com.Geary.towerdefense.UI.displays.modal.scrollbox.HorizontalScrollBox;
 import com.Geary.towerdefense.UI.displays.modal.scrollbox.VerticalScrollBox;
 import com.Geary.towerdefense.entity.mob.Mob;
+import com.Geary.towerdefense.entity.resources.Resource;
 import com.Geary.towerdefense.entity.spawner.FriendlySpawner;
+import com.Geary.towerdefense.world.GameStateManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -19,6 +21,7 @@ public class SpawnerModal extends Modal {
     private static final float TAB_HEIGHT_FRAC = 0.08f;
 
     private final FriendlySpawner spawner;
+    private final GameStateManager gameStateManager;
     private final VerticalScrollBox<MobMenuEntry> mobScrollBox;
     private final HorizontalScrollBox<QueueEntry> queueScrollBox;
     private final HorizontalScrollBox<QueueEntry> garrisonScrollBox;
@@ -26,9 +29,11 @@ public class SpawnerModal extends Modal {
     private final SpawnerTabs tabs;
     private final SpawnerTabRenderer<SpawnerTabs.OrderTab> tabRenderer;
 
-    public SpawnerModal(FriendlySpawner spawner, BitmapFont font, OrthographicCamera camera) {
+
+    public SpawnerModal(FriendlySpawner spawner, GameStateManager gameStateManager, BitmapFont font, OrthographicCamera camera) {
         super(font, camera);
         this.spawner = spawner;
+        this.gameStateManager = gameStateManager;
 
         mobScrollBox = new VerticalScrollBox<>(0, 0, 0, 0);
         queueScrollBox = new HorizontalScrollBox<>(0, 0, 0, 0);
@@ -43,28 +48,46 @@ public class SpawnerModal extends Modal {
         applyActiveTab();
     }
 
-    /* =========================
-       Mob entry callbacks
-       ========================= */
-
     private final MobMenuEntry.MobEntryListener listener = new MobMenuEntry.MobEntryListener() {
         @Override
-        public void onRecruitClicked(MobMenuEntry entry) {
-            add(queueScrollBox, entry.templateMob, false);
+        public void onRecruitClicked(MobMenuEntry entry, int amount) {
+            System.out.println("recruiting "+amount+" "+entry.name+"s");
+            for (int i = 0; i < amount; i++) {
+                if (!gameStateManager.canAfford(entry.templateMob)) break;
+
+                gameStateManager.consumeCost(entry.templateMob);
+                add(queueScrollBox, entry.templateMob, false);
+            }
+
             updateQueueLeftmost();
+            updateAffordability();
         }
 
         @Override
-        public void onGarrisonClicked(MobMenuEntry entry) {
-            add(queueScrollBox, entry.templateMob, true);
+        public void onGarrisonClicked(MobMenuEntry entry, int amount) {
+            for (int i = 0; i < amount; i++) {
+                if (!gameStateManager.canAfford(entry.templateMob)) break;
+
+                gameStateManager.consumeCost(entry.templateMob);
+                add(queueScrollBox, entry.templateMob, true);
+            }
+
+            updateAffordability();
         }
     };
 
     private void applyActiveTab() {
         float totalHeight = tabs.getActiveEntriesTotalHeight(5f);
         Color c = tabs.getActiveTabColor();
+
+        List<MobMenuEntry> entries = tabs.getActiveEntries();
+
+        for (MobMenuEntry entry : entries) {
+            entry.setAffordable(canAfford(entry.templateMob));
+        }
+
         mobScrollBox.setBackgroundColor(c.r, c.g, c.b, c.a);
-        mobScrollBox.setEntries(tabs.getActiveEntries(), totalHeight);
+        mobScrollBox.setEntries(entries, totalHeight);
     }
 
     /* =========================
@@ -144,8 +167,15 @@ public class SpawnerModal extends Modal {
         }
 
         if (mobScrollBox.contains(x, y) && mobScrollBox.click(x, y) != null) return true;
-        if (queueScrollBox.contains(x, y) && queueScrollBox.click(x, y) != null) return true;
         if (garrisonScrollBox.contains(x, y) && garrisonScrollBox.click(x, y) != null) return true;
+
+        if (queueScrollBox.contains(x, y)) {
+            QueueEntry clicked = queueScrollBox.click(x, y);
+            if (clicked != null) {
+                removeFromRecruitQueue(clicked);
+                return true;
+            }
+        }
 
         return false;
     }
@@ -200,6 +230,54 @@ public class SpawnerModal extends Modal {
 
             if (!queue.isEmpty()) queue.get(0).isLeftmost = true;
             queueScrollBox.setEntries(queue);
+        }
+    }
+
+    private void removeFromRecruitQueue(QueueEntry entry) {
+        List<QueueEntry> queue = new ArrayList<>(queueScrollBox.getEntries());
+
+        int idx = queue.indexOf(entry);
+        if (idx == -1) return;
+
+        // Do not allow removing garrison entries
+//        if (entry.isToGarrison) return;
+
+        boolean wasLeftmost = entry.isLeftmost;
+
+        queue.remove(idx);
+
+        // Fix leftmost + cooldown if we removed the front
+        if (wasLeftmost && !queue.isEmpty()) {
+            QueueEntry next = queue.get(0);
+            next.isLeftmost = true;
+            if (next.cooldownElapsed == 0f) {
+                next.resetCooldown();
+            }
+        }
+
+        queueScrollBox.setEntries(queue);
+    }
+
+    private boolean canAfford(Mob mob) {
+        // Coins
+        if (gameStateManager.gameState.getCoins() < mob.coinCost) return false;
+
+        // Raw resources
+        for (Resource.RawResourceType type : mob.rawResourceCost.keySet()) {
+            if (gameStateManager.getRawResourceCount().get(type) < mob.rawResourceCost.get(type)) return false;
+        }
+
+        for (Resource.RefinedResourceType type : mob.refinedResourceCost.keySet()) {
+            if (gameStateManager.getRefinedResourceCount().get(type) < mob.refinedResourceCost.get(type)) return false;
+        }
+
+        return true;
+    }
+
+    void updateAffordability() {
+        for (MobMenuEntry entry : mobScrollBox.getEntries()) {
+            boolean affordable = gameStateManager.canAfford(entry.templateMob);
+            entry.setAffordable(affordable);
         }
     }
 }

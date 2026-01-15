@@ -70,7 +70,6 @@ public class MobManager {
                         friendly.applyDamage(enemy.damage);
 
                         applyBounce(friendly, enemy);
-
                         enemy.collisionCooldown = 0.1f;
                         friendly.collisionCooldown = 0.1f;
                     }

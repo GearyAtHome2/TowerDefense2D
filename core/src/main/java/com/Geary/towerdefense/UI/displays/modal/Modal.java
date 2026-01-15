@@ -36,8 +36,8 @@ public abstract class Modal {
 
     /** Layout the modal in screen space (pixels) */
     public void layout() {
-        float modalWidth = 500;
-        float modalHeight = 450;
+        float modalWidth = Gdx.graphics.getWidth()*0.7f;
+        float modalHeight = Gdx.graphics.getHeight()*0.7f;
 
         float modalX = Gdx.graphics.getWidth() / 2f - modalWidth / 2f;
         float modalY = (Gdx.graphics.getHeight() / 2f - modalHeight / 2f)*1.3f;//push it a bit above the ui bar

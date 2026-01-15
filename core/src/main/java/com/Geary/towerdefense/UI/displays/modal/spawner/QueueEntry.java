@@ -73,11 +73,12 @@ public class QueueEntry implements ScrollEntry {
 
     @Override
     public boolean click(float x, float y) {
-        if (bounds.contains(x, y)) {
-            if (onClick != null) onClick.run();
-            return true;
-        }
-        return false;
+//        if (bounds.contains(x, y)) {
+//            if (onClick != null) onClick.run();
+//            return true;
+//        }
+//        return false;
+        return bounds.contains(x, y);
     }
 
     @Override

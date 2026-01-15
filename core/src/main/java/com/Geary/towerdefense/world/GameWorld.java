@@ -219,7 +219,7 @@ public class GameWorld {
         factoryManager.animateFactories(delta);
         mineManager.calculateResourcesGenerated(delta);
         factoryManager.handleFactoryProduction(delta);
-        spawnerModalManager.updateQueues(delta);
+        spawnerModalManager.updateSpawner(delta);
     }
 
     public void deleteBuilding(Building building) {
@@ -257,7 +257,7 @@ public class GameWorld {
     }
 
     public void showSpawnerMenu(FriendlySpawner spawner, BitmapFont font, OrthographicCamera uiCamera) {
-        activeModal = spawnerModalManager.getSpawnerModal(spawner, font, uiCamera);
+        activeModal = spawnerModalManager.getSpawnerModal(spawner, gameStateManager, font, uiCamera);
     }
 
     public void setActiveModal(Modal modal) {

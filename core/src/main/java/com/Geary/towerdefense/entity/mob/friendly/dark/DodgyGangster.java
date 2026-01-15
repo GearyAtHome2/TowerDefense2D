@@ -18,6 +18,6 @@ public class DodgyGangster extends FDark {
 
     public DodgyGangster(float x, float y) {
         super(x, y, STATS, DodgyGangster.class);
-        // No more manual assignments here!
+        this.coinCost = 6;
     }
 }

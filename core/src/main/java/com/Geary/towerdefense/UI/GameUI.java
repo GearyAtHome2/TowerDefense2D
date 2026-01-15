@@ -37,6 +37,7 @@ public class GameUI {
     private static final float RESOURCE_PADDING = 2f;
     private static final float RESOURCE_ICON_SIZE = 20f;
     private static final float RESOURCE_ICON_TEXT_GAP = 2f;
+    private static final float COIN_PADDING = 3f;
 
     private final ShapeRenderer shapeRenderer;
     private final SpriteBatch batch;
@@ -75,7 +76,7 @@ public class GameUI {
         float viewportWidth = uiViewport.getWorldWidth();
 
         float placeTowerX = BUTTON_MARGIN;
-        float placeTowerY = (UI_BAR_HEIGHT - BUTTON_HEIGHT) / 2f;
+        float placeTowerY = (UI_BAR_HEIGHT - BUTTON_HEIGHT) * 0.53f;
 
         float placeTowerWidthPixels = viewportWidth * DEFAULT_BUTTON_WIDTH;
         float transportWidthPixels = viewportWidth * DEFAULT_BUTTON_WIDTH;
@@ -134,6 +135,15 @@ public class GameUI {
         Rectangle refinedPanel = getRefinedResourcePanelBounds();
         shapeRenderer.setColor(0.2f, 0.15f, 0.3f, 1f); // different color (purple-ish)
         shapeRenderer.rect(refinedPanel.x, refinedPanel.y, refinedPanel.width, refinedPanel.height);
+
+
+        float coinWidth = 40f + COIN_PADDING * 2;
+        float coinHeight = refinedPanel.height * 0.2f + COIN_PADDING * 2;
+        float coinX = refinedPanel.x - coinWidth - 4f;
+        float coinY = refinedPanel.y + refinedPanel.height / 2f - coinHeight / 2f;
+
+        shapeRenderer.setColor(0.65f, 0.58f, 0.18f, 1f);
+        shapeRenderer.rect(coinX, coinY, coinWidth, coinHeight);
         shapeRenderer.end();
 
         // 2️⃣ Draw all text, icons, and tooltips in a single batch
@@ -155,10 +165,11 @@ public class GameUI {
 
         // Misc UI
         font.draw(batch, "ESC = Pause", 10, UI_BAR_HEIGHT - 10);
-        font.draw(batch, "gamespeed: " + gameSpeed, 400, UI_BAR_HEIGHT - 50);
+        font.draw(batch, "gamespeed: " + gameSpeed, transportButtonBounds.x, BUTTON_HEIGHT);
         // Draw resources
         float resourceFontScale = Math.round(((resourcePanel.height - RESOURCE_PANEL_PADDING * 2) / 80f) * 2f) / 2f;
         font.getData().setScale(resourceFontScale);
+        drawCoins(batch, font);
         drawResources(batch, font);
         batch.end();
         if (hoveredResource != null) {
@@ -207,6 +218,27 @@ public class GameUI {
         drawResourceSet(batch, font, gameStateManager.getRefinedResourceCount(),
             IconStore::refinedResource, getRefinedResourcePanelBounds());
     }
+
+    private void drawCoins(SpriteBatch batch, BitmapFont font) {
+        int coins = gameStateManager.gameState.getCoins();
+
+        Rectangle refinedPanel = getRefinedResourcePanelBounds();
+        float coinWidth = 40f;
+        float coinHeight = refinedPanel.height - RESOURCE_PANEL_PADDING * 2;
+        float coinX = refinedPanel.x - coinWidth - 4f;
+        float coinY = refinedPanel.y + RESOURCE_PANEL_PADDING;
+
+        font.getData().setScale(RESOURCE_ICON_SIZE / 20f);
+
+        String text = String.valueOf(coins);
+        glyphLayout.setText(font, text);
+
+        float textX = coinX + (coinWidth - glyphLayout.width) / 2f;
+        float textY = coinY + coinHeight - (coinHeight - glyphLayout.height) / 2f - 4f;
+
+        font.draw(batch, glyphLayout, textX, textY);
+    }
+
 
     // Generic helper to draw resources inside a panel
     private <T extends Enum<T>> void drawResourceSet(SpriteBatch batch, BitmapFont font,

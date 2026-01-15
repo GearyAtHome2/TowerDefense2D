@@ -1,5 +1,6 @@
 package com.Geary.towerdefense.world;
 
+import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.entity.resources.Resource;
 import com.Geary.towerdefense.entity.resources.mapEntity.ResourceType;
 import com.badlogic.gdx.Input;
@@ -70,6 +71,47 @@ public class GameStateManager {
             return true;
         }
         return false;
+    }
+
+    public boolean canAfford(Mob mob) {
+        // Coins
+        if (gameState.coins < mob.coinCost) return false;
+
+        // Raw resources
+        for (var e : mob.rawResourceCost.entrySet()) {
+            double available = gameState.rawResources.getOrDefault(e.getKey(), 0.0);
+            if (available < e.getValue()) return false;
+        }
+
+        // Refined resources
+        for (var e : mob.refinedResourceCost.entrySet()) {
+            double available = gameState.refinedResources.getOrDefault(e.getKey(), 0.0);
+            if (available < e.getValue()) return false;
+        }
+        return true;
+    }
+
+    public boolean consumeCost(Mob mob) {
+        if (!canAfford(mob)) return false;
+
+        // Coins
+        gameState.coins -= mob.coinCost;
+
+        // Raw resources
+        for (var e : mob.rawResourceCost.entrySet()) {
+            Resource.RawResourceType type = e.getKey();
+            double current = gameState.rawResources.get(type);
+            gameState.rawResources.put(type, current - e.getValue());
+        }
+
+        // Refined resources
+        for (var e : mob.refinedResourceCost.entrySet()) {
+            Resource.RefinedResourceType type = e.getKey();
+            double current = gameState.refinedResources.get(type);
+            gameState.refinedResources.put(type, current - e.getValue());
+        }
+
+        return true;
     }
 
 }

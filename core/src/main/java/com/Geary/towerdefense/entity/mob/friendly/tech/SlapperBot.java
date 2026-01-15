@@ -1,6 +1,7 @@
 package com.Geary.towerdefense.entity.mob.friendly.tech;
 
 import com.Geary.towerdefense.entity.mob.MobStats;
+import com.Geary.towerdefense.entity.resources.Resource;
 import com.badlogic.gdx.graphics.Color;
 
 
@@ -18,5 +19,6 @@ public class SlapperBot extends FTech {
 
     public SlapperBot(float x, float y) {
         super(x, y, STATS, SlapperBot.class);
+        this.rawResourceCost.put(Resource.RawResourceType.IRON, 4.0);
     }
 }
