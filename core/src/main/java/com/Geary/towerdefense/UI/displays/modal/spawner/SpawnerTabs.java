@@ -2,9 +2,13 @@ package com.Geary.towerdefense.UI.displays.modal.spawner;
 
 import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.entity.spawner.FriendlySpawner;
+import com.Geary.towerdefense.world.GameStateManager;
 import com.badlogic.gdx.graphics.Color;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 public class SpawnerTabs {
 
@@ -89,6 +93,22 @@ public class SpawnerTabs {
 
     public OrderTab getActiveTab() {
         return tabs.get(activeTab);
+    }
+
+    public List<MobMenuEntry> getActiveEntries(GameStateManager gsm) {
+        List<MobMenuEntry> entries = tabEntries.get(getActiveTab());
+        for (MobMenuEntry entry : entries) {
+            entry.setAffordable(gsm.canAfford(entry.templateMob));
+        }
+        return entries;
+    }
+
+    public float getActiveEntriesTotalHeight(float gap, GameStateManager gsm) {
+        float total = 0f;
+        for (MobMenuEntry e : getActiveEntries(gsm)) {
+            total += e.bounds().height + gap;
+        }
+        return total > 0 ? total - gap : 0;
     }
 
     public Color getActiveTabColor() {
