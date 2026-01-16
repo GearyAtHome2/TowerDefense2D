@@ -126,9 +126,9 @@ public class GameScreen implements Screen {
             uiFont,
             uiViewport,
             world,
-            world.getTowerManager(),
-            world.getTransportManager(),
-            world.getGameStateManager()
+//            world.getTowerManager(),
+            world.getGameStateManager(),
+            world.getTransportManager()
         );
         uiManager = new UIManager(world, shapeRenderer, batch, uiFont, uiCamera);
     }

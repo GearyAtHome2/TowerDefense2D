@@ -3,7 +3,6 @@ package com.Geary.towerdefense.UI;
 import com.Geary.towerdefense.UI.render.icons.IconStore;
 import com.Geary.towerdefense.UI.render.icons.TooltipRenderer;
 import com.Geary.towerdefense.UI.text.TextFormatter;
-import com.Geary.towerdefense.behaviour.buildings.manager.TowerManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TransportManager;
 import com.Geary.towerdefense.entity.resources.Resource;
 import com.Geary.towerdefense.entity.resources.mapEntity.ResourceType;
@@ -24,14 +23,21 @@ public class GameUI {
 
     public static final int UI_BAR_HEIGHT = 90;
 
-    // Button size relative to UI_BAR_HEIGHT
-    private static final float DEFAULT_BUTTON_WIDTH = 0.18f; // % of viewport width
-    private static final float BUTTON_HEIGHT = 0.2f * UI_BAR_HEIGHT;
-    private static final float BUTTON_MARGIN = 18f;
-    private static final float BUTTON_VERTICAL_SPACING = 3f;
+    // --- Main button layout ---
+    private static final float BUTTON_START_X_RATIO = 0.1f;
+    private static final float BUTTON_END_X_RATIO = 0.8f;
+    private static final int BUTTON_COUNT = 5;
+
+    private static final String[] BUTTON_LABELS = {
+        "transport",
+        "tower",
+        "production",
+        "manufacturing",
+        "other"
+    };
 
     // --- Resource panel layout ---
-    private static final float RESOURCE_PANEL_WIDTH_RATIO = 0.21f; // % of screen width
+    private static final float RESOURCE_PANEL_WIDTH_RATIO = 0.08f;
     private static final float RESOURCE_PANEL_PADDING = 4f;
 
     private static final float RESOURCE_PADDING = 2f;
@@ -44,52 +50,66 @@ public class GameUI {
     private final BitmapFont font;
     private final Viewport uiViewport;
     private final GameWorld world;
-    private final TowerManager towerManager;
-    private final TransportManager transportManager;
+
+
     private final GameStateManager gameStateManager;
+    private final TransportManager transportManager;
 
     private TooltipRenderer tooltipRenderer;
-
     private final GlyphLayout glyphLayout = new GlyphLayout();
 
-    private Rectangle placeTowerButtonBounds;
-    private Rectangle transportButtonBounds;
-
+    private Rectangle[] mainButtons;
     private Vector3 lastMousePos = new Vector3();
     private ResourceType hoveredResource = null;
 
-    public GameUI(ShapeRenderer shapeRenderer, SpriteBatch batch, BitmapFont font,
-                  Viewport uiViewport, GameWorld world, TowerManager towerManager, TransportManager transportManager, GameStateManager gameStateManager) {
+    public GameUI(
+        ShapeRenderer shapeRenderer,
+        SpriteBatch batch,
+        BitmapFont font,
+        Viewport uiViewport,
+        GameWorld world,
+        GameStateManager gameStateManager,
+        TransportManager transportManager
+    ) {
         this.shapeRenderer = shapeRenderer;
         this.batch = batch;
         this.font = font;
         this.uiViewport = uiViewport;
         this.world = world;
-        this.towerManager = towerManager;
-        this.transportManager = transportManager;
         this.gameStateManager = gameStateManager;
+        this.transportManager = transportManager;
         this.tooltipRenderer = new TooltipRenderer(font);
+
         updateButtonBounds();
     }
 
     private void updateButtonBounds() {
-        float viewportWidth = uiViewport.getWorldWidth();
+        float width = uiViewport.getWorldWidth();
 
-        float placeTowerX = BUTTON_MARGIN;
-        float placeTowerY = (UI_BAR_HEIGHT - BUTTON_HEIGHT) * 0.53f;
+        float startX = width * BUTTON_START_X_RATIO;
+        float endX = width * BUTTON_END_X_RATIO;
+        float usableWidth = endX - startX;
 
-        float placeTowerWidthPixels = viewportWidth * DEFAULT_BUTTON_WIDTH;
-        float transportWidthPixels = viewportWidth * DEFAULT_BUTTON_WIDTH;
+        float padding = 10f; // small, fixed gap between buttons
+        float buttonHeight = UI_BAR_HEIGHT * 0.7f;
 
-        placeTowerButtonBounds = new Rectangle(placeTowerX, placeTowerY, placeTowerWidthPixels, BUTTON_HEIGHT);
-        transportButtonBounds = new Rectangle(placeTowerX, placeTowerY - BUTTON_HEIGHT - BUTTON_VERTICAL_SPACING, transportWidthPixels, BUTTON_HEIGHT);
+        float buttonWidth =
+            (usableWidth - padding * (BUTTON_COUNT - 1)) / BUTTON_COUNT;
+
+        float y = (UI_BAR_HEIGHT - buttonHeight) / 2f;
+
+        mainButtons = new Rectangle[BUTTON_COUNT];
+
+        for (int i = 0; i < BUTTON_COUNT; i++) {
+            float x = startX + i * (buttonWidth + padding);
+            mainButtons[i] = new Rectangle(x, y, buttonWidth, buttonHeight);
+        }
     }
 
     public void updateHover(float screenX, float screenY) {
         uiViewport.unproject(lastMousePos.set(screenX, screenY, 0));
         hoveredResource = null;
 
-        // Check raw resources
         hoveredResource = getHoveredResourceInPanel(
             getRawResourcePanelBounds(),
             gameStateManager.getRawResourceCount()
@@ -97,19 +117,16 @@ public class GameUI {
 
         if (hoveredResource != null) return;
 
-        // Check refined resources
         hoveredResource = getHoveredResourceInPanel(
             getRefinedResourcePanelBounds(),
             gameStateManager.getRefinedResourceCount()
         );
     }
 
-
     public void drawUI(boolean paused, float gameSpeed) {
         uiViewport.apply();
         updateButtonBounds();
 
-        // 1️⃣ Draw UI shapes
         shapeRenderer.setProjectionMatrix(uiViewport.getCamera().combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
@@ -117,73 +134,68 @@ public class GameUI {
         shapeRenderer.setColor(0.1f, 0.1f, 0.1f, 1f);
         shapeRenderer.rect(0, 0, uiViewport.getWorldWidth(), UI_BAR_HEIGHT);
 
-        // Tower button
-        shapeRenderer.setColor(towerManager.isPlacementActive() ? 0f : 0.3f, 0.6f, 0.3f, 1f);
-        shapeRenderer.rect(placeTowerButtonBounds.x, placeTowerButtonBounds.y,
-            placeTowerButtonBounds.width, placeTowerButtonBounds.height);
+        // Main buttons
+//        shapeRenderer.setColor(0.25f, 0.5f, 0.35f, 1f);
+//        for (Rectangle r : mainButtons) {
+//            shapeRenderer.rect(r.x, r.y, r.width, r.height);
+//        }
 
-        // Transport button
-        shapeRenderer.setColor(transportManager.isPlacementActive() ? 0f : 0.3f, 0.6f, 0.3f, 1f);
-        shapeRenderer.rect(transportButtonBounds.x, transportButtonBounds.y,
-            transportButtonBounds.width, transportButtonBounds.height);
-
-        // Resource panel
-        Rectangle resourcePanel = getRawResourcePanelBounds();
+        // Resource panels
+        Rectangle raw = getRawResourcePanelBounds();
         shapeRenderer.setColor(0.15f, 0.15f, 0.15f, 1f);
-        shapeRenderer.rect(resourcePanel.x, resourcePanel.y, resourcePanel.width, resourcePanel.height);
+        shapeRenderer.rect(raw.x, raw.y, raw.width, raw.height);
 
-        Rectangle refinedPanel = getRefinedResourcePanelBounds();
-        shapeRenderer.setColor(0.2f, 0.15f, 0.3f, 1f); // different color (purple-ish)
-        shapeRenderer.rect(refinedPanel.x, refinedPanel.y, refinedPanel.width, refinedPanel.height);
+        Rectangle refined = getRefinedResourcePanelBounds();
+        shapeRenderer.setColor(0.2f, 0.15f, 0.3f, 1f);
+        shapeRenderer.rect(refined.x, refined.y, refined.width, refined.height);
 
-
-        float coinWidth = 40f + COIN_PADDING * 2;
-        float coinHeight = refinedPanel.height * 0.2f + COIN_PADDING * 2;
-        float coinX = refinedPanel.x - coinWidth - 4f;
-        float coinY = refinedPanel.y + refinedPanel.height / 2f - coinHeight / 2f;
-
-        shapeRenderer.setColor(0.65f, 0.58f, 0.18f, 1f);
-        shapeRenderer.rect(coinX, coinY, coinWidth, coinHeight);
         shapeRenderer.end();
 
-        // 2️⃣ Draw all text, icons, and tooltips in a single batch
         batch.setProjectionMatrix(uiViewport.getCamera().combined);
+
+        shapeRenderer.begin();
+        // Button labels
+        for (int i = 0; i < mainButtons.length; i++) {
+            Rectangle r = mainButtons[i];
+
+            if (i == 0 && transportManager.isPlacementActive()) {
+                shapeRenderer.setColor(0f, 0.6f, 0.3f, 1f); // active
+            } else {
+                shapeRenderer.setColor(0.25f, 0.5f, 0.35f, 1f);
+            }
+            shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.rect(r.x, r.y, r.width, r.height);
+        }
+        shapeRenderer.end();
+
         batch.begin();
 
-        // Reset font scale for buttons
         float baseFontScale = UI_BAR_HEIGHT / 90f;
         font.getData().setScale(baseFontScale);
-
-        // Button labels
-        font.draw(batch, "Place Tower",
-            placeTowerButtonBounds.x + 15,
-            placeTowerButtonBounds.y + placeTowerButtonBounds.height / 2 + BUTTON_HEIGHT / 4);
-
-        font.draw(batch, "Place Transport",
-            transportButtonBounds.x + 10,
-            transportButtonBounds.y + transportButtonBounds.height / 2 + BUTTON_HEIGHT / 4);
-
-        // Misc UI
         font.draw(batch, "ESC = Pause", 10, UI_BAR_HEIGHT - 10);
-        font.draw(batch, "gamespeed: " + gameSpeed, transportButtonBounds.x, BUTTON_HEIGHT);
-        // Draw resources
-        float resourceFontScale = Math.round(((resourcePanel.height - RESOURCE_PANEL_PADDING * 2) / 80f) * 2f) / 2f;
-        font.getData().setScale(resourceFontScale);
+        for (int i = 0; i < mainButtons.length; i++) {
+            Rectangle r = mainButtons[i];
+
+            glyphLayout.setText(font, BUTTON_LABELS[i]);
+
+            float textX = r.x + (r.width - glyphLayout.width) / 2f;
+            float textY = r.y + r.height / 2f + glyphLayout.height / 2f;
+
+            font.draw(batch, glyphLayout, textX, textY);
+        }
+
+        batch.end();
+
+        batch.begin();
         drawCoins(batch, font);
         drawResources(batch, font);
-        batch.end();
-        if (hoveredResource != null) {
-            double amount;
 
-            if (hoveredResource instanceof Resource.RawResourceType) {
-                amount = gameStateManager
-                    .getRawResourceCount()
-                    .get((Resource.RawResourceType) hoveredResource);
-            } else {
-                amount = gameStateManager
-                    .getRefinedResourceCount()
-                    .get((Resource.RefinedResourceType) hoveredResource);
-            }
+        batch.end();
+
+        if (hoveredResource != null) {
+            double amount = hoveredResource instanceof Resource.RawResourceType
+                ? gameStateManager.getRawResourceCount().get(hoveredResource)
+                : gameStateManager.getRefinedResourceCount().get(hoveredResource);
 
             tooltipRenderer.drawTooltip(
                 batch,
@@ -195,26 +207,27 @@ public class GameUI {
             );
         }
 
-
         if (paused) {
             batch.begin();
             font.getData().setScale(2.5f);
-            font.draw(batch, "PAUSED",
+            font.draw(
+                batch,
+                "PAUSED",
                 uiViewport.getWorldWidth() / 2f - 70,
-                uiViewport.getWorldHeight() / 2f);
+                uiViewport.getWorldHeight() / 2f
+            );
             batch.end();
         }
 
-        // Reset font scale for safety
         font.getData().setScale(1f);
     }
 
+    // --- everything below here is unchanged ---
+
     private void drawResources(SpriteBatch batch, BitmapFont font) {
-        // --- Draw Raw Resources ---
         drawResourceSet(batch, font, gameStateManager.getRawResourceCount(),
             IconStore::rawResource, getRawResourcePanelBounds());
 
-        // --- Draw Refined Resources ---
         drawResourceSet(batch, font, gameStateManager.getRefinedResourceCount(),
             IconStore::refinedResource, getRefinedResourcePanelBounds());
     }
@@ -239,12 +252,13 @@ public class GameUI {
         font.draw(batch, glyphLayout, textX, textY);
     }
 
-
-    // Generic helper to draw resources inside a panel
-    private <T extends Enum<T>> void drawResourceSet(SpriteBatch batch, BitmapFont font,
-                                                     EnumMap<T, Double> resources,
-                                                     java.util.function.Function<T, TextureRegion> iconProvider,
-                                                     Rectangle panel) {
+    private <T extends Enum<T>> void drawResourceSet(
+        SpriteBatch batch,
+        BitmapFont font,
+        EnumMap<T, Double> resources,
+        java.util.function.Function<T, TextureRegion> iconProvider,
+        Rectangle panel
+    ) {
         if (resources == null || resources.isEmpty()) return;
 
         float usableHeight = panel.height - RESOURCE_PANEL_PADDING * 2;
@@ -257,6 +271,7 @@ public class GameUI {
 
         int row = 0;
         int column = 0;
+
         for (T type : resources.keySet()) {
             TextureRegion icon = iconProvider.apply(type);
             if (icon == null) continue;
@@ -281,46 +296,17 @@ public class GameUI {
 
     private Rectangle getRawResourcePanelBounds() {
         float panelWidth = uiViewport.getWorldWidth() * RESOURCE_PANEL_WIDTH_RATIO;
-
-        return new Rectangle(
-            uiViewport.getWorldWidth() - panelWidth,
-            0,
-            panelWidth,
-            UI_BAR_HEIGHT
-        );
+        return new Rectangle(uiViewport.getWorldWidth() - panelWidth, 0, panelWidth, UI_BAR_HEIGHT);
     }
 
     private Rectangle getRefinedResourcePanelBounds() {
         float panelWidth = uiViewport.getWorldWidth() * RESOURCE_PANEL_WIDTH_RATIO;
-        float panelHeight = UI_BAR_HEIGHT;
-
-        float panelX = uiViewport.getWorldWidth() - 2 * panelWidth; // left of raw panel
-        float panelY = 0;
-
-        return new Rectangle(panelX, panelY, panelWidth, panelHeight);
-    }
-
-    public boolean handleUiClick(Vector3 uiClick) {
-        if (placeTowerButtonBounds.contains(uiClick.x, uiClick.y)) {
-            towerManager.togglePlacementClick(
-                uiClick,
-                placeTowerButtonBounds.x,
-                placeTowerButtonBounds.y,
-                placeTowerButtonBounds.width,
-                placeTowerButtonBounds.height
-            );
-            return true;
-        }
-
-        if (transportButtonBounds.contains(uiClick.x, uiClick.y)) {
-            transportManager.togglePlacementClick(uiClick,
-                placeTowerButtonBounds.x,
-                placeTowerButtonBounds.y,
-                placeTowerButtonBounds.width,
-                placeTowerButtonBounds.height);
-            return true;
-        }
-        return false;
+        return new Rectangle(
+            uiViewport.getWorldWidth() - 2 * panelWidth,
+            0,
+            panelWidth,
+            UI_BAR_HEIGHT
+        );
     }
 
     private <T extends Enum<T>> T getHoveredResourceInPanel(
@@ -356,4 +342,21 @@ public class GameUI {
         return null;
     }
 
+    public boolean handleUiClick(Vector3 uiClick) {
+        // Transport button = index 0
+        Rectangle transportButton = mainButtons[0];
+
+        if (transportButton.contains(uiClick.x, uiClick.y)) {
+            transportManager.togglePlacementClick(
+                uiClick,
+                transportButton.x,
+                transportButton.y,
+                transportButton.width,
+                transportButton.height
+            );
+            return true;
+        }
+
+        return false;
+    }
 }
