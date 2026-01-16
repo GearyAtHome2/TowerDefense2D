@@ -153,36 +153,36 @@ public class GameUI {
 
         batch.setProjectionMatrix(uiViewport.getCamera().combined);
 
-        shapeRenderer.begin();
-        // Button labels
-        for (int i = 0; i < mainButtons.length; i++) {
-            Rectangle r = mainButtons[i];
+        drawButtons();
+//        for (int i = 0; i < mainButtons.length; i++) {
+//            Rectangle r = mainButtons[i];
+//
+//            if (i == 0 && transportManager.isPlacementActive()) {
+//                shapeRenderer.setColor(0f, 0.6f, 0.3f, 1f); // active
+//            } else {
+//                shapeRenderer.setColor(0.25f, 0.5f, 0.35f, 1f);
+//            }
+//
+//            shapeRenderer.rect(r.x, r.y, r.width, r.height);
+//        }
 
-            if (i == 0 && transportManager.isPlacementActive()) {
-                shapeRenderer.setColor(0f, 0.6f, 0.3f, 1f); // active
-            } else {
-                shapeRenderer.setColor(0.25f, 0.5f, 0.35f, 1f);
-            }
-            shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.rect(r.x, r.y, r.width, r.height);
-        }
-        shapeRenderer.end();
 
         batch.begin();
 
         float baseFontScale = UI_BAR_HEIGHT / 90f;
         font.getData().setScale(baseFontScale);
         font.draw(batch, "ESC = Pause", 10, UI_BAR_HEIGHT - 10);
-        for (int i = 0; i < mainButtons.length; i++) {
-            Rectangle r = mainButtons[i];
-
-            glyphLayout.setText(font, BUTTON_LABELS[i]);
-
-            float textX = r.x + (r.width - glyphLayout.width) / 2f;
-            float textY = r.y + r.height / 2f + glyphLayout.height / 2f;
-
-            font.draw(batch, glyphLayout, textX, textY);
-        }
+        drawButtonLabels();
+//        for (int i = 0; i < mainButtons.length; i++) {
+//            Rectangle r = mainButtons[i];
+//
+//            glyphLayout.setText(font, BUTTON_LABELS[i]);
+//
+//            float textX = r.x + (r.width - glyphLayout.width) / 2f;
+//            float textY = r.y + r.height / 2f + glyphLayout.height / 2f;
+//
+//            font.draw(batch, glyphLayout, textX, textY);
+//        }
 
         batch.end();
 
@@ -222,7 +222,36 @@ public class GameUI {
         font.getData().setScale(1f);
     }
 
-    // --- everything below here is unchanged ---
+    private void drawButtons() {
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+        for (int i = 0; i < mainButtons.length; i++) {
+            Rectangle r = mainButtons[i];
+
+            if (i == 0 && transportManager.isPlacementActive()) {
+                shapeRenderer.setColor(0f, 0.6f, 0.3f, 1f);
+            } else {
+                shapeRenderer.setColor(0.25f, 0.5f, 0.35f, 1f);
+            }
+
+            shapeRenderer.rect(r.x, r.y, r.width, r.height);
+        }
+
+        shapeRenderer.end();
+    }
+
+    private void drawButtonLabels() {
+        for (int i = 0; i < mainButtons.length; i++) {
+            Rectangle r = mainButtons[i];
+
+            glyphLayout.setText(font, BUTTON_LABELS[i]);
+
+            float textX = r.x + (r.width - glyphLayout.width) / 2f;
+            float textY = r.y + r.height / 2f + glyphLayout.height / 2f;
+
+            font.draw(batch, glyphLayout, textX, textY);
+        }
+    }
 
     private void drawResources(SpriteBatch batch, BitmapFont font) {
         drawResourceSet(batch, font, gameStateManager.getRawResourceCount(),
