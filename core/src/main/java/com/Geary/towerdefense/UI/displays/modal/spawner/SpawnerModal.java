@@ -7,11 +7,13 @@ import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.entity.resources.Resource;
 import com.Geary.towerdefense.entity.spawner.FriendlySpawner;
 import com.Geary.towerdefense.world.GameStateManager;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,8 @@ public class SpawnerModal extends Modal {
     private final SpawnerTabs tabs;
     private final SpawnerTabRenderer<SpawnerTabs.OrderTab> tabRenderer;
 
+    private final Rectangle deployGarrisonButton = new Rectangle();
+    private boolean deployHovered = false;
 
     public SpawnerModal(FriendlySpawner spawner, GameStateManager gameStateManager, BitmapFont font, OrthographicCamera camera) {
         super(font, camera);
@@ -123,6 +127,15 @@ public class SpawnerModal extends Modal {
 
         queueScrollBox.bounds.set(bounds.x + hPad, queueY, bounds.width - hPad * 2, queueHeight);
         garrisonScrollBox.bounds.set(bounds.x + hPad, garrisonY, bounds.width - hPad * 2, garrisonHeight);
+        float buttonWidth = garrisonScrollBox.bounds.width * 0.35f;
+        float buttonHeight = garrisonScrollBox.bounds.height * 0.25f;
+
+        deployGarrisonButton.set(
+            garrisonScrollBox.bounds.x + hPad * 0.5f,
+            garrisonScrollBox.bounds.y + garrisonScrollBox.bounds.height - buttonHeight - vGap * 0.5f,
+            buttonWidth,
+            buttonHeight
+        );
     }
 
     /* =========================
@@ -148,6 +161,32 @@ public class SpawnerModal extends Modal {
 
         queueScrollBox.draw(renderer, batch, font, camera);
         garrisonScrollBox.draw(renderer, batch, font, camera);
+        // Deploy garrison button
+        deployHovered = deployGarrisonButton.contains(
+            Gdx.input.getX(),
+            Gdx.graphics.getHeight() - Gdx.input.getY()
+        );
+        Color bg = deployHovered ? new Color(0.25f, 0.25f, 0.25f, 1f)
+            : new Color(0.18f, 0.18f, 0.18f, 1f);
+        renderer.begin(ShapeRenderer.ShapeType.Filled);
+        renderer.setColor(bg);
+        renderer.rect(
+            deployGarrisonButton.x,
+            deployGarrisonButton.y,
+            deployGarrisonButton.width,
+            deployGarrisonButton.height
+        );
+        renderer.end();
+
+        batch.begin();
+        font.setColor(Color.WHITE);
+        font.draw(
+            batch,
+            "DEPLOY",
+            deployGarrisonButton.x + deployGarrisonButton.width * 0.3f,
+            deployGarrisonButton.y + deployGarrisonButton.height * 0.65f
+        );
+        batch.end();
     }
 
     /* =========================
@@ -176,7 +215,10 @@ public class SpawnerModal extends Modal {
                 return true;
             }
         }
-
+        if (deployGarrisonButton.contains(x, y)) {
+            deployGarrison();
+            return true;
+        }
         return false;
     }
 
@@ -239,9 +281,6 @@ public class SpawnerModal extends Modal {
         int idx = queue.indexOf(entry);
         if (idx == -1) return;
 
-        // Do not allow removing garrison entries
-//        if (entry.isToGarrison) return;
-
         boolean wasLeftmost = entry.isLeftmost;
 
         queue.remove(idx);
@@ -272,6 +311,19 @@ public class SpawnerModal extends Modal {
         }
 
         return true;
+    }
+
+    private void deployGarrison() {
+        List<QueueEntry> garrison = new ArrayList<>(garrisonScrollBox.getEntries());
+        if (garrison.isEmpty()) return;
+
+        List<Mob> mobs = new ArrayList<>();
+        for (QueueEntry entry : garrison) {
+            mobs.add(entry.mob);
+        }
+
+        spawner.requestSpawn(mobs);
+        garrisonScrollBox.setEntries(new ArrayList<>());
     }
 
     void updateAffordability() {

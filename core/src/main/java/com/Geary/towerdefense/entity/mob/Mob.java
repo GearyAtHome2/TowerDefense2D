@@ -21,7 +21,6 @@ public abstract class Mob extends Entity implements Cloneable {
 
     public final Order order;
     public float size;
-    public int health;
     public int armour = 0;
     public int damage;
     public Color color;

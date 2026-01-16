@@ -1,7 +1,6 @@
 package com.Geary.towerdefense.entity.spawner;
 
 import com.Geary.towerdefense.entity.mob.Mob;
-import com.Geary.towerdefense.entity.mob.friendly.Friendly;
 import com.Geary.towerdefense.entity.mob.friendly.dark.DodgyGangster;
 import com.Geary.towerdefense.entity.mob.friendly.light.ServantOfLight;
 import com.Geary.towerdefense.entity.mob.friendly.nature.Wolf;
@@ -51,14 +50,6 @@ public class FriendlySpawner extends Spawner {
             getCenterY() - (int) (random() * 14) + 7);
         requestedSpawns.remove(0);
         return spawn;
-    }
-
-    public List<Friendly> deathRattleSpawns() {
-        List<Friendly> deathrattleSpawns = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-//            deathrattleSpawns.add(spawn());
-        }
-        return deathrattleSpawns;
     }
 
     /**

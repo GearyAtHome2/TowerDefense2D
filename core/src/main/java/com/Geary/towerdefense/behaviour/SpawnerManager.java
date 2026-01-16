@@ -31,24 +31,18 @@ public class SpawnerManager {
         removeDeadSpawners();
     }
 
-    public void spawnFriendly(Friendly friendly){
+    public void spawnFriendly(Friendly friendly) {
         friendly.setPath(world.path, cellSize, true);
         world.friends.add(friendly);
     }
 
-    public void spawnEnemy(Enemy enemy){
+    public void spawnEnemy(Enemy enemy) {
         enemy.setPath(world.path, cellSize, false);
         world.enemies.add(enemy);
     }
 
-    public void removeDeadSpawners(){
-        world.friendlySpawners.removeIf(spawner -> {
-            if (spawner.health < 1) {
-                spawner.deathRattleSpawns().forEach(this::spawnFriendly);
-                return true;
-            }
-            return false;
-        });
+    public void removeDeadSpawners() {
+        world.friendlySpawners.removeIf(spawner ->spawner.health < 1);
 
         world.enemySpawners.removeIf(spawner -> {
             if (spawner.health < 1) {

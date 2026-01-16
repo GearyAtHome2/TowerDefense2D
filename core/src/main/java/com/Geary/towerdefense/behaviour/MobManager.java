@@ -66,6 +66,7 @@ public class MobManager {
 
                 if (overlaps(enemy, friendly)) {
                     if (enemy.collisionCooldown <= 0 && friendly.collisionCooldown <= 0) {
+//                        System.out.println();
                         enemy.applyDamage(friendly.damage);
                         friendly.applyDamage(enemy.damage);
 

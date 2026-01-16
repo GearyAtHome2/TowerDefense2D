@@ -54,7 +54,6 @@ public class QueueEntry implements ScrollEntry {
             renderer.end();
         }
         if (isToGarrison) {
-            System.out.println("drawing the little G");
             batch.begin();
             font.setColor(Color.YELLOW);
             float gSize = bounds.height * 0.3f; // scale relative to entry

@@ -13,7 +13,7 @@ public class Groblin extends Enemy {
         0.1f, 220, 5, 0.65f, 5f, 0.25f,
         Color.FIREBRICK,
         2, // spawnTime
-        0  // armour
+        0  // armourmo
     );
 
     public Groblin(float x, float y) {
