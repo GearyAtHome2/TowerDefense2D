@@ -74,7 +74,7 @@ public class GameUI implements GameInputProcessor.UiScrollListener {
         boolean onUiScroll(float amount, Vector3 uiCoords);
     }
 
-    private HorizontalScrollBox scrollBox;
+    private HorizontalScrollBox<BuildListEntry> scrollBox;
     private Rectangle scrollBoxRect;
     private Rectangle closeButtonRect;
 
@@ -104,33 +104,54 @@ public class GameUI implements GameInputProcessor.UiScrollListener {
 
     private void updateButtonBounds() {
         float width = uiViewport.getWorldWidth();
+        float height = uiViewport.getWorldHeight();
 
+        // Buttons
         float startX = width * BUTTON_START_X_RATIO;
         float endX = width * BUTTON_END_X_RATIO;
         float usableWidth = endX - startX;
 
-        float padding = 10f;
-        float buttonHeight = UI_BAR_HEIGHT * 0.7f;
-
-        float buttonWidth =
-            (usableWidth - padding * (BUTTON_COUNT - 1)) / BUTTON_COUNT;
-
+        float padding = width * 0.01f; // relative padding
+        float buttonHeight = UI_BAR_HEIGHT * 0.7f; // can also scale by screen height if desired
         float y = (UI_BAR_HEIGHT - buttonHeight) / 2f;
 
-        mainButtons = new Rectangle[BUTTON_COUNT];
+        float buttonWidth = (usableWidth - padding * (BUTTON_COUNT - 1)) / BUTTON_COUNT;
 
+        if (mainButtons == null) mainButtons = new Rectangle[BUTTON_COUNT];
         for (int i = 0; i < BUTTON_COUNT; i++) {
             float x = startX + i * (buttonWidth + padding);
-            mainButtons[i] = new Rectangle(x, y, buttonWidth, buttonHeight);
+            if (mainButtons[i] == null) mainButtons[i] = new Rectangle();
+            mainButtons[i].set(x, y, buttonWidth, buttonHeight);
         }
 
-        this.scrollBoxRect = new Rectangle(startX, y, (float) (uiViewport.getWorldWidth() * 0.7), buttonHeight);
-        float closeButtonSize = 20f;
-        this.closeButtonRect = new Rectangle(scrollBoxRect.x + scrollBoxRect.width - closeButtonSize,
-            scrollBoxRect.y + scrollBoxRect.height / 2 - closeButtonSize / 2,
-            closeButtonSize, closeButtonSize);
+        float boxWidth = usableWidth; // same as buttons area
+        float boxHeight = UI_BAR_HEIGHT * 0.9f; // slightly smaller than UI bar
+        float boxY = (UI_BAR_HEIGHT - boxHeight) / 2f; // vertically centered
+        if (scrollBoxRect == null) scrollBoxRect = new Rectangle();
+        scrollBoxRect.set(startX, boxY, boxWidth, boxHeight);
 
+        // Close button
+        float closeButtonSize = boxHeight * 0.3f;
+        if (closeButtonRect == null) closeButtonRect = new Rectangle();
+        closeButtonRect.set(
+            scrollBoxRect.x + scrollBoxRect.width - closeButtonSize - 4f, // 4px padding
+            scrollBoxRect.y + scrollBoxRect.height - closeButtonSize - 4f, // 4px padding
+            closeButtonSize,
+            closeButtonSize
+        );
+
+        if (scrollBox != null) {
+            scrollBox.bounds.set(scrollBoxRect);
+
+            if (scrollBox.getEntries() != null) {
+                for (BuildListEntry entry : scrollBox.getEntries()) {
+                    entry.setSize(scrollBox.bounds.height * 2.5f, scrollBox.bounds.height * 0.9f);
+                    scrollBox.relayout();
+                }
+            }
+        }
     }
+
 
     private void drawBuildUI() {
         Rectangle rectangle = new Rectangle(scrollBox.bounds);
@@ -140,10 +161,7 @@ public class GameUI implements GameInputProcessor.UiScrollListener {
         shapeRenderer.end();
         scrollBox.draw(shapeRenderer, batch, font, uiViewport.getCamera());
 
-        float closeButtonSize = 20f;
-        Rectangle closeButton = new Rectangle(rectangle.x + rectangle.width - closeButtonSize,
-            rectangle.y + rectangle.height / 2 - closeButtonSize / 2,
-            closeButtonSize, closeButtonSize);
+        Rectangle closeButton = closeButtonRect; // use the correct rectangle
 
         shapeRenderer.begin();
         shapeRenderer.setColor(0.1f, 0.1f, 0.1f, 1f);
@@ -154,7 +172,7 @@ public class GameUI implements GameInputProcessor.UiScrollListener {
         batch.begin();
         float baseFontScale = UI_BAR_HEIGHT / 80f;
         font.getData().setScale(baseFontScale);
-        font.draw(batch, "X", closeButton.getX() + 4, closeButton.getY() + closeButton.height - 4);
+        font.draw(batch, "X", closeButton.x + 4, closeButton.y + closeButton.height - 4);
         batch.end();
     }
 
@@ -420,7 +438,7 @@ public class GameUI implements GameInputProcessor.UiScrollListener {
                 return true;
             } else if (mainButtons[1].contains(uiClick.x, uiClick.y)) {
                 this.uiMode = UiMode.SCROLLBOX;
-                scrollBox = new HorizontalScrollBox<BuildListEntry>(scrollBoxRect);
+                scrollBox = new HorizontalScrollBox<>(scrollBoxRect);
                 List<BuildListEntry> builds = world.getTowerManager().unlockedTowerTypes.stream().map(build ->
                     new BuildListEntry(build, scrollBox.bounds.height * 1.5f, scrollBox.bounds.height)).toList();
                 scrollBox.setEntries(builds);

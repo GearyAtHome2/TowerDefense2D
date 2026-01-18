@@ -160,4 +160,8 @@ public class HorizontalScrollBox<T extends ScrollEntry> {
         }
         return null;
     }
+
+    public void relayout() {
+        layoutEntries();
+    }
 }

@@ -77,6 +77,10 @@ public class BuildListEntry implements ScrollEntry {
         return bounds;
     }
 
+    public void setSize(float width, float height) {
+        bounds.set(bounds.x, bounds.y, width, height);
+    }
+
     private Color computeBackgroundColor(Mob.Order order) {
         return switch (order) {
             case NEUTRAL -> new Color(0.45f, 0.45f, 0.45f, 1f);
