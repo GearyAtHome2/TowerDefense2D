@@ -13,16 +13,18 @@ import java.util.List;
 public class TowerManager extends BuildingManager<Tower> {
 
     private Tower activelyPlacingTower = new BasicTower(0, 0);
+
     public final List<Tower> allTowerTypes;
     public List<Tower> unlockedTowerTypes;
 
     public TowerManager(GameWorld world, OrthographicCamera camera) {
         super(world, camera);
+
         allTowerTypes = List.of(
-            new BasicTower(0,0),
-            new ShotgunTower(0,0)
+            new BasicTower(0, 0),
+            new ShotgunTower(0, 0)
         );
-        unlockedTowerTypes = allTowerTypes;//for now, until unlocks.
+        unlockedTowerTypes = allTowerTypes;
     }
 
     @Override
@@ -35,6 +37,7 @@ public class TowerManager extends BuildingManager<Tower> {
     protected void handleLeftClick(Cell cell, int x, int y) {
         Tower tower = activelyPlacingTower.clone();
         tower.setPosition(x * world.cellSize, y * world.cellSize);
+
         world.towers.add(tower);
         cell.building = tower;
         world.occupied[x][y] = true;
@@ -42,9 +45,10 @@ public class TowerManager extends BuildingManager<Tower> {
 
     @Override
     protected void updateGhost(Cell cell, int x, int y) {
-        if (world.ghostTower == null) world.ghostTower = activelyPlacingTower.clone();
-        else {
-            //maybe create a building updateposition method?
+        if (world.ghostTower == null) {
+            world.ghostTower = activelyPlacingTower.clone();
+            world.ghostTower.setPosition(x * world.cellSize, y * world.cellSize);
+        } else {
             world.ghostTower.xPos = x * world.cellSize + world.cellSize / 2f;
             world.ghostTower.yPos = y * world.cellSize + world.cellSize / 2f;
         }
@@ -55,32 +59,32 @@ public class TowerManager extends BuildingManager<Tower> {
         world.ghostTower = null;
     }
 
-    /**
-     * Update towers: acquire targets, rotate gun, handle cooldown, and shoot bullets
-     */
+    public void setPlacementTower(Tower tower) {
+        activelyPlacingTower = tower;
+        BuildingManager.setActivePlacement(this);
+    }
+
     public void updateTowers(List<Bullet> bullets, float delta) {
         for (Tower tower : world.towers) {
             tower.cooldown -= delta;
 
-            // Acquire or refresh target
-            if (tower.currentTarget == null || tower.currentTarget.health <= 0 ||
+            if (tower.currentTarget == null ||
+                tower.currentTarget.health <= 0 ||
                 tower.getDistanceTo(tower.currentTarget) > tower.range) {
-                tower.currentTarget = tower.findTarget(world.enemies);//this will lean towards the furthest progressed
-                // because we only retarget when a target leaves
+
+                tower.currentTarget = tower.findTarget(world.enemies);
             }
 
             tower.updateGunAngle(delta);
 
-            if (tower.cooldown <= 0 && tower.currentTarget != null && tower.canShoot()) {
-                List<Bullet> firedBullets = tower.shoot(tower.currentTarget);
-                bullets.addAll(firedBullets);
+            if (tower.cooldown <= 0 &&
+                tower.currentTarget != null &&
+                tower.canShoot()) {
+
+                bullets.addAll(tower.shoot(tower.currentTarget));
                 tower.cooldown = tower.maxCooldown;
             }
         }
-    }
-
-    public void setPlacementTower(Tower tower) {
-        this.activelyPlacingTower = tower;
     }
 
     public void unlockTower(String name) {

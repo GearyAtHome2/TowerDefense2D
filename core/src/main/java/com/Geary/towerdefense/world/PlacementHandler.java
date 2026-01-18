@@ -1,9 +1,6 @@
 package com.Geary.towerdefense.world;
 
-import com.Geary.towerdefense.behaviour.buildings.manager.FactoryManager;
-import com.Geary.towerdefense.behaviour.buildings.manager.MineManager;
-import com.Geary.towerdefense.behaviour.buildings.manager.TowerManager;
-import com.Geary.towerdefense.behaviour.buildings.manager.TransportManager;
+import com.Geary.towerdefense.behaviour.buildings.manager.*;
 
 public class PlacementHandler {
 
@@ -12,38 +9,57 @@ public class PlacementHandler {
     private final MineManager mineManager;
     private final FactoryManager factoryManager;
 
-    public PlacementHandler(TowerManager towerManager,
-                            TransportManager transportManager,
-                            MineManager mineManager, FactoryManager factoryManager) {
+    /** True only while a keyboard key is held */
+    private boolean keyboardOverrideActive = false;
+
+    public PlacementHandler(
+        TowerManager towerManager,
+        TransportManager transportManager,
+        MineManager mineManager,
+        FactoryManager factoryManager
+    ) {
         this.towerManager = towerManager;
         this.transportManager = transportManager;
         this.mineManager = mineManager;
         this.factoryManager = factoryManager;
     }
 
-    /** Called from render() to update placement via keyboard */
-    public void handleKeyboardInput(boolean transportKey, boolean towerKey, boolean mineKey, boolean factoryKey) {
-        if (transportKey) {
-            setPlacementState(false, true, false, false);
-        } else if (towerKey) {
-            setPlacementState(true, false, false, false);
+    public void handleKeyboardInput(
+        boolean transportKey,
+        boolean towerKey,
+        boolean mineKey,
+        boolean factoryKey
+    ) {
+        if (towerKey) {
+            activateKeyboardPlacement(towerManager);
+        } else if (transportKey) {
+            activateKeyboardPlacement(transportManager);
         } else if (mineKey) {
-            setPlacementState(false, false, true, false);
-        }  else if (factoryKey) {
-            setPlacementState(false, false, false, true);
+            activateKeyboardPlacement(mineManager);
+        } else if (factoryKey) {
+            activateKeyboardPlacement(factoryManager);
         } else {
-            setPlacementState(false, false, false, false);
+            clearKeyboardPlacement();
         }
     }
 
-    private void setPlacementState(boolean tower, boolean transport, boolean mine, boolean factory) {
-        towerManager.setPlacementKeyboardActive(tower);
-        transportManager.setPlacementKeyboardActive(transport);
-        mineManager.setPlacementKeyboardActive(mine);
-        factoryManager.setPlacementKeyboardActive(factory);
+    private void activateKeyboardPlacement(BuildingManager<?> manager) {
+        if (keyboardOverrideActive && manager.isThisActiveManager()) {
+            return;
+        }
+
+        keyboardOverrideActive = true;
+        BuildingManager.setActivePlacement(manager);
     }
 
-    /** Called from render() to handle placements and update links */
+    private void clearKeyboardPlacement() {
+        if (!keyboardOverrideActive) return;
+
+        keyboardOverrideActive = false;
+        BuildingManager.clearActivePlacement();
+    }
+
+    /** Called every frame */
     public boolean handlePlacements() {
         boolean placedTower = towerManager.handlePlacement();
         boolean placedTransport = transportManager.handlePlacement();

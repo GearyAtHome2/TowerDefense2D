@@ -118,7 +118,7 @@ public class GameInputProcessor extends InputAdapter {
     }
 
     private boolean isAnyPlacementActive() {
-        return towerManager.isPlacementActive() ||
+        return towerManager.isThisActiveManager() ||
             transportManager.isPlacementActive() ||
             mineManager.isPlacementActive() ||
             factoryManager.isPlacementActive();

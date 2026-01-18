@@ -6,6 +6,7 @@ import com.Geary.towerdefense.UI.gameUI.scrollbox.BuildListEntry;
 import com.Geary.towerdefense.UI.render.icons.IconStore;
 import com.Geary.towerdefense.UI.render.icons.TooltipRenderer;
 import com.Geary.towerdefense.UI.text.TextFormatter;
+import com.Geary.towerdefense.behaviour.buildings.manager.BuildingManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TransportManager;
 import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.entity.buildings.tower.Tower;
@@ -426,11 +427,16 @@ public class GameUI implements GameInputProcessor.UiScrollListener {
         if (uiMode == UiMode.SCROLLBOX) {
             if (closeButtonRect.contains(uiClick.x, uiClick.y)) {
                 uiMode = UiMode.BUTTONS;
+                BuildingManager.clearActivePlacement();
                 return true;
             } else if (scrollBox.contains(uiClick.x, uiClick.y) &&
-                scrollBox.click(uiClick.x, uiClick.y) != null){
+                scrollBox.click(uiClick.x, uiClick.y) != null) {
                 BuildListEntry clicked = scrollBox.click(uiClick.x, uiClick.y);
                 setActiveBuild(clicked.building);
+                return true;
+            } else if (scrollBox.contains(uiClick.x, uiClick.y) &&
+                scrollBox.click(uiClick.x, uiClick.y) == null) {
+                setActiveBuild(null);//? maybe? for outside the box?
                 return true;
             }
         } else if (uiMode == UiMode.BUTTONS) {
@@ -456,14 +462,22 @@ public class GameUI implements GameInputProcessor.UiScrollListener {
         return false;
     }
 
-    public void setActiveBuild(Building building){
-        if (building instanceof Tower tower){
+    public void setActiveBuild(Building building) {
+        scrollBox.getEntries().forEach(e -> e.setActiveEntry(false));
+        if (building instanceof Tower tower) {
+            scrollBox.getEntries().forEach(entry -> {
+                if (entry.building.equals(tower)) {
+                    entry.setActiveEntry(true);
+                }
+            });
             world.getTowerManager().setPlacementTower(tower);
+        } else {
+            BuildingManager.clearActivePlacement();
         }
     }
 
     //this is required for when we unlock stuff as we go
-    public void refreshBuildMenuContent(){
+    public void refreshBuildMenuContent() {
         List<BuildListEntry> builds = world.towers.stream().map(build ->
             new BuildListEntry(build, scrollBox.bounds.height * 1.5f, scrollBox.bounds.height)).toList();
     }

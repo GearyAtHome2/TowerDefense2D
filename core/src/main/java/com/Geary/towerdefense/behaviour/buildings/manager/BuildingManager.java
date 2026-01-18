@@ -17,22 +17,53 @@ public abstract class BuildingManager<T extends Building> {
 
     protected final GameWorld world;
     protected final OrthographicCamera camera;
-
-    protected boolean placementButtonActive;
-    protected boolean placementKeyboardActive;
+    private static BuildingManager activePlacementManager;
+    private static boolean keyboardOverrideActive;
+    protected static boolean placementButtonActive;
+    protected boolean keyboardPlacementRequested;
 
     protected BuildingManager(GameWorld world, OrthographicCamera camera) {
         this.world = world;
         this.camera = camera;
     }
 
-    public void setPlacementKeyboardActive(boolean active) {
-        this.placementKeyboardActive = active;
+    public void requestKeyboardPlacement() {
+        keyboardPlacementRequested = true;
     }
 
     public boolean isPlacementActive() {
-        return placementButtonActive || placementKeyboardActive;
+        return isThisActiveManager();
     }
+
+    public static void clearActivePlacement() {
+        if (activePlacementManager != null) {
+            activePlacementManager.onPlacementDeactivated();
+            activePlacementManager = null;
+        }
+    }
+
+    public static void setActivePlacement(BuildingManager manager) {
+        if (activePlacementManager == manager) return;
+        clearActivePlacement();
+        activePlacementManager = manager;
+        manager.onPlacementActivated();
+    }
+
+    public static boolean isAnyPlacementActive() {
+        return activePlacementManager != null;
+    }
+
+    public boolean isThisActiveManager() {
+        return activePlacementManager == this;
+    }
+
+    // Hooks for subclasses
+    protected void onPlacementActivated() {
+    }
+
+    protected void onPlacementDeactivated() {
+    }
+
 
     public void togglePlacementClick(
         Vector3 uiClick,
@@ -46,10 +77,11 @@ public abstract class BuildingManager<T extends Building> {
 
     public boolean handlePlacement() {
         Vector3 worldPos = getWorldMousePosition();
-        if (!isPlacementActive() || worldPos == null) {
+        if (!isThisActiveManager() || worldPos == null) {
             resetGhost();
             return false;
         }
+
 
         int gridX = toGrid(worldPos.x);
         int gridY = toGrid(worldPos.y);
@@ -68,11 +100,15 @@ public abstract class BuildingManager<T extends Building> {
             resetGhost();
         }
 
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && canPlace) {
+        boolean shouldPlace =
+            Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)
+                || keyboardPlacementRequested;
+
+        if (shouldPlace && canPlace) {
             handleLeftClick(cell, gridX, gridY);
             return true;
         }
-
+        keyboardPlacementRequested = false;
         return false;
     }
 

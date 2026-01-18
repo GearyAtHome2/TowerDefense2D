@@ -16,7 +16,7 @@ public class BuildListEntry implements ScrollEntry {
     public final Building building;
     public final Rectangle bounds = new Rectangle();
     public Runnable onClick;
-
+    private boolean isActiveEntry;
 
     public BuildListEntry(Building building, float sizeX, float sizeY) {
         bounds.set(0, 0, sizeX, sizeY);
@@ -27,6 +27,13 @@ public class BuildListEntry implements ScrollEntry {
     public void draw(ShapeRenderer renderer, SpriteBatch batch, BitmapFont font, Camera camera) {
         // Draw background
         Color bg = computeBackgroundColor(building.order);
+        if (isActiveEntry){
+            renderer.begin(ShapeRenderer.ShapeType.Line);
+            renderer.setColor(Color.YELLOW);
+            renderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
+            renderer.end();
+            bg.mul(1.15f, 1.15f, 1.15f, 1f); // brighten ~15%
+        }
 
         renderer.begin(ShapeRenderer.ShapeType.Filled);
         renderer.setColor(bg);
@@ -39,6 +46,7 @@ public class BuildListEntry implements ScrollEntry {
         String text = building.name;
 
         float originalScaleX = font.getScaleX();
+
         float originalScaleY = font.getScaleY();
 
         font.getData().setScale(1f);
@@ -53,7 +61,7 @@ public class BuildListEntry implements ScrollEntry {
 
         float padding = 3f;
         float textX = bounds.x + padding;
-        float textY = bounds.y + bounds.height - 2*padding;
+        float textY = bounds.y + bounds.height - 2 * padding;
 
         font.draw(batch, layout, textX, textY);
 
@@ -81,15 +89,23 @@ public class BuildListEntry implements ScrollEntry {
         bounds.set(bounds.x, bounds.y, width, height);
     }
 
+    public boolean getActiveEntry() {
+        return this.isActiveEntry;
+    }
+
+    public void setActiveEntry(boolean active) {
+        this.isActiveEntry = active;
+    }
+
     private Color computeBackgroundColor(Mob.Order order) {
         return switch (order) {
             case NEUTRAL -> new Color(0.45f, 0.45f, 0.45f, 1f);
-            case TECH    -> new Color(0.3f, 0.35f, 0.5f, 1f);
-            case NATURE  -> new Color(0.15f, 0.55f, 0.15f, 1f);
-            case DARK    -> new Color(0.05f, 0.05f, 0.05f, 1f);
-            case LIGHT   -> new Color(0.65f, 0.65f, 0.45f, 1f);
-            case FIRE    -> new Color(0.65f, 0.15f, 0.1f, 1f);
-            case WATER   -> new Color(0.15f, 0.3f, 0.65f, 1f);
+            case TECH -> new Color(0.3f, 0.35f, 0.5f, 1f);
+            case NATURE -> new Color(0.15f, 0.55f, 0.15f, 1f);
+            case DARK -> new Color(0.05f, 0.05f, 0.05f, 1f);
+            case LIGHT -> new Color(0.65f, 0.65f, 0.45f, 1f);
+            case FIRE -> new Color(0.65f, 0.15f, 0.1f, 1f);
+            case WATER -> new Color(0.15f, 0.3f, 0.65f, 1f);
         };
     }
 }
