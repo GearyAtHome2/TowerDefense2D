@@ -26,6 +26,9 @@ public class HorizontalScrollBox<T extends ScrollEntry> {
     public HorizontalScrollBox(float x, float y, float width, float height) {
         bounds.set(x, y, width, height);
     }
+    public HorizontalScrollBox(Rectangle rect) {
+        bounds.set(rect.x, rect.y, rect.width, rect.height);
+    }
 
     public void setSpacing(float spacing) {
         this.spacing = spacing;

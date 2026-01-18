@@ -254,7 +254,7 @@ public class SpawnerModal extends Modal {
 
     private void add(HorizontalScrollBox<QueueEntry> box, Mob mob, boolean toGarrison) {
         List<QueueEntry> entries = new ArrayList<>(box.getEntries());
-        entries.add(new QueueEntry(mob, 0, 0, 50f, toGarrison));
+        entries.add(new QueueEntry(mob, box.bounds.height*0.8f, toGarrison));
 
         if (box == queueScrollBox && !entries.isEmpty()) {
             entries.get(0).isLeftmost = true;
@@ -291,7 +291,7 @@ public class SpawnerModal extends Modal {
                 List<QueueEntry> garrison =
                     new ArrayList<>(garrisonScrollBox.getEntries());
                 garrison.add(
-                    new QueueEntry(first.mob, 0, 0, 50f, true)
+                    new QueueEntry(first.mob, garrisonScrollBox.bounds.height*0.65f, true)
                 );
                 garrisonScrollBox.setEntries(garrison);
             } else {

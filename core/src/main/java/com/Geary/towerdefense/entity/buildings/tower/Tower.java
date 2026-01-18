@@ -1,23 +1,26 @@
-package com.Geary.towerdefense.entity.buildings;
+package com.Geary.towerdefense.entity.buildings.tower;
 
 import com.Geary.towerdefense.behaviour.targeting.AimingHelper;
 import com.Geary.towerdefense.behaviour.targeting.ShootingHelper;
 import com.Geary.towerdefense.behaviour.targeting.TargetingHelper;
-import com.Geary.towerdefense.entity.mob.bullet.BasicBullet;
+import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.entity.mob.bullet.Bullet;
 import com.Geary.towerdefense.entity.mob.enemy.Enemy;
+import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.Color;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class Tower extends Building {
+public abstract class Tower extends Building implements Cloneable {
 
     // Tower stats
-    public float range = 207f; // pixels
-    public float maxCooldown = 0.1f; // seconds
+    public float range; // pixels
+    public float maxCooldown; // seconds
     public float cooldown = maxCooldown;
-    public int damage = 1;
-    public float accuracy = 0.7f; // 0 = always miss, 1 = perfect accuracy
+    public float accuracy; // 0 = always miss, 1 = perfect accuracy
+    public int simultShots = 1;
+    public int burst = 0;
 
     // Current target and gun angle
     public Enemy currentTarget = null;
@@ -26,11 +29,27 @@ public class Tower extends Building {
     // Prototype bullet; used to create new bullets when shooting
     public Bullet selectedAmmo;
 
-    public Tower(float x, float y) {
+    public Tower(float x, float y, String name, Bullet ammo, float maxCooldown, float accuracy, float range) {
         super(x, y);
-        // Default bullet type (prototype)
-        this.selectedAmmo = new BasicBullet(0,0,0,0);
-        this.name = "Tower";
+        this.name = name;
+        this.selectedAmmo = ammo;
+        this.maxCooldown = maxCooldown;
+        this.accuracy = accuracy;
+        this.range = range;
+    }
+
+    @Override
+    public Tower clone() {
+        try {
+            return (Tower) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(); // can't happen
+        }
+    }
+
+    public void setPosition(float x, float y) {
+        this.xPos = x + GameWorld.cellSize / 2f;
+        this.yPos = y + GameWorld.cellSize / 2f;
     }
 
     // --- Targeting ---
@@ -47,9 +66,18 @@ public class Tower extends Building {
         return isConnectedToNetwork && ShootingHelper.canShoot(this);
     }
 
-    public Bullet shoot(Enemy target) {
+//    public Bullet shoot(Enemy target) {
+//        if (target == null || selectedAmmo == null) return null;
+//        return ShootingHelper.shoot(this, target);
+//    }
+
+    public List<Bullet> shoot(Enemy target) {
         if (target == null || selectedAmmo == null) return null;
-        return ShootingHelper.shoot(this, target);
+        List<Bullet> bullets = new ArrayList<>();
+        for (int i = 0; i < simultShots; i++) {
+            bullets.add(ShootingHelper.shoot(this, target));
+        }
+        return bullets;
     }
 
     // --- Gun rotation ---

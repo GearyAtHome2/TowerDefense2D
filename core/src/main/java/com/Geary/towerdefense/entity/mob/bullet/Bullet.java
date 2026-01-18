@@ -21,7 +21,7 @@ public abstract class Bullet {
     protected abstract Color getColor();
 
     /** Factory method: creates a new instance for shooting */
-    public abstract Bullet createInstance(float x, float y, float angle, int damage);
+    public abstract Bullet createInstance(float x, float y, float angle);
 
     /** Update position, check collision with enemies, return false if bullet should be removed */
     public boolean update(float delta, List<Enemy> enemies) {

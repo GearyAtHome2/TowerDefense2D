@@ -1,6 +1,6 @@
 package com.Geary.towerdefense.UI.render;
 
-import com.Geary.towerdefense.entity.buildings.Tower;
+import com.Geary.towerdefense.entity.buildings.tower.Tower;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.Color;

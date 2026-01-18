@@ -21,9 +21,9 @@ public class QueueEntry implements ScrollEntry {
     public boolean isLeftmost = false; // flag to know which entry gets the cooldown effect
     public boolean isToGarrison; // flag to know which entry gets the cooldown effect
 
-    public QueueEntry(Mob mob, float x, float y, float size, boolean isToGarrison) {
+    public QueueEntry(Mob mob, float size, boolean isToGarrison) {
         this.mob = mob;
-        bounds.set(x, y, size, size);
+        bounds.set(0, 0, size, size);
         this.isToGarrison = isToGarrison;
     }
 

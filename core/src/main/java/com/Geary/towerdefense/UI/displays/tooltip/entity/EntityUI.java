@@ -1,6 +1,6 @@
 package com.Geary.towerdefense.UI.displays.tooltip.entity;
 
-import com.Geary.towerdefense.UI.GameUI;
+import com.Geary.towerdefense.UI.gameUI.GameUI;
 import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.Color;

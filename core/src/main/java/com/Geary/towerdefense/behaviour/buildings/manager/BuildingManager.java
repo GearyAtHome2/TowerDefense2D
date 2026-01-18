@@ -1,7 +1,7 @@
 package com.Geary.towerdefense.behaviour.buildings.manager;
 
 import com.Geary.towerdefense.Direction;
-import com.Geary.towerdefense.UI.GameUI;
+import com.Geary.towerdefense.UI.gameUI.GameUI;
 import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.entity.world.Cell;
 import com.Geary.towerdefense.world.GameWorld;

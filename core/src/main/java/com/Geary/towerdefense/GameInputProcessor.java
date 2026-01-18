@@ -2,6 +2,7 @@ package com.Geary.towerdefense;
 
 import com.Geary.towerdefense.UI.CameraController;
 import com.Geary.towerdefense.UI.displays.modal.Modal;
+import com.Geary.towerdefense.UI.gameUI.GameUI;
 import com.Geary.towerdefense.behaviour.buildings.manager.FactoryManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.MineManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TowerManager;
@@ -26,6 +27,10 @@ public class GameInputProcessor extends InputAdapter {
 
     private WorldClickListener worldClickListener;
     private UiClickListener uiClickListener;
+    public interface UiScrollListener {
+        boolean onUiScroll(float amountY, Vector3 uiCoords);
+    }
+    private UiScrollListener uiScrollListener;
 
     private Modal activeModal = null;
     private OrthographicCamera worldCameraRef = null;
@@ -40,6 +45,7 @@ public class GameInputProcessor extends InputAdapter {
         this.cameraController = cameraController;
         this.uiViewport = uiViewport;
     }
+
     /**
      * Optional callback for world clicks
      */
@@ -120,16 +126,34 @@ public class GameInputProcessor extends InputAdapter {
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
-        if (activeModal != null && worldCameraRef != null) {
-            boolean consumed = activeModal.handleScroll(amountY);
-            if (consumed) {
+
+        // Get mouse position in UI space
+        Vector3 uiCoords = new Vector3(
+            com.badlogic.gdx.Gdx.input.getX(),
+            com.badlogic.gdx.Gdx.input.getY(),
+            0
+        );
+        uiViewport.unproject(uiCoords);
+
+        // 1️⃣ UI scroll region (bottom bar, etc)
+        if (uiScrollListener != null && uiCoords.y <= GameUI.UI_BAR_HEIGHT) {
+            if (uiScrollListener.onUiScroll(amountY, uiCoords)) {
                 return true;
             }
         }
 
+        // 2️⃣ Modal scroll (modal overlays world)
+        if (activeModal != null && worldCameraRef != null) {
+            if (activeModal.handleScroll(amountY)) {
+                return true;
+            }
+        }
+
+        // 3️⃣ World / camera scroll
         cameraController.scrolled(amountX, amountY);
         return true;
     }
+
 
     public interface WorldClickListener {
         void onClick(int screenX, int screenY);
@@ -137,5 +161,9 @@ public class GameInputProcessor extends InputAdapter {
 
     public interface UiClickListener {
         boolean onUiClick(Vector3 uiCoords);
+    }
+
+    public void setUiScrollListener(UiScrollListener listener) {
+        this.uiScrollListener = listener;
     }
 }

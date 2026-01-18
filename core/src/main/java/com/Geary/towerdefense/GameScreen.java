@@ -1,7 +1,7 @@
 package com.Geary.towerdefense;
 
 import com.Geary.towerdefense.UI.CameraController;
-import com.Geary.towerdefense.UI.GameUI;
+import com.Geary.towerdefense.UI.gameUI.GameUI;
 import com.Geary.towerdefense.UI.displays.modal.Modal;
 import com.Geary.towerdefense.UI.displays.tooltip.UIClickManager;
 import com.Geary.towerdefense.UI.displays.tooltip.UIManager;
@@ -145,6 +145,7 @@ public class GameScreen implements Screen {
 
         inputProcessor.setUiClickListener(gameUI::handleUiClick);
         inputProcessor.setWorldClickListener(this::handleWorldClick);
+        inputProcessor.setUiScrollListener(gameUI);
 
         Gdx.input.setInputProcessor(inputProcessor);
     }

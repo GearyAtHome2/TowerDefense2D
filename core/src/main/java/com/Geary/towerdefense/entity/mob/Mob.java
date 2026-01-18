@@ -19,7 +19,7 @@ import static com.Geary.towerdefense.Direction.*;
 
 public abstract class Mob extends Entity implements Cloneable {
 
-    public final Order order;
+
     public float size;
     public int armour = 0;
     public int damage;
@@ -357,15 +357,5 @@ public abstract class Mob extends Entity implements Cloneable {
         }
 
         return sb.length() == 0 ? "Free" : sb.toString();
-    }
-
-    public enum Order {
-        NEUTRAL,
-        TECH,
-        NATURE,
-        DARK,
-        LIGHT,
-        FIRE,
-        WATER
     }
 }

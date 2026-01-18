@@ -25,6 +25,10 @@ public class TransportManager extends BuildingManager<Transport> {
         placementButtonActive = !placementButtonActive;
     }
 
+    public void setPlacementClick(boolean isActive) {
+        placementButtonActive = isActive;
+    }
+
     @Override
     protected boolean canPlaceAt(Cell cell, int x, int y) {
         boolean bridge = cell.type == Cell.Type.PATH || cell.type == Cell.Type.TURN;

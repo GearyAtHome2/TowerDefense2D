@@ -1,5 +1,8 @@
-package com.Geary.towerdefense.UI;
+package com.Geary.towerdefense.UI.gameUI;
 
+import com.Geary.towerdefense.GameInputProcessor;
+import com.Geary.towerdefense.UI.displays.modal.scrollbox.HorizontalScrollBox;
+import com.Geary.towerdefense.UI.gameUI.scrollbox.BuildListEntry;
 import com.Geary.towerdefense.UI.render.icons.IconStore;
 import com.Geary.towerdefense.UI.render.icons.TooltipRenderer;
 import com.Geary.towerdefense.UI.text.TextFormatter;
@@ -18,8 +21,9 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.EnumMap;
+import java.util.List;
 
-public class GameUI {
+public class GameUI implements GameInputProcessor.UiScrollListener {
 
     public static final int UI_BAR_HEIGHT = 90;
 
@@ -51,7 +55,6 @@ public class GameUI {
     private final Viewport uiViewport;
     private final GameWorld world;
 
-
     private final GameStateManager gameStateManager;
     private final TransportManager transportManager;
 
@@ -61,6 +64,22 @@ public class GameUI {
     private Rectangle[] mainButtons;
     private Vector3 lastMousePos = new Vector3();
     private ResourceType hoveredResource = null;
+
+    private enum UiMode {
+        BUTTONS,
+        SCROLLBOX
+    }
+
+    public interface UiScrollListener {
+        boolean onUiScroll(float amount, Vector3 uiCoords);
+    }
+
+    private HorizontalScrollBox scrollBox;
+    private Rectangle scrollBoxRect;
+    private Rectangle closeButtonRect;
+
+    // DEFAULT MODE — scrollbox can switch this later
+    private UiMode uiMode = UiMode.BUTTONS;
 
     public GameUI(
         ShapeRenderer shapeRenderer,
@@ -90,7 +109,7 @@ public class GameUI {
         float endX = width * BUTTON_END_X_RATIO;
         float usableWidth = endX - startX;
 
-        float padding = 10f; // small, fixed gap between buttons
+        float padding = 10f;
         float buttonHeight = UI_BAR_HEIGHT * 0.7f;
 
         float buttonWidth =
@@ -104,6 +123,39 @@ public class GameUI {
             float x = startX + i * (buttonWidth + padding);
             mainButtons[i] = new Rectangle(x, y, buttonWidth, buttonHeight);
         }
+
+        this.scrollBoxRect = new Rectangle(startX, y, (float) (uiViewport.getWorldWidth() * 0.7), buttonHeight);
+        float closeButtonSize = 20f;
+        this.closeButtonRect = new Rectangle(scrollBoxRect.x + scrollBoxRect.width - closeButtonSize,
+            scrollBoxRect.y + scrollBoxRect.height / 2 - closeButtonSize / 2,
+            closeButtonSize, closeButtonSize);
+
+    }
+
+    private void drawBuildUI() {
+        Rectangle rectangle = new Rectangle(scrollBox.bounds);
+        shapeRenderer.begin();
+        shapeRenderer.setColor(0.2f, 0.15f, 0.3f, 1f);
+        shapeRenderer.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+        shapeRenderer.end();
+        scrollBox.draw(shapeRenderer, batch, font, uiViewport.getCamera());
+
+        float closeButtonSize = 20f;
+        Rectangle closeButton = new Rectangle(rectangle.x + rectangle.width - closeButtonSize,
+            rectangle.y + rectangle.height / 2 - closeButtonSize / 2,
+            closeButtonSize, closeButtonSize);
+
+        shapeRenderer.begin();
+        shapeRenderer.setColor(0.1f, 0.1f, 0.1f, 1f);
+        shapeRenderer.rect(closeButton.x, closeButton.y, closeButton.width, closeButton.height);
+        shapeRenderer.end();
+
+
+        batch.begin();
+        float baseFontScale = UI_BAR_HEIGHT / 80f;
+        font.getData().setScale(baseFontScale);
+        font.draw(batch, "X", closeButton.getX() + 4, closeButton.getY() + closeButton.height - 4);
+        batch.end();
     }
 
     public void updateHover(float screenX, float screenY) {
@@ -130,17 +182,9 @@ public class GameUI {
         shapeRenderer.setProjectionMatrix(uiViewport.getCamera().combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
-        // Background bar
         shapeRenderer.setColor(0.1f, 0.1f, 0.1f, 1f);
         shapeRenderer.rect(0, 0, uiViewport.getWorldWidth(), UI_BAR_HEIGHT);
 
-        // Main buttons
-//        shapeRenderer.setColor(0.25f, 0.5f, 0.35f, 1f);
-//        for (Rectangle r : mainButtons) {
-//            shapeRenderer.rect(r.x, r.y, r.width, r.height);
-//        }
-
-        // Resource panels
         Rectangle raw = getRawResourcePanelBounds();
         shapeRenderer.setColor(0.15f, 0.15f, 0.15f, 1f);
         shapeRenderer.rect(raw.x, raw.y, raw.width, raw.height);
@@ -153,43 +197,24 @@ public class GameUI {
 
         batch.setProjectionMatrix(uiViewport.getCamera().combined);
 
-        drawButtons();
-//        for (int i = 0; i < mainButtons.length; i++) {
-//            Rectangle r = mainButtons[i];
-//
-//            if (i == 0 && transportManager.isPlacementActive()) {
-//                shapeRenderer.setColor(0f, 0.6f, 0.3f, 1f); // active
-//            } else {
-//                shapeRenderer.setColor(0.25f, 0.5f, 0.35f, 1f);
-//            }
-//
-//            shapeRenderer.rect(r.x, r.y, r.width, r.height);
-//        }
-
+        if (uiMode == UiMode.BUTTONS) {
+            drawButtons();
+            batch.begin();
+            drawButtonLabels();
+            batch.end();
+        } else if (uiMode == UiMode.SCROLLBOX) {
+            drawBuildUI();
+        }
 
         batch.begin();
-
         float baseFontScale = UI_BAR_HEIGHT / 90f;
         font.getData().setScale(baseFontScale);
         font.draw(batch, "ESC = Pause", 10, UI_BAR_HEIGHT - 10);
-        drawButtonLabels();
-//        for (int i = 0; i < mainButtons.length; i++) {
-//            Rectangle r = mainButtons[i];
-//
-//            glyphLayout.setText(font, BUTTON_LABELS[i]);
-//
-//            float textX = r.x + (r.width - glyphLayout.width) / 2f;
-//            float textY = r.y + r.height / 2f + glyphLayout.height / 2f;
-//
-//            font.draw(batch, glyphLayout, textX, textY);
-//        }
-
         batch.end();
 
         batch.begin();
         drawCoins(batch, font);
         drawResources(batch, font);
-
         batch.end();
 
         if (hoveredResource != null) {
@@ -226,6 +251,8 @@ public class GameUI {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
         for (int i = 0; i < mainButtons.length; i++) {
+            if (uiMode == UiMode.SCROLLBOX) continue;
+
             Rectangle r = mainButtons[i];
 
             if (i == 0 && transportManager.isPlacementActive()) {
@@ -242,8 +269,9 @@ public class GameUI {
 
     private void drawButtonLabels() {
         for (int i = 0; i < mainButtons.length; i++) {
-            Rectangle r = mainButtons[i];
+            if (uiMode == UiMode.SCROLLBOX && i == 0) continue;
 
+            Rectangle r = mainButtons[i];
             glyphLayout.setText(font, BUTTON_LABELS[i]);
 
             float textX = r.x + (r.width - glyphLayout.width) / 2f;
@@ -372,20 +400,47 @@ public class GameUI {
     }
 
     public boolean handleUiClick(Vector3 uiClick) {
-        // Transport button = index 0
-        Rectangle transportButton = mainButtons[0];
+        transportManager.setPlacementClick(false);//if we click anywhere in the UI the placement becomes false,
+        // so all other buttons turn it off
+        if (uiMode == UiMode.SCROLLBOX) {
+            if (closeButtonRect.contains(uiClick.x, uiClick.y)) {
+                uiMode = UiMode.BUTTONS;
+                return true;
+            }
+        } else if (uiMode == UiMode.BUTTONS) {
+            if (mainButtons[0].contains(uiClick.x, uiClick.y)) {
+                Rectangle transportButton = mainButtons[0];
+                transportManager.togglePlacementClick(
+                    uiClick,
+                    transportButton.x,
+                    transportButton.y,
+                    transportButton.width,
+                    transportButton.height
+                );
+                return true;
+            } else if (mainButtons[1].contains(uiClick.x, uiClick.y)) {
+                this.uiMode = UiMode.SCROLLBOX;
+                scrollBox = new HorizontalScrollBox<BuildListEntry>(scrollBoxRect);
+                List<BuildListEntry> builds = world.getTowerManager().unlockedTowerTypes.stream().map(build ->
+                    new BuildListEntry(build, scrollBox.bounds.height * 1.5f, scrollBox.bounds.height)).toList();
+                scrollBox.setEntries(builds);
+                return true;
+            }
+        }
+        return false;
+    }
 
-        if (transportButton.contains(uiClick.x, uiClick.y)) {
-            transportManager.togglePlacementClick(
-                uiClick,
-                transportButton.x,
-                transportButton.y,
-                transportButton.width,
-                transportButton.height
-            );
+    //this is required for when we unlock stuff as we go
+    public void refreshBuildMenuContent(){
+        List<BuildListEntry> builds = world.towers.stream().map(build ->
+            new BuildListEntry(build, scrollBox.bounds.height * 1.5f, scrollBox.bounds.height)).toList();
+    }
+
+    public boolean onUiScroll(float amount, Vector3 uiCoords) {
+        if (scrollBox != null && scrollBox.bounds.contains(uiCoords.x, uiCoords.y)) {
+            scrollBox.scroll(amount * 25);
             return true;
         }
-
         return false;
     }
 }

@@ -1,6 +1,6 @@
 package com.Geary.towerdefense.behaviour.targeting;
 
-import com.Geary.towerdefense.entity.buildings.Tower;
+import com.Geary.towerdefense.entity.buildings.tower.Tower;
 import com.Geary.towerdefense.entity.mob.bullet.Bullet;
 import com.Geary.towerdefense.entity.mob.enemy.Enemy;
 
@@ -44,8 +44,7 @@ public class ShootingHelper {
         return tower.selectedAmmo.createInstance(
             tower.xPos,
             tower.yPos,
-            angle,
-            tower.damage
+            angle
         );
     }
 
