@@ -231,10 +231,19 @@ public class SpawnerModal extends Modal {
 
     @Override
     protected boolean handleScrollInside(float x, float y, float amountY) {
-        if (mobScrollBox.contains(x, y)) mobScrollBox.scroll(amountY * 10f);
-        if (queueScrollBox.contains(x, y)) queueScrollBox.scroll(amountY * 10f);
-        if (garrisonScrollBox.contains(x, y)) garrisonScrollBox.scroll(amountY * 10f);
-        return true;
+        if (mobScrollBox.contains(x, y)) {
+            mobScrollBox.scroll(amountY * 10f);
+            return true;
+        }
+        if (queueScrollBox.contains(x, y)) {
+            queueScrollBox.scroll(amountY * 10f);
+            return true;
+        }
+        if (garrisonScrollBox.contains(x, y)) {
+            garrisonScrollBox.scroll(amountY * 10f);
+            return true;
+        }
+        return false;
     }
 
     void updateAffordability() {

@@ -33,13 +33,11 @@ public class VerticalScrollBox<T extends ScrollEntry> {
         this.entries.clear();
         this.entries.addAll(entries);
         this.contentHeight = totalHeight;
-        scrollOffset = 0;
         updateEntryPositions();
     }
 
     public void scroll(float deltaY) {
         scrollOffset += deltaY;
-
         float maxOffset = Math.max(0, contentHeight - bounds.height);
         if (scrollOffset < 0) scrollOffset = 0;
         if (scrollOffset > maxOffset) scrollOffset = maxOffset;
@@ -104,7 +102,6 @@ public class VerticalScrollBox<T extends ScrollEntry> {
         float arrowY = bounds.y+bounds.height*0.98f;
         float arrowX = bounds.x + bounds.width/2;
 
-        // Left Arrow (Show if we have scrolled right at all)
         if (scrollOffset > 0) {
             renderer.triangle(
                 arrowX, arrowY + arrowSize / 2f,
@@ -113,7 +110,7 @@ public class VerticalScrollBox<T extends ScrollEntry> {
             );
         }
         arrowY = bounds.y+bounds.height*0.02f;
-        // Right Arrow (Show if there is more content to the right)
+
         if (scrollOffset < contentHeight - bounds.height - 1f) { // -1f to avoid float precision flickering
             renderer.triangle(
                 arrowX, arrowY - arrowSize / 2f,

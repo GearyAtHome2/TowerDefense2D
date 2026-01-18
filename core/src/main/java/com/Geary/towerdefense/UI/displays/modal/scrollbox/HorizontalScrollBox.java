@@ -157,5 +157,4 @@ public class HorizontalScrollBox<T extends ScrollEntry> {
         }
         return null;
     }
-
 }
