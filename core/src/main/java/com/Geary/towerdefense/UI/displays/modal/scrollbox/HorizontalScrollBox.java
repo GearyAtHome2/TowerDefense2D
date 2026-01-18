@@ -88,7 +88,6 @@ public class HorizontalScrollBox<T extends ScrollEntry> {
 
                 float oldX = eBounds.x;
                 eBounds.x = drawX;
-                // Updated call with camera
                 entry.draw(renderer, batch, font, camera);
                 eBounds.x = oldX;
             }

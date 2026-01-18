@@ -1,6 +1,6 @@
 package com.Geary.towerdefense.UI.render;
 
-import com.Geary.towerdefense.entity.buildings.Mine;
+import com.Geary.towerdefense.entity.buildings.production.Production;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -16,26 +16,26 @@ public class MineRenderer {
     }
 
     public void drawMines() {
-        for (Mine mine : world.mines) {
-            drawMine(mine, false); // real mine
+        for (Production production : world.productions) {
+            drawMine(production, false); // real mine
         }
 
-        if (world.ghostMine != null) {
-            drawMine(world.ghostMine, true); // ghost mine
+        if (world.ghostProduction != null) {
+            drawMine(world.ghostProduction, true); // ghost mine
         }
     }
 
-    private void drawMine(Mine mine, boolean ghost) {
-        if (mine.resource == null) return;
+    private void drawMine(Production production, boolean ghost) {
+        if (production.resource == null) return;
 
         // --- Colors ---
         Color frameColor = ghost ? new Color(0.2f, 0.4f, 0.2f, 0.4f) : Color.GREEN;
         Color fanColor   = ghost ? new Color(0.3f, 0f, 0f, 0.4f) : Color.RED;
 
-        float centerX = mine.xPos; // now xPos is center
-        float centerY = mine.yPos; // now yPos is center
+        float centerX = production.xPos; // now xPos is center
+        float centerY = production.yPos; // now yPos is center
 
-        float squareSize = mine.size; // use mine’s size
+        float squareSize = production.size; // use mine’s size
         float frameSize  = squareSize / 2f;
 
         // --- Draw frame ---
@@ -52,7 +52,7 @@ public class MineRenderer {
         float armLength = squareSize * 0.4f;
         float armWidth  = 4f;
 
-        float angleDeg = mine.animationState * 360f;
+        float angleDeg = production.animationState * 360f;
 
         for (int i = 0; i < 4; i++) {
             sr.rect(

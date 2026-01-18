@@ -1,6 +1,6 @@
 package com.Geary.towerdefense.UI.render;
 
-import com.Geary.towerdefense.entity.buildings.Factory;
+import com.Geary.towerdefense.entity.buildings.factory.Manufacturing;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -21,29 +21,29 @@ public class FactoryRenderer {
 
     public void drawFactories() {
         // Draw real factories
-        for (Factory f : world.factories) {
+        for (Manufacturing f : world.factories) {
             drawFactory(f, false);
         }
 
         // Draw ghost factory
-        if (world.ghostFactory != null) {
-            drawFactory(world.ghostFactory, true);
+        if (world.ghostManufacturing != null) {
+            drawFactory(world.ghostManufacturing, true);
         }
     }
 
-    private void drawFactory(Factory factory, boolean ghost) {
-        float centerX = factory.xPos;
-        float centerY = factory.yPos;
+    private void drawFactory(Manufacturing manufacturing, boolean ghost) {
+        float centerX = manufacturing.xPos;
+        float centerY = manufacturing.yPos;
 
-        float frameSize = factory.size; // use building’s size
+        float frameSize = manufacturing.size; // use building’s size
         float gap = 3f;
 
         Color outerColor = ghost
             ? new Color(0.4f, 0.3f, 0.2f, 0.4f)
-            : (factory.isConnectedToNetwork ? new Color(0.7f, 0.5f, 0.3f, 1f) : new Color(0.4f, 0.3f, 0.2f, 1f));
+            : (manufacturing.isConnectedToNetwork ? new Color(0.7f, 0.5f, 0.3f, 1f) : new Color(0.4f, 0.3f, 0.2f, 1f));
         Color gearColor = ghost
             ? new Color(0.5f, 0.5f, 0.5f, 0.4f)
-            : (factory.isConnectedToNetwork ? new Color(0.9f, 0.8f, 0.5f, 1f) : new Color(0.6f, 0.6f, 0.6f, 1f));
+            : (manufacturing.isConnectedToNetwork ? new Color(0.9f, 0.8f, 0.5f, 1f) : new Color(0.6f, 0.6f, 0.6f, 1f));
 
         sr.begin(ShapeRenderer.ShapeType.Line);
         sr.setColor(outerColor);
@@ -73,7 +73,7 @@ public class FactoryRenderer {
             float spokeLength = radius * 0.8f;
             float spokeWidth = 2f;
 
-            float rotation = factory.isConnectedToNetwork ? factory.animationState * 360f * speedMultiplier : 0f;
+            float rotation = manufacturing.isConnectedToNetwork ? manufacturing.animationState * 360f * speedMultiplier : 0f;
 
             for (int i = 0; i < numSpokes; i++) {
                 float angleDeg = rotation + i * (360f / numSpokes) + gear[5];

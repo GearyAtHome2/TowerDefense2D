@@ -2,18 +2,20 @@ package com.Geary.towerdefense.world;
 
 import com.Geary.towerdefense.Direction;
 import com.Geary.towerdefense.UI.displays.modal.Modal;
-import com.Geary.towerdefense.UI.displays.modal.factory.FactoryModal;
+import com.Geary.towerdefense.UI.displays.modal.manufacturing.FactoryModal;
 import com.Geary.towerdefense.UI.displays.modal.spawner.SpawnerModalManager;
 import com.Geary.towerdefense.behaviour.MobManager;
 import com.Geary.towerdefense.behaviour.ResourceManager;
 import com.Geary.towerdefense.behaviour.SparkManager;
 import com.Geary.towerdefense.behaviour.SpawnerManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.FactoryManager;
-import com.Geary.towerdefense.behaviour.buildings.manager.MineManager;
+import com.Geary.towerdefense.behaviour.buildings.manager.ProductionManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TowerManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TransportManager;
 import com.Geary.towerdefense.entity.buildings.*;
+import com.Geary.towerdefense.entity.buildings.production.Production;
 import com.Geary.towerdefense.entity.buildings.tower.Tower;
+import com.Geary.towerdefense.entity.buildings.factory.Manufacturing;
 import com.Geary.towerdefense.entity.mob.bullet.Bullet;
 import com.Geary.towerdefense.entity.mob.enemy.Enemy;
 import com.Geary.towerdefense.entity.mob.friendly.Friendly;
@@ -48,10 +50,10 @@ public class GameWorld {
     public Tower ghostTower = null;
     public List<Transport> transports = new ArrayList<>();
     public Transport ghostTransport = null;
-    public List<Mine> mines = new ArrayList<>();
-    public Mine ghostMine = null;
-    public List<Factory> factories = new ArrayList<>();
-    public Factory ghostFactory = null;
+    public List<Production> productions = new ArrayList<>();
+    public Production ghostProduction = null;
+    public List<Manufacturing> factories = new ArrayList<>();
+    public Manufacturing ghostManufacturing = null;
 
     public List<Enemy> enemies = new ArrayList<>();
     public List<Friendly> friends = new ArrayList<>();
@@ -62,7 +64,7 @@ public class GameWorld {
     private ResourceManager resourceManager;
     private TowerManager towerManager;
     private TransportManager transportManager;
-    private MineManager mineManager;
+    private ProductionManager productionManager;
     private FactoryManager factoryManager;
     private MobManager mobManager;
     private SparkManager sparkManager;
@@ -93,7 +95,7 @@ public class GameWorld {
         sparkManager = new SparkManager(100);
         towerManager = new TowerManager(this, worldCamera);
         transportManager = new TransportManager(this, worldCamera);
-        mineManager = new MineManager(this, worldCamera);
+        productionManager = new ProductionManager(this, worldCamera);
         factoryManager = new FactoryManager(this, worldCamera);
         mobManager = new MobManager(this, sparkManager); // no camera
         spawnerManager = new SpawnerManager(this);       // no camera
@@ -216,9 +218,9 @@ public class GameWorld {
         mobManager.update(delta);
         spawnerManager.update(delta);
         sparkManager.update(delta);
-        mineManager.animateMines(delta);
+        productionManager.animateMines(delta);
         factoryManager.animateFactories(delta);
-        mineManager.calculateResourcesGenerated(delta);
+        productionManager.calculateResourcesGenerated(delta);
         factoryManager.handleFactoryProduction(delta);
         spawnerModalManager.updateSpawner(delta);
     }
@@ -232,12 +234,12 @@ public class GameWorld {
         } else if (building instanceof Transport transport) {
             transports.remove(transport);
             transportManager.deleteTransport(transport);
-        } else if (building instanceof Mine mine) {
-            mines.remove(mine);
-            mineManager.deleteBuilding(mine, mines);
-        } else if (building instanceof Factory factory) {
-            factories.remove(factory);
-            factoryManager.deleteBuilding(factory, factories);
+        } else if (building instanceof Production production) {
+            productions.remove(production);
+            productionManager.deleteBuilding(production, productions);
+        } else if (building instanceof Manufacturing manufacturing) {
+            factories.remove(manufacturing);
+            factoryManager.deleteBuilding(manufacturing, factories);
         }
 
 
@@ -253,8 +255,8 @@ public class GameWorld {
         transportManager.updateAllTransportLinks();
     }
 
-    public void showFactoryMenu(Factory factory, BitmapFont font, OrthographicCamera uiCamera) {
-        activeModal = new FactoryModal(factory, font, uiCamera);
+    public void showFactoryMenu(Manufacturing manufacturing, BitmapFont font, OrthographicCamera uiCamera) {
+        activeModal = new FactoryModal(manufacturing, font, uiCamera);
     }
 
     public void showSpawnerMenu(FriendlySpawner spawner, BitmapFont font, OrthographicCamera uiCamera) {
@@ -281,8 +283,8 @@ public class GameWorld {
         return transportManager;
     }
 
-    public MineManager getMineManager() {
-        return mineManager;
+    public ProductionManager getProductionManager() {
+        return productionManager;
     }
 
     public FactoryManager getFactoryManager() {

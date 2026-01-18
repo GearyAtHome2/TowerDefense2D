@@ -103,7 +103,7 @@ public class GameScreen implements Screen {
         placementHandler = new PlacementHandler(
             world.getTowerManager(),
             world.getTransportManager(),
-            world.getMineManager(),
+            world.getProductionManager(),
             world.getFactoryManager()
         );
         entitySelectionHandler = new EntitySelectionHandler(world, worldViewport);
@@ -136,7 +136,7 @@ public class GameScreen implements Screen {
     private void initInputProcessor() {
         inputProcessor = new GameInputProcessor(
             world.getTowerManager(),
-            world.getMineManager(),
+            world.getProductionManager(),
             world.getTransportManager(),
             world.getFactoryManager(),
             cameraController,

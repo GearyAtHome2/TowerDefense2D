@@ -1,4 +1,4 @@
-package com.Geary.towerdefense.UI.displays.modal.factory;
+package com.Geary.towerdefense.UI.displays.modal.manufacturing;
 
 import com.Geary.towerdefense.UI.displays.modal.scrollbox.ScrollEntry;
 import com.Geary.towerdefense.UI.render.icons.IconStore;

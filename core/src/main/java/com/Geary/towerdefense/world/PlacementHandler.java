@@ -6,7 +6,7 @@ public class PlacementHandler {
 
     private final TowerManager towerManager;
     private final TransportManager transportManager;
-    private final MineManager mineManager;
+    private final ProductionManager productionManager;
     private final FactoryManager factoryManager;
 
     /** True only while a keyboard key is held */
@@ -15,12 +15,12 @@ public class PlacementHandler {
     public PlacementHandler(
         TowerManager towerManager,
         TransportManager transportManager,
-        MineManager mineManager,
+        ProductionManager productionManager,
         FactoryManager factoryManager
     ) {
         this.towerManager = towerManager;
         this.transportManager = transportManager;
-        this.mineManager = mineManager;
+        this.productionManager = productionManager;
         this.factoryManager = factoryManager;
     }
 
@@ -35,7 +35,7 @@ public class PlacementHandler {
         } else if (transportKey) {
             activateKeyboardPlacement(transportManager);
         } else if (mineKey) {
-            activateKeyboardPlacement(mineManager);
+            activateKeyboardPlacement(productionManager);
         } else if (factoryKey) {
             activateKeyboardPlacement(factoryManager);
         } else {
@@ -63,7 +63,7 @@ public class PlacementHandler {
     public boolean handlePlacements() {
         boolean placedTower = towerManager.handlePlacement();
         boolean placedTransport = transportManager.handlePlacement();
-        boolean placedMine = mineManager.handlePlacement();
+        boolean placedMine = productionManager.handlePlacement();
         boolean placedFactory = factoryManager.handlePlacement();
 
         if (placedTower || placedTransport || placedMine || placedFactory) {

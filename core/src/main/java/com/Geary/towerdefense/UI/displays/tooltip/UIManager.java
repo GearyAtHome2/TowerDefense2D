@@ -5,7 +5,7 @@ import com.Geary.towerdefense.UI.displays.tooltip.entity.EntityUI;
 import com.Geary.towerdefense.UI.displays.tooltip.entity.FactoryUI;
 import com.Geary.towerdefense.UI.displays.tooltip.entity.SpawnerUI;
 import com.Geary.towerdefense.entity.Entity;
-import com.Geary.towerdefense.entity.buildings.Factory;
+import com.Geary.towerdefense.entity.buildings.factory.Manufacturing;
 import com.Geary.towerdefense.entity.spawner.FriendlySpawner;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -27,7 +27,7 @@ public class UIManager {
         defaultUI = new DefaultEntityUI(world, shapeRenderer, batch, font, camera);
 
         // Register specialized UIs
-        specializedUIs.put(Factory.class, new FactoryUI(world, shapeRenderer, batch, font, camera));
+        specializedUIs.put(Manufacturing.class, new FactoryUI(world, shapeRenderer, batch, font, camera));
         specializedUIs.put(FriendlySpawner.class, new SpawnerUI(world, shapeRenderer, batch, font, camera));
         // Add more: TowerUI, MineUI, etc.
     }

@@ -1,9 +1,9 @@
-package com.Geary.towerdefense.UI.displays.modal.factory;
+package com.Geary.towerdefense.UI.displays.modal.manufacturing;
 
 import com.Geary.towerdefense.UI.displays.modal.Modal;
 import com.Geary.towerdefense.UI.displays.modal.scrollbox.VerticalScrollBox;
 import com.Geary.towerdefense.UI.render.icons.TooltipRenderer;
-import com.Geary.towerdefense.entity.buildings.Factory;
+import com.Geary.towerdefense.entity.buildings.factory.Manufacturing;
 import com.Geary.towerdefense.entity.resources.Recipe;
 import com.Geary.towerdefense.entity.resources.mapEntity.ResourceType;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class FactoryModal extends Modal {
 
-    private final Factory factory;
+    private final Manufacturing manufacturing;
     private final VerticalScrollBox<RecipeMenuEntry> verticalScrollBox;
     public RecipeMenuEntry activeMenuEntry;
 
@@ -52,9 +52,9 @@ public class FactoryModal extends Modal {
 
     private final LayoutConfig layoutCfg = new LayoutConfig();
 
-    public FactoryModal(Factory factory, BitmapFont font, OrthographicCamera camera) {
+    public FactoryModal(Manufacturing manufacturing, BitmapFont font, OrthographicCamera camera) {
         super(font, camera);
-        this.factory = factory;
+        this.manufacturing = manufacturing;
         this.tooltipRenderer = new TooltipRenderer(font);
         verticalScrollBox = new VerticalScrollBox(0, 0, 0, 0);
         populateScrollBox();
@@ -125,7 +125,7 @@ public class FactoryModal extends Modal {
     private void populateScrollBox() {
         List<RecipeMenuEntry> entries = new ArrayList<>();
 
-        for (Recipe recipe : factory.recipes) {
+        for (Recipe recipe : manufacturing.recipes) {
             RecipeMenuEntry entry = new RecipeMenuEntry(
                 recipe,
                 0, 0, 0, 0,
@@ -134,7 +134,7 @@ public class FactoryModal extends Modal {
 
             entry.onClick = () -> setActiveEntry(entry);
 
-            if (factory.activeRecipe == recipe) {
+            if (manufacturing.activeRecipe == recipe) {
                 entry.active = true;
                 activeMenuEntry = entry;
             }
@@ -150,7 +150,7 @@ public class FactoryModal extends Modal {
         if (activeMenuEntry != null) activeMenuEntry.active = false;
         activeMenuEntry = entry;
         activeMenuEntry.active = true;
-        factory.activeRecipe = entry.recipe;
+        manufacturing.activeRecipe = entry.recipe;
     }
 
     private void drawTooltip(SpriteBatch batch, ShapeRenderer shapeRenderer, RecipeMenuEntry entry) {
@@ -245,7 +245,7 @@ public class FactoryModal extends Modal {
 
     private void drawTitle(SpriteBatch batch) {
         batch.begin();
-        String title = factory.name;
+        String title = manufacturing.name;
 
         float oldScaleX = font.getScaleX();
         float oldScaleY = font.getScaleY();

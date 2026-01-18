@@ -23,6 +23,11 @@ public class Building extends Entity {
         this.yPos = tileY + GameWorld.cellSize / 2f;
     }
 
+    public void setPosition(float x, float y) {
+        this.xPos = x + GameWorld.cellSize / 2f;
+        this.yPos = y + GameWorld.cellSize / 2f;
+    }
+
     public boolean contains(float x, float y, float cellSize) {
         return x >= xPos && x <= xPos + cellSize && y >= yPos && y <= yPos + cellSize;
     }

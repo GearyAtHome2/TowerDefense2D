@@ -115,7 +115,7 @@ public class TransportManager extends BuildingManager<Transport> {
         List<Building> allBuildings = new ArrayList<>();
         allBuildings.addAll(world.transports);
         allBuildings.addAll(world.towers);
-        allBuildings.addAll(world.mines);
+        allBuildings.addAll(world.productions);
         allBuildings.addAll(world.factories);
 
         for (Building b : allBuildings)

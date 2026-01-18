@@ -6,7 +6,6 @@ import com.Geary.towerdefense.behaviour.targeting.TargetingHelper;
 import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.entity.mob.bullet.Bullet;
 import com.Geary.towerdefense.entity.mob.enemy.Enemy;
-import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.Color;
 
 import java.util.ArrayList;
@@ -51,11 +50,6 @@ public abstract class Tower extends Building implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new AssertionError(); // can't happen
         }
-    }
-
-    public void setPosition(float x, float y) {
-        this.xPos = x + GameWorld.cellSize / 2f;
-        this.yPos = y + GameWorld.cellSize / 2f;
     }
 
     public Enemy findTarget(List<Enemy> enemies){

@@ -9,6 +9,8 @@ import com.Geary.towerdefense.UI.text.TextFormatter;
 import com.Geary.towerdefense.behaviour.buildings.manager.BuildingManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TransportManager;
 import com.Geary.towerdefense.entity.buildings.Building;
+import com.Geary.towerdefense.entity.buildings.factory.Manufacturing;
+import com.Geary.towerdefense.entity.buildings.production.Production;
 import com.Geary.towerdefense.entity.buildings.tower.Tower;
 import com.Geary.towerdefense.entity.resources.Resource;
 import com.Geary.towerdefense.entity.resources.mapEntity.ResourceType;
@@ -421,7 +423,6 @@ public class GameUI implements GameInputProcessor.UiScrollListener {
     }
 
     public boolean handleUiClick(Vector3 uiClick) {
-
         transportManager.setPlacementClick(false);//if we click anywhere in the UI the placement becomes false,
         // so all other buttons turn it off
         if (uiMode == UiMode.SCROLLBOX) {
@@ -457,6 +458,20 @@ public class GameUI implements GameInputProcessor.UiScrollListener {
                     new BuildListEntry(build, scrollBox.bounds.height * 1.5f, scrollBox.bounds.height)).toList();
                 scrollBox.setEntries(builds);
                 return true;
+            } else if (mainButtons[2].contains(uiClick.x, uiClick.y)) {
+                this.uiMode = UiMode.SCROLLBOX;
+                scrollBox = new HorizontalScrollBox<>(scrollBoxRect);
+                List<BuildListEntry> builds = world.getProductionManager().unlockedProductionTypes.stream().map(build ->
+                    new BuildListEntry(build, scrollBox.bounds.height * 1.5f, scrollBox.bounds.height)).toList();
+                scrollBox.setEntries(builds);
+                return true;
+            } else if (mainButtons[3].contains(uiClick.x, uiClick.y)) {
+                this.uiMode = UiMode.SCROLLBOX;
+                scrollBox = new HorizontalScrollBox<>(scrollBoxRect);
+                List<BuildListEntry> builds = world.getFactoryManager().unlockedManufacturingTypes.stream().map(build ->
+                    new BuildListEntry(build, scrollBox.bounds.height * 1.5f, scrollBox.bounds.height)).toList();
+                scrollBox.setEntries(builds);
+                return true;
             }
         }
         return false;
@@ -471,6 +486,20 @@ public class GameUI implements GameInputProcessor.UiScrollListener {
                 }
             });
             world.getTowerManager().setPlacementTower(tower);
+        } else if (building instanceof Production production) {
+            scrollBox.getEntries().forEach(entry -> {
+                if (entry.building.equals(production)) {
+                    entry.setActiveEntry(true);
+                }
+            });
+            world.getProductionManager().setPlacementProduction(production);
+        }  else if (building instanceof Manufacturing manufacturing) {
+            scrollBox.getEntries().forEach(entry -> {
+                if (entry.building.equals(manufacturing)) {
+                    entry.setActiveEntry(true);
+                }
+            });
+            world.getFactoryManager().setPlacementFactory(manufacturing);
         } else {
             BuildingManager.clearActivePlacement();
         }

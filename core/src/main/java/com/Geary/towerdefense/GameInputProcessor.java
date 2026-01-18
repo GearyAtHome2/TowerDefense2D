@@ -4,7 +4,7 @@ import com.Geary.towerdefense.UI.CameraController;
 import com.Geary.towerdefense.UI.displays.modal.Modal;
 import com.Geary.towerdefense.UI.gameUI.GameUI;
 import com.Geary.towerdefense.behaviour.buildings.manager.FactoryManager;
-import com.Geary.towerdefense.behaviour.buildings.manager.MineManager;
+import com.Geary.towerdefense.behaviour.buildings.manager.ProductionManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TowerManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TransportManager;
 import com.badlogic.gdx.InputAdapter;
@@ -15,7 +15,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 public class GameInputProcessor extends InputAdapter {
 
     private final TowerManager towerManager;
-    private final MineManager mineManager;
+    private final ProductionManager productionManager;
     private final TransportManager transportManager;
     private final FactoryManager factoryManager;
     private final CameraController cameraController;
@@ -36,10 +36,10 @@ public class GameInputProcessor extends InputAdapter {
     private OrthographicCamera worldCameraRef = null;
 
 
-    public GameInputProcessor(TowerManager towerManager, MineManager mineManager, TransportManager transportManager, FactoryManager factoryManager, CameraController cameraController,
+    public GameInputProcessor(TowerManager towerManager, ProductionManager productionManager, TransportManager transportManager, FactoryManager factoryManager, CameraController cameraController,
                               Viewport uiViewport) {
         this.towerManager = towerManager;
-        this.mineManager = mineManager;
+        this.productionManager = productionManager;
         this.factoryManager = factoryManager;
         this.transportManager = transportManager;
         this.cameraController = cameraController;
@@ -120,7 +120,7 @@ public class GameInputProcessor extends InputAdapter {
     private boolean isAnyPlacementActive() {
         return towerManager.isThisActiveManager() ||
             transportManager.isPlacementActive() ||
-            mineManager.isPlacementActive() ||
+            productionManager.isPlacementActive() ||
             factoryManager.isPlacementActive();
     }
 

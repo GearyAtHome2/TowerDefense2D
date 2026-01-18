@@ -52,7 +52,7 @@ public class EntitySelectionHandler {
             }
         }
 
-        for (Building b : world.mines) {
+        for (Building b : world.productions) {
             if (isInsideEntity(worldX, worldY, b)) {
                 return b;
             }
