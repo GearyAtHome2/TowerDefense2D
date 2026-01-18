@@ -7,6 +7,8 @@ import com.Geary.towerdefense.UI.render.icons.IconStore;
 import com.Geary.towerdefense.UI.render.icons.TooltipRenderer;
 import com.Geary.towerdefense.UI.text.TextFormatter;
 import com.Geary.towerdefense.behaviour.buildings.manager.TransportManager;
+import com.Geary.towerdefense.entity.buildings.Building;
+import com.Geary.towerdefense.entity.buildings.tower.Tower;
 import com.Geary.towerdefense.entity.resources.Resource;
 import com.Geary.towerdefense.entity.resources.mapEntity.ResourceType;
 import com.Geary.towerdefense.world.GameStateManager;
@@ -418,11 +420,17 @@ public class GameUI implements GameInputProcessor.UiScrollListener {
     }
 
     public boolean handleUiClick(Vector3 uiClick) {
+
         transportManager.setPlacementClick(false);//if we click anywhere in the UI the placement becomes false,
         // so all other buttons turn it off
         if (uiMode == UiMode.SCROLLBOX) {
             if (closeButtonRect.contains(uiClick.x, uiClick.y)) {
                 uiMode = UiMode.BUTTONS;
+                return true;
+            } else if (scrollBox.contains(uiClick.x, uiClick.y) &&
+                scrollBox.click(uiClick.x, uiClick.y) != null){
+                BuildListEntry clicked = scrollBox.click(uiClick.x, uiClick.y);
+                setActiveBuild(clicked.building);
                 return true;
             }
         } else if (uiMode == UiMode.BUTTONS) {
@@ -446,6 +454,12 @@ public class GameUI implements GameInputProcessor.UiScrollListener {
             }
         }
         return false;
+    }
+
+    public void setActiveBuild(Building building){
+        if (building instanceof Tower tower){
+            world.getTowerManager().setPlacementTower(tower);
+        }
     }
 
     //this is required for when we unlock stuff as we go

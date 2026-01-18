@@ -22,6 +22,12 @@ public abstract class Tower extends Building implements Cloneable {
     public int simultShots = 1;
     public int burst = 0;
 
+    protected enum TargetingStrategy {
+        CLOSEST,
+        FURTHEST_PROGRESSED
+    }
+
+    public TargetingStrategy targetingStrategy = TargetingStrategy.CLOSEST;
     // Current target and gun angle
     public Enemy currentTarget = null;
     public float gunAngle = (float) Math.PI / 2f;
@@ -52,12 +58,20 @@ public abstract class Tower extends Building implements Cloneable {
         this.yPos = y + GameWorld.cellSize / 2f;
     }
 
+    public Enemy findTarget(List<Enemy> enemies){
+        return switch (targetingStrategy) {
+            case CLOSEST -> findClosestTarget(enemies);
+            case FURTHEST_PROGRESSED -> findTargetFurthestProgressed(enemies);
+        };
+    }
+
     // --- Targeting ---
-    public Enemy findTarget(List<Enemy> enemies) {
+    private Enemy findClosestTarget(List<Enemy> enemies) {
         return TargetingHelper.findClosest(this, enemies);
     }
 
-    public Enemy findTargetFurthestProgressed(List<Enemy> enemies) {
+
+    private Enemy findTargetFurthestProgressed(List<Enemy> enemies) {
         return TargetingHelper.findFurthestProgressed(this, enemies);
     }
 
@@ -66,16 +80,11 @@ public abstract class Tower extends Building implements Cloneable {
         return isConnectedToNetwork && ShootingHelper.canShoot(this);
     }
 
-//    public Bullet shoot(Enemy target) {
-//        if (target == null || selectedAmmo == null) return null;
-//        return ShootingHelper.shoot(this, target);
-//    }
-
     public List<Bullet> shoot(Enemy target) {
         if (target == null || selectedAmmo == null) return null;
         List<Bullet> bullets = new ArrayList<>();
         for (int i = 0; i < simultShots; i++) {
-            bullets.add(ShootingHelper.shoot(this, target));
+            bullets.add(ShootingHelper.shoot(this, target, selectedAmmo));
         }
         return bullets;
     }

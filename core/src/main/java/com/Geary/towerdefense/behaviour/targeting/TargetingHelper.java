@@ -2,7 +2,6 @@ package com.Geary.towerdefense.behaviour.targeting;
 
 import com.Geary.towerdefense.entity.buildings.tower.Tower;
 import com.Geary.towerdefense.entity.mob.enemy.Enemy;
-import com.Geary.towerdefense.world.GameWorld;
 
 import java.util.List;
 
@@ -12,8 +11,8 @@ public class TargetingHelper {
         Enemy closest = null;
         float closestDistance = Float.MAX_VALUE;
 
-        float centerX = tower.xPos + GameWorld.cellSize / 2f;
-        float centerY = tower.yPos + GameWorld.cellSize / 2f;
+        float centerX = tower.xPos;
+        float centerY = tower.yPos;
 
         for (Enemy e : enemies) {
             float dx = e.getCenterX() - centerX;
@@ -32,8 +31,8 @@ public class TargetingHelper {
         Enemy best = null;
         float mostProgressed = 0;
 
-        float centerX = tower.xPos + GameWorld.cellSize / 2f;
-        float centerY = tower.yPos + GameWorld.cellSize / 2f;
+        float centerX = tower.xPos;
+        float centerY = tower.yPos;
 
         for (Enemy e : enemies) {
             float dx = e.getCenterX() - centerX;
@@ -43,6 +42,10 @@ public class TargetingHelper {
             float totalProgress = e.getPathIndex() + e.getTileProgress();
 
             if (distSqu <= (tower.range * tower.range) && totalProgress > mostProgressed) {
+                System.out.println("found enemy at squ distance:"+distSqu);
+                System.out.println("my range^2 is:"+ (tower.range * tower.range));
+                System.out.println("tower location:"+ tower.xPos +", " +tower.yPos);
+                System.out.println("enemy location:"+ e.xPos +", " +e.yPos);
                 mostProgressed = totalProgress;
                 best = e;
             }

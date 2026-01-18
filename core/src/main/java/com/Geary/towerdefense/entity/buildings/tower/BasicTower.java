@@ -12,74 +12,8 @@ public class BasicTower extends Tower {
     public Bullet selectedAmmo;
 
     public BasicTower(float x, float y) {
-        super(x, y,"Basic Tower",  new BasicBullet(), 0.5f, 0.7f, 207f);
+        super(x, y,"Basic Tower",  new BasicBullet(0.9f, 350f), 0.28f, 0.7f, 207f);
     }
-
-//    // --- Targeting ---
-//    public Enemy findTarget(List<Enemy> enemies) {
-//        return TargetingHelper.findClosest(this, enemies);
-//    }
-//
-//    public Enemy findTargetFurthestProgressed(List<Enemy> enemies) {
-//        return TargetingHelper.findFurthestProgressed(this, enemies);
-//    }
-//
-//    // --- Shooting / CanShoot ---
-//    public boolean canShoot() {
-//        return isConnectedToNetwork && ShootingHelper.canShoot(this);
-//    }
-//
-//    public Bullet shoot(Enemy target) {
-//        if (target == null || selectedAmmo == null) return null;
-//        return ShootingHelper.shoot(this, target);
-//    }
-//
-//    // --- Gun rotation ---
-//    public void updateGunAngle(float delta) {
-//        AimingHelper.updateGunAngle(this, delta);
-//    }
-//
-//    // --- Utility ---
-//    public float getDistanceTo(Enemy enemy) {
-//        float dx = (xPos) - enemy.getCenterX();
-//        float dy = (yPos) - enemy.getCenterY();
-//        return (float) Math.sqrt(dx * dx + dy * dy);
-//    }
-//
-//    // --- Lead calculation ---
-//    public float[] calculateLead(Enemy e) {
-//        float startX = xPos;
-//        float startY = yPos;
-//
-//        float targetX = e.getCenterX();
-//        float targetY = e.getCenterY();
-//
-//        float targetVX = e.vx;
-//        float targetVY = e.vy;
-//
-//        float dx = targetX - startX;
-//        float dy = targetY - startY;
-//
-//        float a = targetVX * targetVX + targetVY * targetVY - selectedAmmo.getSpeed() * selectedAmmo.getSpeed();
-//        float b = 2f * (dx * targetVX + dy * targetVY);
-//        float c = dx * dx + dy * dy;
-//
-//        float discriminant = b * b - 4f * a * c;
-//        if (discriminant < 0f) return new float[]{targetX, targetY};
-//
-//        float sqrtDisc = (float) Math.sqrt(discriminant);
-//        float t1 = (-b + sqrtDisc) / (2f * a);
-//        float t2 = (-b - sqrtDisc) / (2f * a);
-//
-//        float t = Math.max(t1, t2);
-//        if (t < 0f) t = Math.min(t1, t2);
-//        if (t < 0f) return new float[]{targetX, targetY};
-//
-//        float aimX = targetX + targetVX * t;
-//        float aimY = targetY + targetVY * t;
-//
-//        return new float[]{aimX, aimY};
-//    }
 
     // --- UI Info ---
     @Override

@@ -3,6 +3,7 @@ package com.Geary.towerdefense.entity.mob.bullet;
 import com.Geary.towerdefense.entity.mob.enemy.Enemy;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+
 import java.util.List;
 
 public abstract class Bullet {
@@ -12,18 +13,27 @@ public abstract class Bullet {
     protected float vx;
     protected float vy;
     protected int damage;
-    protected float lifetime = 0f;
+    protected float speed;
+    protected float maxLifeTime;//protect these once fixed
+    protected float lifetime;
 
     // Subclasses must provide these constants
     public abstract float getSpeed();
+
     protected abstract float getSize();
+
     protected abstract float getMaxLifetime();
+
     protected abstract Color getColor();
 
-    /** Factory method: creates a new instance for shooting */
+    /**
+     * Factory method: creates a new instance for shooting
+     */
     public abstract Bullet createInstance(float x, float y, float angle);
 
-    /** Update position, check collision with enemies, return false if bullet should be removed */
+    /**
+     * Update position, check collision with enemies, return false if bullet should be removed
+     */
     public boolean update(float delta, List<Enemy> enemies) {
         lifetime += delta;
         if (lifetime > getMaxLifetime()) return false;
@@ -53,7 +63,7 @@ public abstract class Bullet {
                 float[] closest = closestPointOnLineSegment(startX, startY, x, y, centerX, centerY);
                 float dx = closest[0] - startX;
                 float dy = closest[1] - startY;
-                float distSq = dx*dx + dy*dy;
+                float distSq = dx * dx + dy * dy;
 
                 if (distSq < closestDistSq) {
                     closestDistSq = distSq;
@@ -74,42 +84,53 @@ public abstract class Bullet {
         return true;
     }
 
-    /** Draw bullet on screen */
+    public void setLifeTime(float lifeTime) {
+        this.lifetime = lifeTime;
+    }
+
+    /**
+     * Draw bullet on screen
+     */
     public void draw(ShapeRenderer shapeRenderer) {
         shapeRenderer.setColor(getColor());
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.rect(x - getSize()/2f, y - getSize()/2f, getSize(), getSize());
+        shapeRenderer.rect(x - getSize() / 2f, y - getSize() / 2f, getSize(), getSize());
         shapeRenderer.end();
     }
 
-    public float getCenterX() { return x + getSize()/2f; }
-    public float getCenterY() { return y + getSize()/2f; }
+    public float getCenterX() {
+        return x + getSize() / 2f;
+    }
+
+    public float getCenterY() {
+        return y + getSize() / 2f;
+    }
 
     // --- Utility functions for collision detection ---
     private float[] closestPointOnLineSegment(float x1, float y1, float x2, float y2, float px, float py) {
         float dx = x2 - x1;
         float dy = y2 - y1;
         if (dx == 0 && dy == 0) return new float[]{x1, y1};
-        float t = ((px - x1) * dx + (py - y1) * dy) / (dx*dx + dy*dy);
+        float t = ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy);
         t = Math.max(0, Math.min(1, t));
-        return new float[]{x1 + t*dx, y1 + t*dy};
+        return new float[]{x1 + t * dx, y1 + t * dy};
     }
 
     private boolean lineIntersectsRect(float x1, float y1, float x2, float y2, float left, float bottom, float right, float top) {
         if ((x1 >= left && x1 <= right && y1 >= bottom && y1 <= top) ||
             (x2 >= left && x2 <= right && y2 >= bottom && y2 <= top)) return true;
 
-        return lineIntersectsLine(x1,y1,x2,y2,left,bottom,right,bottom) ||
-            lineIntersectsLine(x1,y1,x2,y2,left,top,right,top) ||
-            lineIntersectsLine(x1,y1,x2,y2,left,bottom,left,top) ||
-            lineIntersectsLine(x1,y1,x2,y2,right,bottom,right,top);
+        return lineIntersectsLine(x1, y1, x2, y2, left, bottom, right, bottom) ||
+            lineIntersectsLine(x1, y1, x2, y2, left, top, right, top) ||
+            lineIntersectsLine(x1, y1, x2, y2, left, bottom, left, top) ||
+            lineIntersectsLine(x1, y1, x2, y2, right, bottom, right, top);
     }
 
-    private boolean lineIntersectsLine(float x1,float y1,float x2,float y2,float x3,float y3,float x4,float y4) {
-        float den = (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4);
+    private boolean lineIntersectsLine(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
+        float den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
         if (den == 0) return false;
-        float t = ((x1-x3)*(y3-y4) - (y1-y3)*(x3-x4))/den;
-        float u = -((x1-x2)*(y1-y3) - (y1-y2)*(x1-x3))/den;
+        float t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
+        float u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den;
         return t >= 0 && t <= 1 && u >= 0 && u <= 1;
     }
 }

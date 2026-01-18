@@ -65,8 +65,8 @@ public class TowerManager extends BuildingManager<Tower> {
             // Acquire or refresh target
             if (tower.currentTarget == null || tower.currentTarget.health <= 0 ||
                 tower.getDistanceTo(tower.currentTarget) > tower.range) {
-                tower.currentTarget = tower.findTarget(world.enemies);
-                tower.currentTarget = tower.findTargetFurthestProgressed(world.enemies);
+                tower.currentTarget = tower.findTarget(world.enemies);//this will lean towards the furthest progressed
+                // because we only retarget when a target leaves
             }
 
             tower.updateGunAngle(delta);
@@ -89,7 +89,6 @@ public class TowerManager extends BuildingManager<Tower> {
             .findFirst()
             .ifPresent(unlockedTowerTypes::add);
     }
-
 
     public void deleteTower(Tower tower) {
         deleteBuilding(tower, world.towers);

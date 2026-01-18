@@ -20,11 +20,10 @@ public class ShootingHelper {
 
         float angleDiff = AimingHelper.shortestAngleDiff(tower.gunAngle, leadAngle);
         float shootThreshold = (float) Math.toRadians(10);
-
         return Math.abs(angleDiff) <= shootThreshold;
     }
 
-    public static Bullet shoot(Tower tower, Enemy target) {
+    public static Bullet shoot(Tower tower, Enemy target, Bullet ammo) {
         float centerX = tower.xPos;
         float centerY = tower.yPos;
 
@@ -40,13 +39,10 @@ public class ShootingHelper {
         float angle = tower.gunAngle;
         float maxDeviation = (1f - tower.accuracy) * (float) Math.PI / 6f;
         angle += (Math.random() * 2f - 1f) * maxDeviation;
-
         return tower.selectedAmmo.createInstance(
             tower.xPos,
             tower.yPos,
             angle
         );
     }
-
-
 }
