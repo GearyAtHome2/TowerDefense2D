@@ -1,4 +1,4 @@
-package com.Geary.towerdefense.UI.render;
+package com.Geary.towerdefense.UI.render.production;
 
 import com.Geary.towerdefense.entity.buildings.factory.Manufacturing;
 import com.Geary.towerdefense.world.GameWorld;
@@ -38,15 +38,18 @@ public class FactoryRenderer {
         float frameSize = manufacturing.size; // use building’s size
         float gap = 3f;
 
-        Color outerColor = ghost
-            ? new Color(0.4f, 0.3f, 0.2f, 0.4f)
-            : (manufacturing.isConnectedToNetwork ? new Color(0.7f, 0.5f, 0.3f, 1f) : new Color(0.4f, 0.3f, 0.2f, 1f));
+        FactoryAppearance appearance = manufacturing.getAppearance();
+
+        Color frameColor = ghost
+            ? appearance.frameGhost
+            : (manufacturing.isConnectedToNetwork ? appearance.frameConnected : appearance.frameDisconnected);
+
         Color gearColor = ghost
-            ? new Color(0.5f, 0.5f, 0.5f, 0.4f)
-            : (manufacturing.isConnectedToNetwork ? new Color(0.9f, 0.8f, 0.5f, 1f) : new Color(0.6f, 0.6f, 0.6f, 1f));
+            ? appearance.gearGhost
+            : (manufacturing.isConnectedToNetwork ? appearance.gearConnected : appearance.gearDisconnected);
 
         sr.begin(ShapeRenderer.ShapeType.Line);
-        sr.setColor(outerColor);
+        sr.setColor(frameColor);
         sr.rect(centerX - frameSize / 2f, centerY - frameSize / 2f, frameSize, frameSize);
         sr.rect(centerX - frameSize / 2f + gap, centerY - frameSize / 2f + gap,
             frameSize - 2 * gap, frameSize - 2 * gap);

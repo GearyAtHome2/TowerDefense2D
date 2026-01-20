@@ -1,5 +1,6 @@
 package com.Geary.towerdefense.entity.buildings.factory;
 
+import com.Geary.towerdefense.UI.render.production.FactoryAppearance;
 import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.entity.resources.Recipe;
 import com.badlogic.gdx.graphics.Color;
@@ -10,6 +11,7 @@ import java.util.List;
 public abstract class Manufacturing extends Building implements Cloneable {
     public List<Recipe> recipes = new ArrayList<>();
     public Recipe activeRecipe = null;
+
 
     public Manufacturing(float x, float y) {
         super(x, y);
@@ -44,4 +46,6 @@ public abstract class Manufacturing extends Building implements Cloneable {
     public Color getInfoTextColor() {
         return Color.CYAN; // default
     }
+
+    public abstract FactoryAppearance getAppearance();
 }

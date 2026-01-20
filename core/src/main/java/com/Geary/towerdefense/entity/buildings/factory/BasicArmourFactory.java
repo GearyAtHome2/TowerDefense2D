@@ -1,13 +1,11 @@
 package com.Geary.towerdefense.entity.buildings.factory;
 
+import com.Geary.towerdefense.UI.render.production.FactoryAppearance;
+import com.Geary.towerdefense.UI.render.production.FactoryAppearances;
 import com.Geary.towerdefense.entity.resources.Recipe;
 import com.Geary.towerdefense.entity.resources.Resource;
-import com.badlogic.gdx.graphics.Color;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class BasicArmourFactory extends Manufacturing {
+public class BasicArmourFactory extends Factory {
 
     public BasicArmourFactory(float x, float y) {
         super(x, y);
@@ -21,17 +19,6 @@ public class BasicArmourFactory extends Manufacturing {
         this.name = "Basic Armour Factory";
     }
 
-    @Override
-    public List<String> getInfoLines() {
-        List infoLines = new ArrayList<>();
-        infoLines.add(this.name);
-        if (activeRecipe != null){
-            infoLines.add(activeRecipe.name);
-        }
-        return infoLines;
-    }
-
-    public Color getInfoTextColor() {
-        return Color.CYAN; // default
+    public FactoryAppearance getAppearance() { return FactoryAppearances.ARMOUR;
     }
 }
