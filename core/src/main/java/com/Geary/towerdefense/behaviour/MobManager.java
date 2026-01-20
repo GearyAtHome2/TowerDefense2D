@@ -71,8 +71,8 @@ public class MobManager {
                         friendly.applyDamage(enemy.damage);
 
                         applyBounce(friendly, enemy);
-                        enemy.collisionCooldown = 0.1f;
-                        friendly.collisionCooldown = 0.1f;
+                        enemy.collisionCooldown = 0.04f;//keep an eye on this. in theory as long as it's over 1/60 should be good?
+                        friendly.collisionCooldown = 0.04f;//1/60 ~= 0.0167
                     }
                 }
             }
@@ -135,7 +135,7 @@ public class MobManager {
         dx /= len;
         dy /= len;
 
-        float strength = 120f;
+        float strength = 180f;//enhanced atm - in future, read this from mob values.
 
         f.bounceVX += dx * strength;
         f.bounceVY += dy * strength;
