@@ -22,6 +22,8 @@ public abstract class Mob extends Entity implements Cloneable {
     public Color color;
     public String effectText = "default Mob effect text";
     public String flavourText = "default Mob flavourtext";
+    public float knockBackPower;
+    public float weight;
 
     public float spawnTime;
     public EnumMap<Resource.RawResourceType, Double> rawResourceCost = new EnumMap<>(Resource.RawResourceType.class);
@@ -53,6 +55,9 @@ public abstract class Mob extends Entity implements Cloneable {
         this.size = GameWorld.cellSize * stats.size();
         this.health = stats.health();
         this.damage = stats.damage();
+        this.knockBackPower = stats.knockback();
+        this.weight = stats.weight();
+
         this.speed = stats.speed();
         this.color = stats.color();
         this.ranMoveProb = stats.ranMoveProb();
@@ -145,6 +150,7 @@ public abstract class Mob extends Entity implements Cloneable {
         xPos += vx * delta;
         yPos += vy * delta;
     }
+//    todo: adding knockbackpower and weight currently
 
     protected void applyKnockback(float delta) {
         // collisions handled elsewhere
@@ -156,50 +162,63 @@ public abstract class Mob extends Entity implements Cloneable {
         float bottom = cell.y;
         float top = cell.y + cellSize;
 
+        float bounceFactor = 0.2f; // 20% of velocity retained on bounce
+
         // --- STRAIGHT tiles ---
         switch (cell.type) {
             case PATH -> {
                 // Vertical path (UP/DOWN) → walls left/right
                 if (cell.direction == Direction.UP || cell.direction == Direction.DOWN) {
-                    if (xPos < left + collisionRadius) xPos = left + collisionRadius;
-                    if (xPos + size > right - collisionRadius) xPos = right - size - collisionRadius;
+                    if (xPos < left + collisionRadius) {
+                        xPos = left + collisionRadius;
+                        vx = -vx * bounceFactor;
+                    }
+                    if (xPos + size > right - collisionRadius) {
+                        xPos = right - size - collisionRadius;
+                        vx = -vx * bounceFactor;
+                    }
                 }
                 // Horizontal path (LEFT/RIGHT) → walls top/bottom
                 else if (cell.direction == Direction.LEFT || cell.direction == Direction.RIGHT) {
-                    if (yPos < bottom + collisionRadius) yPos = bottom + collisionRadius;
-                    if (yPos + size > top - collisionRadius) yPos = top - size - collisionRadius;
+                    if (yPos < bottom + collisionRadius) {
+                        yPos = bottom + collisionRadius;
+                        vy = -vy * bounceFactor;
+                    }
+                    if (yPos + size > top - collisionRadius) {
+                        yPos = top - size - collisionRadius;
+                        vy = -vy * bounceFactor;
+                    }
                 }
             }
 
             case TURN -> {
                 // TURN tiles: entry wall on entry side, exit wall on opposite of exit
-
                 Direction entryDir = reversed ? cell.reverseNextDirection : cell.direction;
                 Direction exitDir  = reversed ? cell.reverseDirection : cell.nextDirection;
 
                 // Entry wall (same side as entry direction)
                 switch (entryDir) {
-                    case LEFT -> { if (xPos < left + collisionRadius) xPos = left + collisionRadius; }
-                    case RIGHT -> { if (xPos + size > right - collisionRadius) xPos = right - size - collisionRadius; }
-                    case UP -> { if (yPos + size > top - collisionRadius) yPos = top - size - collisionRadius; }
-                    case DOWN -> { if (yPos < bottom + collisionRadius) yPos = bottom + collisionRadius; }
+                    case LEFT -> { if (xPos < left + collisionRadius) { xPos = left + collisionRadius; vx = -vx * bounceFactor; } }
+                    case RIGHT -> { if (xPos + size > right - collisionRadius) { xPos = right - size - collisionRadius; vx = -vx * bounceFactor; } }
+                    case UP -> { if (yPos + size > top - collisionRadius) { yPos = top - size - collisionRadius; vy = -vy * bounceFactor; } }
+                    case DOWN -> { if (yPos < bottom + collisionRadius) { yPos = bottom + collisionRadius; vy = -vy * bounceFactor; } }
                 }
 
                 // Exit wall (opposite side of exit direction)
                 switch (exitDir) {
-                    case LEFT -> { if (xPos + size > right - collisionRadius) xPos = right - size - collisionRadius; }
-                    case RIGHT -> { if (xPos < left + collisionRadius) xPos = left + collisionRadius; }
-                    case UP -> { if (yPos < bottom + collisionRadius) yPos = bottom + collisionRadius; }
-                    case DOWN -> { if (yPos + size > top - collisionRadius) yPos = top - size - collisionRadius; }
+                    case LEFT -> { if (xPos + size > right - collisionRadius) { xPos = right - size - collisionRadius; vx = -vx * bounceFactor; } }
+                    case RIGHT -> { if (xPos < left + collisionRadius) { xPos = left + collisionRadius; vx = -vx * bounceFactor; } }
+                    case UP -> { if (yPos < bottom + collisionRadius) { yPos = bottom + collisionRadius; vy = -vy * bounceFactor; } }
+                    case DOWN -> { if (yPos + size > top - collisionRadius) { yPos = top - size - collisionRadius; vy = -vy * bounceFactor; } }
                 }
             }
 
             default -> {
                 // Optionally, clamp mob to cell boundaries for other types
-                if (xPos < left + collisionRadius) xPos = left + collisionRadius;
-                if (xPos + size > right - collisionRadius) xPos = right - size - collisionRadius;
-                if (yPos < bottom + collisionRadius) yPos = bottom + collisionRadius;
-                if (yPos + size > top - collisionRadius) yPos = top - size - collisionRadius;
+                if (xPos < left + collisionRadius) { xPos = left + collisionRadius; vx = -vx * bounceFactor; }
+                if (xPos + size > right - collisionRadius) { xPos = right - size - collisionRadius; vx = -vx * bounceFactor; }
+                if (yPos < bottom + collisionRadius) { yPos = bottom + collisionRadius; vy = -vy * bounceFactor; }
+                if (yPos + size > top - collisionRadius) { yPos = top - size - collisionRadius; vy = -vy * bounceFactor; }
             }
         }
     }
@@ -210,7 +229,8 @@ public abstract class Mob extends Entity implements Cloneable {
 
     public float getCenterX() { return xPos + size / 2f; }
     public float getCenterY() { return yPos + size / 2f; }
-    public void setPosition(float x, float y) { this.xPos = x; this.yPos = y; }
+
+    public void setPosition(float x, float y) { this.xPos = x - this.size/2; this.yPos = y - this.size/2; }
 
     public void draw(ShapeRenderer shapeRenderer) {
         shapeRenderer.setColor(this.color);

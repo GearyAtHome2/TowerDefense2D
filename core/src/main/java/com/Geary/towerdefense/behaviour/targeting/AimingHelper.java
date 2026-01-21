@@ -22,7 +22,7 @@ public class AimingHelper {
         float dy = lead[1] - centerY;
         float desiredAngle = (float) Math.atan2(dy, dx);
 
-        float rotationSpeed = 1f; // radians per second
+        float rotationSpeed = 3f; // radians per second - make this configurable per tower.
         float diff = shortestAngleDiff(tower.gunAngle, desiredAngle);
 
         float maxStep = rotationSpeed * delta;

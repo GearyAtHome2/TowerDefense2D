@@ -10,7 +10,8 @@ public record MobStats(
     int health,
     int damage,
     float speed,
-    float knockbackDamping,
+    float knockback,
+    float weight,
     float ranMoveProb,
     Color color,
     int spawnTime, // Set to 0 for enemies if unused

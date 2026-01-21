@@ -30,7 +30,8 @@ public class MobManager {
         removeDeadMobs(world.enemies);
         removeDeadMobs(world.friends);
 
-        world.bullets.removeIf(b -> !b.update(delta, world.enemies));
+        if (!world.bullets.isEmpty()){
+        world.bullets.removeIf(b -> !b.update(delta, world.enemies));}
     }
 
     private void handleSpawnerHit() {
@@ -66,7 +67,6 @@ public class MobManager {
 
                 if (overlaps(enemy, friendly)) {
                     if (enemy.collisionCooldown <= 0 && friendly.collisionCooldown <= 0) {
-//                        System.out.println();
                         enemy.applyDamage(friendly.damage);
                         friendly.applyDamage(enemy.damage);
 
@@ -89,13 +89,12 @@ public class MobManager {
         });
     }
 
-
     //todo: this doesn't seem to work when I pass it two mobs?
     private boolean overlaps(Entity a, Spawner b) {
         float ax = a.xPos + a.collisionRadius;
         float ay = a.yPos + a.collisionRadius;
-        float bx = b.xPos;
-        float by = b.yPos;
+        float bx = b.xPos + b.collisionRadius;
+        float by = b.yPos + b.collisionRadius;
         float dx = ax - bx;
         float dy = ay - by;
         float r = a.collisionRadius + b.collisionRadius;
@@ -114,20 +113,13 @@ public class MobManager {
         return dx * dx + dy * dy <= r * r;
     }
 
-    private void applyBounce(Friendly f, Enemy e) {
-        float fx = f.getCenterX();
-        float fy = f.getCenterY();
-        float ex = e.getCenterX();
-        float ey = e.getCenterY();
-
+    private void applyBounce(Friendly friendly, Enemy enemy) {
+        float fx = friendly.getCenterX();
+        float fy = friendly.getCenterY();
+        float ex = enemy.getCenterX();
+        float ey = enemy.getCenterY();
         float dx = fx - ex;
         float dy = fy - ey;
-
-
-        //important - this dramatically changes collisions to cause "scrums" - removeable and the collisions work very differently.
-//        float bias = Math.abs(f.vx) > Math.abs(f.vy) ? 1f : 0.5f;
-//        dx *= bias;
-//        dy *= (1f - bias);
 
         float len = (float)Math.sqrt(dx*dx + dy*dy);
         if (len == 0) return;
@@ -135,12 +127,13 @@ public class MobManager {
         dx /= len;
         dy /= len;
 
-        float strength = 380f;//enhanced atm - in future, read this from mob values.
+        float friendlyHitAffected = enemy.knockBackPower/ friendly.weight;
+        friendly.vx += dx * friendlyHitAffected;
+        friendly.vy += dy * friendlyHitAffected;
 
-        f.vx += dx * strength;//check this - might be too strong or weak but should be decent?
-        f.vy += dy * strength;
-        e.vx -= dx * strength;
-        e.vy -= dy * strength;
+        float enemyHitAffected = friendly.knockBackPower/ enemy.weight;
+        enemy.vx -= dx * enemyHitAffected;
+        enemy.vy -= dy * enemyHitAffected;
 
     }
 

@@ -10,7 +10,7 @@ public class DodgyGangster extends FDark {
         "Dodgy Gangster",
         "",
         "Good at bad things",
-        0.118f, 220, 5, 0.63f, 9f, 0.28f,
+        0.118f, 220, 5, 48f, 9f, 1f, 0.28f,
         Color.FOREST,
         2, // spawnTime
         0  // armour

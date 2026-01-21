@@ -11,7 +11,7 @@ public class SlapperBot extends FTech {
         "Slapper Bot",
         "Serf Effect text...",
         "Expendable, dependable...",
-        0.14f, 220, 2, 0.71f, 18f, 0.9f,
+        0.14f, 220, 2, 0.71f, 80f, 1.3f, 0.14f,
         Color.LIME,
         2, // spawnTime
         0  // armour

@@ -31,12 +31,12 @@ public class TowerRenderer {
         sr.begin(ShapeRenderer.ShapeType.Line);
         sr.setColor(0f, 1f, 0f, 0.3f);
         for (Tower t : world.towers) {
-            sr.circle(t.xPos, t.yPos, t.range); // xPos/yPos is center
+            sr.circle(t.getCentreX(), t.getCentreY(), t.range);
         }
         if (world.ghostTower != null) {
             Tower ghost = world.ghostTower;
             sr.setColor(0.2f, 0.4f, 0.2f, 0.3f);
-            sr.circle(ghost.xPos, ghost.yPos, ghost.range);
+            sr.circle(ghost.getCentreX(), ghost.getCentreY(), ghost.range);
         }
         sr.end();
     }
@@ -51,8 +51,8 @@ public class TowerRenderer {
             sr.setColor(new Color(0.1f, 0.5f, 0.1f, 0.7f));
         }
 
-        float centerX = t.xPos; // center-based
-        float centerY = t.yPos;
+        float centerX = t.getCentreX(); // center-based
+        float centerY = t.getCentreY();
 
         float towerSize = t.size; // use tower's size for drawing radius
         sr.circle(centerX, centerY, towerSize / 2);

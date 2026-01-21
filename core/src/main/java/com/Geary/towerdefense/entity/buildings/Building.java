@@ -17,15 +17,27 @@ public class Building extends Entity {
         float cellSize = GameWorld.cellSize;
         this.size = cellSize * 0.8f;
         this.collisionRadius = this.size / 2;
+        float buffer = (cellSize - size) / 2f;
 
-        // place building in the center of the tile
-        this.xPos = tileX + GameWorld.cellSize / 2f;
-        this.yPos = tileY + GameWorld.cellSize / 2f;
+        this.xPos = tileX + buffer;
+        this.yPos = tileY + buffer;
     }
 
     public void setPosition(float x, float y) {
-        this.xPos = x + GameWorld.cellSize / 2f;
-        this.yPos = y + GameWorld.cellSize / 2f;
+        float cellSize = GameWorld.cellSize;
+
+        this.collisionRadius = this.size / 2;
+        float buffer = (cellSize - size) / 2f;
+
+        this.xPos = x + buffer;
+        this.yPos = y + buffer;
+    }
+
+    public float getCentreX() {
+        return this.xPos + size/2;
+    }
+    public float getCentreY() {
+        return this.yPos + size/2;
     }
 
     public boolean contains(float x, float y, float cellSize) {

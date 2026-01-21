@@ -11,7 +11,7 @@ public class ManAtArms extends FNeutral {
         "Man At Arms",
         "",
         "This man has been given access to arms, and he is At Them.",
-        0.13f, 220, 5, 0.69f, 12f, 0.2f,
+        0.13f, 220, 5, 0.69f, 45f,1.4f,  0.2f,
         Color.OLIVE,
         2, // spawnTime
         0  // armour

@@ -4,19 +4,19 @@ import com.Geary.towerdefense.entity.mob.MobStats;
 import com.badlogic.gdx.graphics.Color;
 
 
-public class Wolf extends FNature {
+public class StoneGolem extends FNature {
 
     public static final MobStats STATS = new MobStats(
-        "Wolf",
+        "Stone Golem",
         "",
-        "Big bad good boy.",
-        0.12f, 220, 5, 0.73f, 38f,1.2f,  0.26f,
+        "Rocks",
+        0.2f, 220, 5, 0.43f, 55f,2.0f,  0.26f,
         Color.FOREST,
         2, // spawnTime
         0  // armour
     );
 
-    public Wolf(float x, float y) {
-        super(x, y, STATS, Wolf.class);
+    public StoneGolem(float x, float y) {
+        super(x, y, STATS, StoneGolem.class);
     }
 }

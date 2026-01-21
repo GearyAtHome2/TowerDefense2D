@@ -115,7 +115,6 @@ public class GameScreen implements Screen {
         transportRenderer = new TransportRenderer(world, shapeRenderer);
         mineRenderer = new MineRenderer(world, shapeRenderer);
         factoryRenderer = new FactoryRenderer(world, shapeRenderer);
-
         worldRenderer = new WorldRenderer(world, shapeRenderer);
         resourceRenderer = new ResourceRenderer(world, shapeRenderer);
     }
@@ -313,8 +312,8 @@ public class GameScreen implements Screen {
         shapeRenderer.setColor(color);
         float r = entity.collisionRadius;
         shapeRenderer.rect(
-            entity.xPos - r,
-            entity.yPos - r,
+            entity.xPos,
+            entity.yPos,
             r * 2f,
             r * 2f
         );

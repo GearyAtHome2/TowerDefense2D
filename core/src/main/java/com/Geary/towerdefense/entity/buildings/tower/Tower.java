@@ -75,11 +75,16 @@ public abstract class Tower extends Building implements Cloneable {
     }
 
     public List<Bullet> shoot(Enemy target) {
-        if (target == null || selectedAmmo == null) return null;
+        if (target == null || selectedAmmo == null) return List.of();
         List<Bullet> bullets = new ArrayList<>();
         for (int i = 0; i < simultShots; i++) {
-            bullets.add(ShootingHelper.shoot(this, target, selectedAmmo));
+            Bullet b = ShootingHelper.shoot(this, target, selectedAmmo);
+            if (b != null) {
+                bullets.add(b);
+                System.out.println("shooting bullet: " + b);
+            }
         }
+        System.out.println("firing all bullets:: "+bullets.size());
         return bullets;
     }
 
@@ -90,15 +95,15 @@ public abstract class Tower extends Building implements Cloneable {
 
     // --- Utility ---
     public float getDistanceTo(Enemy enemy) {
-        float dx = (xPos) - enemy.getCenterX();
-        float dy = (yPos) - enemy.getCenterY();
+        float dx = (this.getCentreX()) - enemy.getCenterX();
+        float dy = (this.getCentreY()) - enemy.getCenterY();
         return (float) Math.sqrt(dx * dx + dy * dy);
     }
 
     // --- Lead calculation ---
     public float[] calculateLead(Enemy e) {
-        float startX = xPos;
-        float startY = yPos;
+        float startX = this.getCentreX();
+        float startY = this.getCentreY();
 
         float targetX = e.getCenterX();
         float targetY = e.getCenterY();

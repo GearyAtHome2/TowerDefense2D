@@ -10,7 +10,7 @@ public class ServantOfLight extends FLight {
         "Servant of Light",
         "",
         "Choir boy",
-        0.09f, 220, 5, 0.67f, 6.5f, 0.22f,
+        0.09f, 220, 5, 0.67f, 41f, 0.9f, 0.22f,
         Color.FOREST,
         2, // spawnTime
         0  // armour

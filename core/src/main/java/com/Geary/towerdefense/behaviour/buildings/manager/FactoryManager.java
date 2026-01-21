@@ -54,8 +54,7 @@ public class FactoryManager extends BuildingManager<Manufacturing> {
             world.ghostManufacturing = activelyPlacing.clone();
             world.ghostManufacturing.setPosition(x * world.cellSize, y * world.cellSize);
         } else {
-            world.ghostManufacturing.xPos = x * world.cellSize + world.cellSize / 2f;
-            world.ghostManufacturing.yPos = y * world.cellSize + world.cellSize / 2f;
+            world.ghostManufacturing.setPosition(x * world.cellSize, y * world.cellSize);
         }
     }
 

@@ -32,8 +32,8 @@ public class TransportRenderer {
 
     /** Draw a single transport */
     private void drawTransport(Transport t, boolean ghost) {
-        float centerX = t.xPos; // center-based
-        float centerY = t.yPos;
+        float centerX = t.xPos + t.size/2; // center-based
+        float centerY = t.yPos + t.size/2;;
         float width = t.size / 8f; // use transport size
 
         // Color based on type

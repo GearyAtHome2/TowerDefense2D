@@ -10,10 +10,10 @@ public class Groblin extends Enemy {
         "Groblin",
         "",
         "Less fortunate cousin of the Goblin, more fortunate cousin of the Grob",
-        0.1f, 220, 5, 0.65f, .6f, 0.25f,
+        0.1f, 220, 5, 0.65f, 28f, 0.8f, 0.25f,
         Color.FIREBRICK,
-        2, // spawnTime
-        0  // armourmo
+        2,
+        0
     );
 
     public Groblin(float x, float y) {

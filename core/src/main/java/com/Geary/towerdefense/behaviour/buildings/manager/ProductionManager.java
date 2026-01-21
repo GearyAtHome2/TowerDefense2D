@@ -51,8 +51,7 @@ public class ProductionManager extends BuildingManager<Production> {
             world.ghostProduction = activelyPlacing.clone();
             world.ghostProduction.setPosition(x * world.cellSize, y * world.cellSize);
         } else {
-            world.ghostProduction.xPos = x * world.cellSize + world.cellSize / 2f;
-            world.ghostProduction.yPos = y * world.cellSize + world.cellSize / 2f;
+            world.ghostProduction.setPosition(x * world.cellSize, y * world.cellSize);
         }
     }
 

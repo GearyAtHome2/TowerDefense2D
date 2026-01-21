@@ -53,13 +53,12 @@ public class TransportManager extends BuildingManager<Transport> {
     @Override
     protected void updateGhost(Cell cell, int x, int y) {
         EnumSet<Direction> adjacent = getAdjacentOccupiedTiles(x, y);
-
-        if (world.ghostTransport == null)
+        if (world.ghostTransport == null) {
             world.ghostTransport = new Transport(x * world.cellSize, y * world.cellSize, adjacent);
-        else {
+            world.ghostTransport.setPosition(x * world.cellSize, y * world.cellSize);
+        } else {
             world.ghostTransport.directions = adjacent;
-            world.ghostTransport.xPos = x * world.cellSize + world.cellSize / 2f;
-            world.ghostTransport.yPos = y * world.cellSize + world.cellSize / 2f;
+            world.ghostTransport.setPosition(x * world.cellSize,  y * world.cellSize);
         }
     }
 

@@ -32,8 +32,8 @@ public class FactoryRenderer {
     }
 
     private void drawFactory(Manufacturing manufacturing, boolean ghost) {
-        float centerX = manufacturing.xPos;
-        float centerY = manufacturing.yPos;
+        float centerX = manufacturing.getCentreX();
+        float centerY = manufacturing.getCentreY();
 
         float frameSize = manufacturing.size; // use building’s size
         float gap = 3f;

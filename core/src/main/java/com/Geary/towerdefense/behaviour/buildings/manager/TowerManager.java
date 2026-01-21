@@ -49,8 +49,7 @@ public class TowerManager extends BuildingManager<Tower> {
             world.ghostTower = activelyPlacingTower.clone();
             world.ghostTower.setPosition(x * world.cellSize, y * world.cellSize);
         } else {
-            world.ghostTower.xPos = x * world.cellSize + world.cellSize / 2f;
-            world.ghostTower.yPos = y * world.cellSize + world.cellSize / 2f;
+            world.ghostTower.setPosition(x * world.cellSize, y * world.cellSize);
         }
     }
 
@@ -80,9 +79,11 @@ public class TowerManager extends BuildingManager<Tower> {
             if (tower.cooldown <= 0 &&
                 tower.currentTarget != null &&
                 tower.canShoot()) {
-
-                bullets.addAll(tower.shoot(tower.currentTarget));
-                tower.cooldown = tower.maxCooldown;
+                List<Bullet> bulletsFired = tower.shoot(tower.currentTarget);
+                if (!bulletsFired.isEmpty()) {
+                    bullets.addAll(bulletsFired);
+                    tower.cooldown = tower.maxCooldown;
+                }
             }
         }
     }

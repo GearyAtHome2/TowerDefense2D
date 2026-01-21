@@ -10,8 +10,8 @@ public class ShootingHelper {
     public static boolean canShoot(Tower tower) {
         if (tower.currentTarget == null) return false;
 
-        float centerX = tower.xPos;
-        float centerY = tower.yPos;
+        float centerX = tower.getCentreX();
+        float centerY = tower.getCentreY();
 
         float[] lead = tower.calculateLead(tower.currentTarget);
         float dxLead = lead[0] - centerX;
@@ -19,13 +19,19 @@ public class ShootingHelper {
         float leadAngle = (float) Math.atan2(dyLead, dxLead);
 
         float angleDiff = AimingHelper.shortestAngleDiff(tower.gunAngle, leadAngle);
-        float shootThreshold = (float) Math.toRadians(10);
+        float shootThreshold = (float) Math.toRadians(25);//todo: configure this at some point. It's a bit of a mess tbh
+
+        if (!(Math.abs(angleDiff) <= shootThreshold)){
+            System.out.println("unable to shoot due to angle diff:");
+            System.out.println("threshold:"+shootThreshold);
+            System.out.println("diff"+angleDiff);
+        }
         return Math.abs(angleDiff) <= shootThreshold;
     }
 
     public static Bullet shoot(Tower tower, Enemy target, Bullet ammo) {
-        float centerX = tower.xPos;
-        float centerY = tower.yPos;
+        float centerX = tower.getCentreX();
+        float centerY = tower.getCentreY();
 
         float[] lead = tower.calculateLead(target);
         float deltaX = lead[0] - centerX;
@@ -33,15 +39,15 @@ public class ShootingHelper {
 
         float leadAngle = (float) Math.atan2(deltaY, deltaX);
         float angleDiff = AimingHelper.shortestAngleDiff(tower.gunAngle, leadAngle);
-        float shootThreshold = (float) Math.toRadians(10);
+        float shootThreshold = (float) Math.toRadians(25);
         if (Math.abs(angleDiff) > shootThreshold) return null;
 
         float angle = tower.gunAngle;
         float maxDeviation = (1f - tower.accuracy) * (float) Math.PI / 6f;
         angle += (Math.random() * 2f - 1f) * maxDeviation;
         return tower.selectedAmmo.createInstance(
-            tower.xPos,
-            tower.yPos,
+            tower.getCentreX(),
+            tower.getCentreY(),
             angle
         );
     }

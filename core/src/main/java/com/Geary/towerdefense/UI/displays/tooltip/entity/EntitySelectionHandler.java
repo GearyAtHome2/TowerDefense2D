@@ -93,9 +93,9 @@ public class EntitySelectionHandler {
 
     private boolean isInsideEntity(float x, float y, Entity entity) {
         float r = entity.collisionRadius;
-        return x >= entity.xPos - r &&
-            x <= entity.xPos + r &&
-            y >= entity.yPos - r &&
-            y <= entity.yPos + r;
+        return x >= entity.xPos &&
+            x <= entity.xPos + 2 * r &&
+            y >= entity.yPos &&
+            y <= entity.yPos + 2 * r;
     }
 }

@@ -11,7 +11,7 @@ public class Imp extends Enemy {
         "Imp",
         "Demonic",
         "Lorem impsum dolor sit amet",
-        0.08f, 220, 5, 0.73f, 6f, 0.35f,
+        0.08f, 220, 5, 0.73f, 18f, 0.3f, 0.35f,
         Color.FIREBRICK,
         2, // spawnTime
         0  // armour

@@ -32,8 +32,8 @@ public class MineRenderer {
         Color frameColor = ghost ? new Color(0.2f, 0.4f, 0.2f, 0.4f) : Color.GREEN;
         Color fanColor   = ghost ? new Color(0.3f, 0f, 0f, 0.4f) : Color.RED;
 
-        float centerX = production.xPos; // now xPos is center
-        float centerY = production.yPos; // now yPos is center
+        float centerX = production.getCentreX();
+        float centerY = production.getCentreY();
 
         float squareSize = production.size; // use mine’s size
         float frameSize  = squareSize / 2f;
