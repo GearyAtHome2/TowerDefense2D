@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 
+import static java.lang.Math.abs;
+
 public abstract class Mob extends Entity implements Cloneable {
 
     public float size;
@@ -77,27 +79,41 @@ public abstract class Mob extends Entity implements Cloneable {
             Direction dir = pathNavigator.getCurrentDirection();
             if (dir != null) {
                 switch (dir) {
-                    case RIGHT -> { vx = speed; vy = 0f; }
-                    case LEFT  -> { vx = -speed; vy = 0f; }
-                    case UP    -> { vx = 0f; vy = speed; }
-                    case DOWN  -> { vx = 0f; vy = -speed; }
+                    case RIGHT -> {
+                        vx = speed;
+                        vy = 0f;
+                    }
+                    case LEFT -> {
+                        vx = -speed;
+                        vy = 0f;
+                    }
+                    case UP -> {
+                        vx = 0f;
+                        vy = speed;
+                    }
+                    case DOWN -> {
+                        vx = 0f;
+                        vy = -speed;
+                    }
                 }
             }
         }
     }
 
 
+    public boolean isAlive() {
+        return health > 0;
+    }
 
-    public boolean isAlive() { return health > 0; }
-
-    public boolean isHostileTo(Mob other) { return faction != other.faction; }
+    public boolean isHostileTo(Mob other) {
+        return faction != other.faction;
+    }
 
     public abstract Mob copy();
 
     public void update(float delta) {
         if (!canUpdate()) return;
-
-        // NEW: spatial cell ownership update
+        int cellSize = pathNavigator.getCellSize();
         pathNavigator.updateFromPosition(getCenterX(), getCenterY());
 
         Cell cell = pathNavigator.getCurrentCell();
@@ -105,32 +121,56 @@ public abstract class Mob extends Entity implements Cloneable {
 
         handleCellEntry(cell);
         handleMovement(delta);
-        applyPathWalls(cell, pathNavigator.getCellSize());
+        applyPathWalls(cell, cellSize);
+        Cell previousCell = pathNavigator.getPreviousCell();
+        if (overlapsCell(previousCell)) {
+            applyPathWalls(previousCell, cellSize);
+            applyMinorOverlapMovement(previousCell, delta);
+        }
+        Cell nextCell = pathNavigator.getNextCell();
+        if (overlapsCell(nextCell)) {
+            applyPathWalls(nextCell, cellSize);
+            applyMinorOverlapMovement(nextCell, delta);
+        }
         applyKnockback(delta);
         finalizeFrame(delta);
     }
 
-    private boolean canUpdate() { return isAlive() && !pathNavigator.reachedEnd(); }
+    private boolean canUpdate() {
+        return isAlive() && !pathNavigator.reachedEnd();
+    }
 
     private void handleCellEntry(Cell cell) {
         if (pathNavigator.hasEnteredNewTile()) onEnterCell(cell);
     }
 
     public void handleMovement(float delta) {
-        Cell cell = pathNavigator.getCurrentCell();
-        if (cell == null) return;
+        if (pathNavigator.getCurrentCell() == null) return;
 
         Direction dir = pathNavigator.getCurrentDirection();
 
         if (dir == null) return;
 
-        // --- 1. Direction unit vector ---
+        applyMovement(speed, dir, delta);
+    }
+
+    protected void applyMinorOverlapMovement(Cell cell, float delta) {
+        if (cell == null) return;
+        Direction dir = pathNavigator.getLeaveDirectionForCell(cell);
+        if (dir == null) return;
+
+        if (abs(vx) + abs(vy) < 1) {//only apply if we're not really moving maybe?
+            applyMovement(speed * 0.05f, dir, delta);
+        }
+    }
+
+    private void applyMovement(float speed, Direction direction, float delta) {
         float dx = 0f, dy = 0f;
-        switch (dir) {
+        switch (direction) {
             case RIGHT -> dx = 1f;
-            case LEFT  -> dx = -1f;
-            case UP    -> dy = 1f;
-            case DOWN  -> dy = -1f;
+            case LEFT -> dx = -1f;
+            case UP -> dy = 1f;
+            case DOWN -> dy = -1f;
         }
 
         // --- 2. Apply directional acceleration ---
@@ -146,17 +186,18 @@ public abstract class Mob extends Entity implements Cloneable {
         vx *= damping;
         vy *= damping;
 
-        // --- 4. Integrate velocity ---
         xPos += vx * delta;
         yPos += vy * delta;
     }
-//    todo: adding knockbackpower and weight currently
 
     protected void applyKnockback(float delta) {
         // collisions handled elsewhere
     }
 
     protected void applyPathWalls(Cell cell, int cellSize) {
+        if (cell == null) {
+            return;
+        }
         float left = cell.x;
         float right = cell.x + cellSize;
         float bottom = cell.y;
@@ -190,47 +231,168 @@ public abstract class Mob extends Entity implements Cloneable {
                     }
                 }
             }
-
             case TURN -> {
-                // TURN tiles: entry wall on entry side, exit wall on opposite of exit
-                Direction entryDir = reversed ? cell.reverseNextDirection : cell.direction;
-                Direction exitDir  = reversed ? cell.reverseDirection : cell.nextDirection;
-
-                // Entry wall (same side as entry direction)
-                switch (entryDir) {
-                    case LEFT -> { if (xPos < left + collisionRadius) { xPos = left + collisionRadius; vx = -vx * bounceFactor; } }
-                    case RIGHT -> { if (xPos + size > right - collisionRadius) { xPos = right - size - collisionRadius; vx = -vx * bounceFactor; } }
-                    case UP -> { if (yPos + size > top - collisionRadius) { yPos = top - size - collisionRadius; vy = -vy * bounceFactor; } }
-                    case DOWN -> { if (yPos < bottom + collisionRadius) { yPos = bottom + collisionRadius; vy = -vy * bounceFactor; } }
-                }
-
-                // Exit wall (opposite side of exit direction)
-                switch (exitDir) {
-                    case LEFT -> { if (xPos + size > right - collisionRadius) { xPos = right - size - collisionRadius; vx = -vx * bounceFactor; } }
-                    case RIGHT -> { if (xPos < left + collisionRadius) { xPos = left + collisionRadius; vx = -vx * bounceFactor; } }
-                    case UP -> { if (yPos < bottom + collisionRadius) { yPos = bottom + collisionRadius; vy = -vy * bounceFactor; } }
-                    case DOWN -> { if (yPos + size > top - collisionRadius) { yPos = top - size - collisionRadius; vy = -vy * bounceFactor; } }
-                }
+                handleTurn(cell, cellSize);
             }
-
             default -> {
                 // Optionally, clamp mob to cell boundaries for other types
-                if (xPos < left + collisionRadius) { xPos = left + collisionRadius; vx = -vx * bounceFactor; }
-                if (xPos + size > right - collisionRadius) { xPos = right - size - collisionRadius; vx = -vx * bounceFactor; }
-                if (yPos < bottom + collisionRadius) { yPos = bottom + collisionRadius; vy = -vy * bounceFactor; }
-                if (yPos + size > top - collisionRadius) { yPos = top - size - collisionRadius; vy = -vy * bounceFactor; }
+                if (xPos < left + collisionRadius) {
+                    xPos = left + collisionRadius;
+                    vx = -vx * bounceFactor;
+                }
+                if (xPos + size > right - collisionRadius) {
+                    xPos = right - size - collisionRadius;
+                    vx = -vx * bounceFactor;
+                }
+                if (yPos < bottom + collisionRadius) {
+                    yPos = bottom + collisionRadius;
+                    vy = -vy * bounceFactor;
+                }
+                if (yPos + size > top - collisionRadius) {
+                    yPos = top - size - collisionRadius;
+                    vy = -vy * bounceFactor;
+                }
             }
         }
     }
 
-    private void finalizeFrame(float delta) { collisionCooldown = Math.max(0, collisionCooldown - delta); }
+    private void handleTurn(Cell cell, int cellSize) {
+        float bounceFactor = 0.2f;
+        float left = cell.x;
+        float right = cell.x + cellSize;
+        float bottom = cell.y;
+        float top = cell.y + cellSize;
 
-    protected void onEnterCell(Cell cell) { }
+        // Determine entry and exit directions for this tile
+        Direction entryDir = reversed ? cell.reverseNextDirection : cell.direction;
+        Direction exitDir = reversed ? cell.reverseDirection : cell.nextDirection;
 
-    public float getCenterX() { return xPos + size / 2f; }
-    public float getCenterY() { return yPos + size / 2f; }
+        // --- Inside corner soft push ---
+        float cx = 0, cy = 0;
+        if ((entryDir == Direction.UP && exitDir == Direction.RIGHT) ||
+            (entryDir == Direction.RIGHT && exitDir == Direction.UP)) {
+            cx = left;
+            cy = bottom;
+        } else if ((entryDir == Direction.RIGHT && exitDir == Direction.DOWN) ||
+            (entryDir == Direction.DOWN && exitDir == Direction.RIGHT)) {
+            cx = left;
+            cy = top;
+        } else if ((entryDir == Direction.DOWN && exitDir == Direction.LEFT) ||
+            (entryDir == Direction.LEFT && exitDir == Direction.DOWN)) {
+            cx = right;
+            cy = top;
+        } else if ((entryDir == Direction.LEFT && exitDir == Direction.UP) ||
+            (entryDir == Direction.UP && exitDir == Direction.LEFT)) {
+            cx = right;
+            cy = bottom;
+        }
 
-    public void setPosition(float x, float y) { this.xPos = x - this.size/2; this.yPos = y - this.size/2; }
+        float mx = xPos + size * 0.5f;
+        float my = yPos + size * 0.5f;
+        float dx = mx - cx;
+        float dy = my - cy;
+        float distSq = dx * dx + dy * dy;
+        float minDist = collisionRadius;
+
+        if (distSq < minDist * minDist) {
+            float dist = (float) Math.sqrt(distSq);
+            if (dist < 0.0001f) dist = 0.0001f;
+
+            float nx = dx / dist;
+            float ny = dy / dist;
+
+            float penetration = minDist - dist;
+            float pushFactor = 0.8f;
+            xPos += nx * penetration * pushFactor;
+            yPos += ny * penetration * pushFactor;
+
+            float vn = vx * nx + vy * ny;
+            if (vn < 0f) {
+                vx -= vn * nx;
+                vy -= vn * ny;
+            }
+
+            // small tangential push
+            vx += nx * 0.05f;
+            vy += ny * 0.05f;
+        }
+
+        // --- Entry wall: clamp on the same side as entryDir ---
+        switch (entryDir) {
+            case LEFT -> {
+                if (xPos < left + collisionRadius) {
+                    xPos = left + collisionRadius;
+                    vx = -vx * bounceFactor;
+                }
+            }
+            case RIGHT -> {
+                if (xPos + size > right - collisionRadius) {
+                    xPos = right - size - collisionRadius;
+                    vx = -vx * bounceFactor;
+                }
+            }
+            case UP -> {
+                if (yPos + size > top - collisionRadius) {
+                    yPos = top - size - collisionRadius;
+                    vy = -vy * bounceFactor;
+                }
+            }
+            case DOWN -> {
+                if (yPos < bottom + collisionRadius) {
+                    yPos = bottom + collisionRadius;
+                    vy = -vy * bounceFactor;
+                }
+            }
+        }
+
+        // --- Exit wall: clamp on the opposite side of exitDir ---
+        switch (exitDir) {
+            case LEFT -> {
+                if (xPos + size > right - collisionRadius) {
+                    xPos = right - size - collisionRadius;
+                    vx = -vx * bounceFactor;
+                }
+            }
+            case RIGHT -> {
+                if (xPos < left + collisionRadius) {
+                    xPos = left + collisionRadius;
+                    vx = -vx * bounceFactor;
+                }
+            }
+            case UP -> {
+                if (yPos < bottom + collisionRadius) {
+                    yPos = bottom + collisionRadius;
+                    vy = -vy * bounceFactor;
+                }
+            }
+            case DOWN -> {
+                if (yPos + size > top - collisionRadius) {
+                    yPos = top - size - collisionRadius;
+                    vy = -vy * bounceFactor;
+                }
+            }
+        }
+    }
+
+    private void finalizeFrame(float delta) {
+        collisionCooldown = Math.max(0, collisionCooldown - delta);
+    }
+
+    protected void onEnterCell(Cell cell) {
+    }
+
+    public float getCenterX() {
+        return xPos + size / 2f;
+    }
+
+    public float getCenterY() {
+        return yPos + size / 2f;
+    }
+
+    public void setPosition(float x, float y) {
+        this.xPos = x - this.size / 2;
+        this.yPos = y - this.size / 2;
+    }
 
     public void draw(ShapeRenderer shapeRenderer) {
         shapeRenderer.setColor(this.color);
@@ -239,9 +401,11 @@ public abstract class Mob extends Entity implements Cloneable {
         shapeRenderer.end();
     }
 
-    public enum Faction { FRIENDLY, ENEMY }
+    public enum Faction {FRIENDLY, ENEMY}
 
-    public int getPathIndex() { return pathNavigator != null ? pathNavigator.getPathIndex() : -1; }
+    public int getPathIndex() {
+        return pathNavigator != null ? pathNavigator.getPathIndex() : -1;
+    }
 
     @Override
     public List<String> getInfoLines() {
@@ -252,7 +416,9 @@ public abstract class Mob extends Entity implements Cloneable {
     }
 
     @Override
-    public Color getInfoTextColor() { return Color.WHITE; }
+    public Color getInfoTextColor() {
+        return Color.WHITE;
+    }
 
     public String getCostText() {
         StringBuilder sb = new StringBuilder();
@@ -266,5 +432,19 @@ public abstract class Mob extends Entity implements Cloneable {
             sb.append(e.getKey().name()).append(": ").append(e.getValue().intValue());
         }
         return sb.length() == 0 ? "Free" : sb.toString();
+    }
+
+    private boolean overlapsCell(Cell cell) {
+        if (cell == null) return false;
+
+        float left = cell.x;
+        float right = cell.x + pathNavigator.getCellSize();
+        float bottom = cell.y;
+        float top = cell.y + pathNavigator.getCellSize();
+
+        return xPos + size > left &&
+            xPos < right &&
+            yPos + size > bottom &&
+            yPos < top;
     }
 }

@@ -49,10 +49,8 @@ public class ProductionManager extends BuildingManager<Production> {
     protected void updateGhost(Cell cell, int x, int y) {
         if (world.ghostProduction == null) {
             world.ghostProduction = activelyPlacing.clone();
-            world.ghostProduction.setPosition(x * world.cellSize, y * world.cellSize);
-        } else {
-            world.ghostProduction.setPosition(x * world.cellSize, y * world.cellSize);
         }
+        world.ghostProduction.setPosition(x * world.cellSize, y * world.cellSize);
     }
 
     @Override

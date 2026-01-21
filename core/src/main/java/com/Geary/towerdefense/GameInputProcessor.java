@@ -3,7 +3,7 @@ package com.Geary.towerdefense;
 import com.Geary.towerdefense.UI.CameraController;
 import com.Geary.towerdefense.UI.displays.modal.Modal;
 import com.Geary.towerdefense.UI.gameUI.GameUI;
-import com.Geary.towerdefense.behaviour.buildings.manager.FactoryManager;
+import com.Geary.towerdefense.behaviour.buildings.manager.ManufactoryManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.ProductionManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TowerManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TransportManager;
@@ -17,7 +17,7 @@ public class GameInputProcessor extends InputAdapter {
     private final TowerManager towerManager;
     private final ProductionManager productionManager;
     private final TransportManager transportManager;
-    private final FactoryManager factoryManager;
+    private final ManufactoryManager manufactoryManager;
     private final CameraController cameraController;
     private final Viewport uiViewport;
     private int lastMouseX, lastMouseY;
@@ -36,11 +36,11 @@ public class GameInputProcessor extends InputAdapter {
     private OrthographicCamera worldCameraRef = null;
 
 
-    public GameInputProcessor(TowerManager towerManager, ProductionManager productionManager, TransportManager transportManager, FactoryManager factoryManager, CameraController cameraController,
+    public GameInputProcessor(TowerManager towerManager, ProductionManager productionManager, TransportManager transportManager, ManufactoryManager manufactoryManager, CameraController cameraController,
                               Viewport uiViewport) {
         this.towerManager = towerManager;
         this.productionManager = productionManager;
-        this.factoryManager = factoryManager;
+        this.manufactoryManager = manufactoryManager;
         this.transportManager = transportManager;
         this.cameraController = cameraController;
         this.uiViewport = uiViewport;
@@ -121,7 +121,7 @@ public class GameInputProcessor extends InputAdapter {
         return towerManager.isThisActiveManager() ||
             transportManager.isPlacementActive() ||
             productionManager.isPlacementActive() ||
-            factoryManager.isPlacementActive();
+            manufactoryManager.isPlacementActive();
     }
 
     @Override

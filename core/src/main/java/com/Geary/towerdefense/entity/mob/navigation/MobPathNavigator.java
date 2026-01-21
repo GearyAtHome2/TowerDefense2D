@@ -127,4 +127,14 @@ public class MobPathNavigator {
 
         return reversed ? current.reverseDirection : current.direction;
     }
+
+    public Direction getLeaveDirectionForCell(Cell cell) {
+        if (cell == null) return null;
+
+        if (cell.type == Cell.Type.TURN) {
+            return reversed ? cell.reverseDirection : cell.nextDirection;
+        }
+
+        return reversed ? cell.reverseDirection : cell.direction;
+    }
 }

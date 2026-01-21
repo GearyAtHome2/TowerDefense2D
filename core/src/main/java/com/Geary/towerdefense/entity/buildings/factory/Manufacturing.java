@@ -12,7 +12,6 @@ public abstract class Manufacturing extends Building implements Cloneable {
     public List<Recipe> recipes = new ArrayList<>();
     public Recipe activeRecipe = null;
 
-
     public Manufacturing(float x, float y) {
         super(x, y);
         this.name = "parent factory object";

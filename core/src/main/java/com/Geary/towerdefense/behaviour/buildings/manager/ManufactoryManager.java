@@ -14,14 +14,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FactoryManager extends BuildingManager<Manufacturing> {
+public class ManufactoryManager extends BuildingManager<Manufacturing> {
 
     private Manufacturing activelyPlacing = new BasicMunitionsFactory(0, 0);
 
     public final List<Manufacturing> allManufacturingTypes;
     public List<Manufacturing> unlockedManufacturingTypes;
 
-    public FactoryManager(GameWorld world, OrthographicCamera camera) {
+    public ManufactoryManager(GameWorld world, OrthographicCamera camera) {
         super(world, camera);
         allManufacturingTypes = List.of(
             new BasicMunitionsFactory(0, 0),
@@ -73,7 +73,7 @@ public class FactoryManager extends BuildingManager<Manufacturing> {
     public void handleFactoryProduction(float delta) {
         for (Manufacturing manufacturing : world.factories) {
             Recipe recipe = manufacturing.activeRecipe;
-            if (recipe == null) continue;
+            if (recipe == null || !manufacturing.isConnectedToNetwork) continue;
 
             boolean enoughResources = true;
             Map<ResourceType, Double> deltaWeightedInputs = new HashMap<>();

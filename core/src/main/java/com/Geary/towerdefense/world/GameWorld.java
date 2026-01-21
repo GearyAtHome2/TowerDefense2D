@@ -8,7 +8,7 @@ import com.Geary.towerdefense.behaviour.MobManager;
 import com.Geary.towerdefense.behaviour.ResourceManager;
 import com.Geary.towerdefense.behaviour.SparkManager;
 import com.Geary.towerdefense.behaviour.SpawnerManager;
-import com.Geary.towerdefense.behaviour.buildings.manager.FactoryManager;
+import com.Geary.towerdefense.behaviour.buildings.manager.ManufactoryManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.ProductionManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TowerManager;
 import com.Geary.towerdefense.behaviour.buildings.manager.TransportManager;
@@ -66,7 +66,7 @@ public class GameWorld {
     private TowerManager towerManager;
     private TransportManager transportManager;
     private ProductionManager productionManager;
-    private FactoryManager factoryManager;
+    private ManufactoryManager manufactoryManager;
     private MobManager mobManager;
     private SparkManager sparkManager;
     private SpawnerManager spawnerManager;
@@ -97,7 +97,7 @@ public class GameWorld {
         towerManager = new TowerManager(this, worldCamera);
         transportManager = new TransportManager(this, worldCamera);
         productionManager = new ProductionManager(this, worldCamera);
-        factoryManager = new FactoryManager(this, worldCamera);
+        manufactoryManager = new ManufactoryManager(this, worldCamera);
         mobManager = new MobManager(this, sparkManager); // no camera
         spawnerManager = new SpawnerManager(this);       // no camera
         gameStateManager = new GameStateManager();
@@ -220,9 +220,9 @@ public class GameWorld {
         spawnerManager.update(delta);
         sparkManager.update(delta);
         productionManager.animateMines(delta);
-        factoryManager.animateFactories(delta);
+        manufactoryManager.animateFactories(delta);
         productionManager.calculateResourcesGenerated(delta);
-        factoryManager.handleFactoryProduction(delta);
+        manufactoryManager.handleFactoryProduction(delta);
         spawnerModalManager.updateSpawner(delta);
     }
 
@@ -240,7 +240,7 @@ public class GameWorld {
             productionManager.deleteBuilding(production, productions);
         } else if (building instanceof Manufacturing manufacturing) {
             factories.remove(manufacturing);
-            factoryManager.deleteBuilding(manufacturing, factories);
+            manufactoryManager.deleteBuilding(manufacturing, factories);
         }
 
 
@@ -288,8 +288,8 @@ public class GameWorld {
         return productionManager;
     }
 
-    public FactoryManager getFactoryManager() {
-        return factoryManager;
+    public ManufactoryManager getFactoryManager() {
+        return manufactoryManager;
     }
 
     public MobManager getMobManager() {
