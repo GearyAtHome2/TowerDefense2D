@@ -135,12 +135,12 @@ public class MobManager {
         dx /= len;
         dy /= len;
 
-        float strength = 180f;//enhanced atm - in future, read this from mob values.
+        float strength = 380f;//enhanced atm - in future, read this from mob values.
 
-        f.bounceVX += dx * strength;
-        f.bounceVY += dy * strength;
-        e.bounceVX -= dx * strength;
-        e.bounceVY -= dy * strength;
+        f.vx += dx * strength;//check this - might be too strong or weak but should be decent?
+        f.vy += dy * strength;
+        e.vx -= dx * strength;
+        e.vy -= dy * strength;
 
     }
 
@@ -161,8 +161,8 @@ public class MobManager {
 
         float strength = 120f;
 
-        m.bounceVX += dx * strength;
-        m.bounceVY += dy * strength;
+        m.vx += dx * strength;
+        m.vy += dy * strength;
     }
 
 }

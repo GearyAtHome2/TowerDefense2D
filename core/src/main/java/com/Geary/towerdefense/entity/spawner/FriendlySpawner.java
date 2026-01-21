@@ -12,8 +12,6 @@ import com.badlogic.gdx.graphics.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.lang.Math.random;
-
 public class FriendlySpawner extends Spawner {
     public float maxCooldown = 1.2f;
     public float cooldown = maxCooldown;
@@ -46,8 +44,8 @@ public class FriendlySpawner extends Spawner {
 
     public Mob spawn() {
         Mob spawn = requestedSpawns.get(0).copy();
-        spawn.setPosition(getCenterX() - (int) (random() * 14) + 7,
-            getCenterY() - (int) (random() * 14) + 7);
+        spawn.setPosition(getCenterX(),
+            getCenterY());
         requestedSpawns.remove(0);
         return spawn;
     }

@@ -39,14 +39,14 @@ public class TargetingHelper {
             float dy = e.getCenterY() - centerY;
             float distSqu = dx * dx + dy * dy;
 
-            float totalProgress = e.getPathIndex() + e.getTileProgress();
+            float tileProgress = e.getPathIndex();
 
-            if (distSqu <= (tower.range * tower.range) && totalProgress > mostProgressed) {
+            if (distSqu <= (tower.range * tower.range) && tileProgress > mostProgressed) {
                 System.out.println("found enemy at squ distance:"+distSqu);
                 System.out.println("my range^2 is:"+ (tower.range * tower.range));
                 System.out.println("tower location:"+ tower.xPos +", " +tower.yPos);
                 System.out.println("enemy location:"+ e.xPos +", " +e.yPos);
-                mostProgressed = totalProgress;
+                mostProgressed = tileProgress;
                 best = e;
             }
         }

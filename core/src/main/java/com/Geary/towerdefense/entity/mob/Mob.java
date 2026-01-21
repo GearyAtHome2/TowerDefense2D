@@ -2,7 +2,6 @@ package com.Geary.towerdefense.entity.mob;
 
 import com.Geary.towerdefense.Direction;
 import com.Geary.towerdefense.entity.Entity;
-import com.Geary.towerdefense.entity.mob.navigation.ArcTurnHandler;
 import com.Geary.towerdefense.entity.mob.navigation.MobPathNavigator;
 import com.Geary.towerdefense.entity.mob.navigation.TileRandomMover;
 import com.Geary.towerdefense.entity.resources.Resource;
@@ -15,10 +14,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 
-import static com.Geary.towerdefense.Direction.*;
-
 public abstract class Mob extends Entity implements Cloneable {
-
 
     public float size;
     public int armour = 0;
@@ -32,44 +28,33 @@ public abstract class Mob extends Entity implements Cloneable {
     public EnumMap<Resource.RefinedResourceType, Double> refinedResourceCost = new EnumMap<>(Resource.RefinedResourceType.class);
     public int coinCost;
 
-    public float bounceVX = 0f;
-    public float bounceVY = 0f;
-
-    public float vx, vy;
+    public float vx, vy; // velocity in pixels/sec
 
     protected Faction faction;
-    protected boolean useCustomTurnLogic = false;
     public boolean reversed = false;
-    protected int turnMultiplier = 1;
 
     protected MobPathNavigator pathNavigator;
-    protected ArcTurnHandler arcHandler = new ArcTurnHandler();
     protected TileRandomMover randomMover;
 
-    protected float speed;
-    protected float ranMoveProb;
+    protected float speed;      // units per second
+    protected float ranMoveProb; // probability for wiggle
 
-    protected float knockbackDamping;
     public float collisionCooldown = 0f;
-    private boolean isBouncing;
 
     protected Mob(float xPos, float yPos, MobStats stats, Order order) {
         this.xPos = xPos;
         this.yPos = yPos;
-
         this.order = order;
-        // Metadata
+
         this.name = stats.name();
         this.effectText = stats.effectText();
         this.flavourText = stats.flavourText();
 
-        // Combat/Physics
         this.size = GameWorld.cellSize * stats.size();
         this.health = stats.health();
         this.damage = stats.damage();
         this.speed = stats.speed();
         this.color = stats.color();
-        this.knockbackDamping = stats.knockbackDamping();
         this.ranMoveProb = stats.ranMoveProb();
         this.armour = stats.armour();
         this.spawnTime = stats.spawnTime();
@@ -80,282 +65,186 @@ public abstract class Mob extends Entity implements Cloneable {
     public void setPath(List<Cell> path, int cellSize, boolean reverse) {
         pathNavigator = new MobPathNavigator(path, cellSize, reverse);
         randomMover = new TileRandomMover(cellSize);
+
+        // Initialize velocity in the starting cell's direction
+        Cell cell = pathNavigator.getCurrentCell();
+        if (cell != null) {
+            Direction dir = pathNavigator.getCurrentDirection();
+            if (dir != null) {
+                switch (dir) {
+                    case RIGHT -> { vx = speed; vy = 0f; }
+                    case LEFT  -> { vx = -speed; vy = 0f; }
+                    case UP    -> { vx = 0f; vy = speed; }
+                    case DOWN  -> { vx = 0f; vy = -speed; }
+                }
+            }
+        }
     }
 
-    public boolean isAlive() {
-        return health > 0;
-    }
 
-    public boolean isHostileTo(Mob other) {
-        return faction != other.faction;
-    }
+
+    public boolean isAlive() { return health > 0; }
+
+    public boolean isHostileTo(Mob other) { return faction != other.faction; }
 
     public abstract Mob copy();
 
     public void update(float delta) {
         if (!canUpdate()) return;
 
+        // NEW: spatial cell ownership update
+        pathNavigator.updateFromPosition(getCenterX(), getCenterY());
+
         Cell cell = pathNavigator.getCurrentCell();
         if (cell == null) return;
 
         handleCellEntry(cell);
-
-        Direction moveDir = resolveMoveDirection(cell);
-        if (moveDir == null) return;
-
-        int cellSize = pathNavigator.getCellSize();
-        handleMovement(cell, moveDir, delta, cellSize);
+        handleMovement(delta);
+        applyPathWalls(cell, pathNavigator.getCellSize());
         applyKnockback(delta);
         finalizeFrame(delta);
     }
 
-    private boolean canUpdate() {
-        return isAlive() && !pathNavigator.reachedEnd();
-    }
+    private boolean canUpdate() { return isAlive() && !pathNavigator.reachedEnd(); }
 
     private void handleCellEntry(Cell cell) {
-        if (pathNavigator.hasEnteredNewTile()) {
-            onEnterCell(cell);
-        }
+        if (pathNavigator.hasEnteredNewTile()) onEnterCell(cell);
     }
 
-    public boolean isBouncing(){
-        return isBouncing;
-    }
+    public void handleMovement(float delta) {
+        Cell cell = pathNavigator.getCurrentCell();
+        if (cell == null) return;
 
-    public void setPosition(float x, float y){
-        this.xPos = x;
-        this.yPos = y;
-    }
+        Direction dir = pathNavigator.getCurrentDirection();
 
-    private void handleMovement(Cell cell, Direction moveDir, float delta, int cellSize) {
-        this.isBouncing = Math.abs(bounceVX) > 0.01f || Math.abs(bounceVY) > 0.01f;
+        if (dir == null) return;
 
-        if (arcHandler.isInArcTurn()) {
-            handleArcMovement(cell, delta, cellSize);
-        } else {
-            handleLinearMovement(cell, moveDir, delta, cellSize);
-        }
-    }
-
-    private void handleArcMovement(Cell cell, float delta, int cellSize) {
-        if (isBouncing) {
-            Direction[] turn = computeTurnDirections(cell);
-            arcHandler.rebuildArcPreserveProgress(
-                cell,
-                turn[0],
-                turn[1],
-                getCenterX(),
-                getCenterY(),
-                cellSize
-            );
+        // --- 1. Direction unit vector ---
+        float dx = 0f, dy = 0f;
+        switch (dir) {
+            case RIGHT -> dx = 1f;
+            case LEFT  -> dx = -1f;
+            case UP    -> dy = 1f;
+            case DOWN  -> dy = -1f;
         }
 
-        float arcMove = speed * delta * cellSize;
-        float[] pos = arcHandler.updateArc(arcMove);
+        // --- 2. Apply directional acceleration ---
+        float accel = speed * pathNavigator.getCellSize();
+        vx += dx * accel * delta;
+        vy += dy * accel * delta;
 
-        if (pos != null) {
-            xPos = pos[0] - size / 2f;
-            yPos = pos[1] - size / 2f;
-        }
+        // --- 3. Apply friction ---
+        float friction = 1.7f;
+        float frictionPerSecond = accel * friction / pathNavigator.getCellSize();
+        float damping = (float) Math.exp(-frictionPerSecond * delta);
 
-        if (!arcHandler.isInArcTurn()) {
-            pathNavigator.advance();
-        }
+        vx *= damping;
+        vy *= damping;
+
+        // --- 4. Integrate velocity ---
+        xPos += vx * delta;
+        yPos += vy * delta;
     }
 
-    private void handleLinearMovement(Cell cell, Direction moveDir, float delta, int cellSize) {
-        float moveDistance = speed * delta * cellSize;
+    protected void applyKnockback(float delta) {
+        // collisions handled elsewhere
+    }
 
-        float oldX = xPos;
-        float oldY = yPos;
+    protected void applyPathWalls(Cell cell, int cellSize) {
+        float left = cell.x;
+        float right = cell.x + cellSize;
+        float bottom = cell.y;
+        float top = cell.y + cellSize;
 
-        // --- Move along main axis ---
-        switch (moveDir) {
-            case RIGHT -> xPos += moveDistance;
-            case LEFT -> xPos -= moveDistance;
-            case UP -> yPos += moveDistance;
-            case DOWN -> yPos -= moveDistance;
+        // --- STRAIGHT tiles ---
+        switch (cell.type) {
+            case PATH -> {
+                // Vertical path (UP/DOWN) → walls left/right
+                if (cell.direction == Direction.UP || cell.direction == Direction.DOWN) {
+                    if (xPos < left + collisionRadius) xPos = left + collisionRadius;
+                    if (xPos + size > right - collisionRadius) xPos = right - size - collisionRadius;
+                }
+                // Horizontal path (LEFT/RIGHT) → walls top/bottom
+                else if (cell.direction == Direction.LEFT || cell.direction == Direction.RIGHT) {
+                    if (yPos < bottom + collisionRadius) yPos = bottom + collisionRadius;
+                    if (yPos + size > top - collisionRadius) yPos = top - size - collisionRadius;
+                }
+            }
+
+            case TURN -> {
+                // TURN tiles: entry wall on entry side, exit wall on opposite of exit
+
+                Direction entryDir = reversed ? cell.reverseNextDirection : cell.direction;
+                Direction exitDir  = reversed ? cell.reverseDirection : cell.nextDirection;
+
+                // Entry wall (same side as entry direction)
+                switch (entryDir) {
+                    case LEFT -> { if (xPos < left + collisionRadius) xPos = left + collisionRadius; }
+                    case RIGHT -> { if (xPos + size > right - collisionRadius) xPos = right - size - collisionRadius; }
+                    case UP -> { if (yPos + size > top - collisionRadius) yPos = top - size - collisionRadius; }
+                    case DOWN -> { if (yPos < bottom + collisionRadius) yPos = bottom + collisionRadius; }
+                }
+
+                // Exit wall (opposite side of exit direction)
+                switch (exitDir) {
+                    case LEFT -> { if (xPos + size > right - collisionRadius) xPos = right - size - collisionRadius; }
+                    case RIGHT -> { if (xPos < left + collisionRadius) xPos = left + collisionRadius; }
+                    case UP -> { if (yPos < bottom + collisionRadius) yPos = bottom + collisionRadius; }
+                    case DOWN -> { if (yPos + size > top - collisionRadius) yPos = top - size - collisionRadius; }
+                }
+            }
+
             default -> {
+                // Optionally, clamp mob to cell boundaries for other types
+                if (xPos < left + collisionRadius) xPos = left + collisionRadius;
+                if (xPos + size > right - collisionRadius) xPos = right - size - collisionRadius;
+                if (yPos < bottom + collisionRadius) yPos = bottom + collisionRadius;
+                if (yPos + size > top - collisionRadius) yPos = top - size - collisionRadius;
             }
         }
-
-        // --- Random wiggle perpendicular ---
-        float perpendicularOffset = 0f;
-        if (moveDir == UP || moveDir == DOWN) {
-            perpendicularOffset = randomMover.computeMovement(getCenterX() - cell.x, delta, ranMoveProb);
-            xPos += perpendicularOffset;
-        } else if (moveDir == LEFT || moveDir == RIGHT) {
-            perpendicularOffset = randomMover.computeMovement(getCenterY() - cell.y, delta, ranMoveProb);
-            yPos += perpendicularOffset;
-        }
-
-        // --- Apply bounce ---
-        vx = (xPos - oldX) / delta;
-        vy = (yPos - oldY) / delta;
-
-        // --- Tile progress update ---
-        pathNavigator.updateTileProgress(computeTileProgress(cell, moveDir));
-        if (pathNavigator.getTileProgress() >= 1f) pathNavigator.advance();
-
-        // --- Spring correction perpendicular to main axis only ---
-        float centerX = cell.x + cellSize / 2f;
-        float centerY = cell.y + cellSize / 2f;
-        float springStrength = 5f;
-
-        if (moveDir == UP || moveDir == DOWN) {
-            float dx = centerX - getCenterX();
-            xPos += dx * springStrength * delta;
-        } else if (moveDir == LEFT || moveDir == RIGHT) {
-            float dy = centerY - getCenterY();
-            yPos += dy * springStrength * delta;
-        }
     }
 
-    private void applyKnockback(float delta) {
-        float decay = knockbackDamping;
+    private void finalizeFrame(float delta) { collisionCooldown = Math.max(0, collisionCooldown - delta); }
 
-        if (decay > 0f) {
-            float factor = (1f - (float) Math.exp(-decay * delta)) / decay;
+    protected void onEnterCell(Cell cell) { }
 
-            xPos += bounceVX * factor;
-            yPos += bounceVY * factor;
-
-            float damp = (float) Math.exp(-decay * delta);
-            bounceVX *= damp;
-            bounceVY *= damp;
-        } else {
-            xPos += bounceVX * delta;
-            yPos += bounceVY * delta;
-        }
-    }
-
-    private void finalizeFrame(float delta) {
-        if (Math.abs(bounceVX) < 1f) bounceVX = 0f;
-        if (Math.abs(bounceVY) < 1f) bounceVY = 0f;
-
-        collisionCooldown = Math.max(0, collisionCooldown - delta);
-    }
-
-    protected void onEnterCell(Cell cell) {
-        if (cell.type != Cell.Type.TURN) return;
-
-        //guard against setting up the arc
-        if (arcHandler.isInArcTurn()) return;
-
-        Direction[] turn = computeTurnDirections(cell);
-        arcHandler.setupArc(
-            cell,
-            turn[0],
-            turn[1],
-            getCenterX(),
-            getCenterY(),
-            pathNavigator.getCellSize()
-        );
-    }
-
-
-    protected Direction resolveMoveDirection(Cell cell) {
-        return reversed ? cell.reverseDirection : cell.direction;
-    }
-
-    private Direction multiplyDirection(Direction dir, int multiplier) {
-        if (multiplier == 1) return dir;
-        return switch (dir) {
-            case UP -> DOWN;
-            case DOWN -> UP;
-            case LEFT -> RIGHT;
-            case RIGHT -> LEFT;
-            default -> NONE;
-        };
-    }
-
-    protected float computeTileProgress(Cell cell, Direction moveDir) {
-        float localX = getCenterX() - cell.x;
-        float localY = getCenterY() - cell.y;
-
-        return switch (moveDir) {
-            case RIGHT -> clamp(localX / pathNavigator.getCellSize());
-            case LEFT -> clamp(1f - (localX / pathNavigator.getCellSize()));
-            case UP -> clamp(localY / pathNavigator.getCellSize());
-            case DOWN -> clamp(1f - (localY / pathNavigator.getCellSize()));
-            default -> 0f;
-        };
-    }
-
-    private Direction[] computeTurnDirections(Cell cell) {
-        Direction entry = adjusted(turnMultiplier < 0 ? cell.nextDirection : cell.direction);
-        Direction exit = adjusted(turnMultiplier < 0 ? cell.direction : cell.nextDirection);
-        return new Direction[]{entry, exit};
-    }
-
-    protected float clamp(float v) {
-        return Math.max(0f, Math.min(1f, v));
-    }
-
-    public float getCenterX() {
-        return xPos + size / 2f;
-    }
-
-    public float getCenterY() {
-        return yPos + size / 2f;
-    }
+    public float getCenterX() { return xPos + size / 2f; }
+    public float getCenterY() { return yPos + size / 2f; }
+    public void setPosition(float x, float y) { this.xPos = x; this.yPos = y; }
 
     public void draw(ShapeRenderer shapeRenderer) {
         shapeRenderer.setColor(this.color);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.rect(xPos - size / 2, yPos - size / 2, size, size);
+        shapeRenderer.rect(xPos, yPos, size, size);
         shapeRenderer.end();
     }
 
-    public enum Faction {FRIENDLY, ENEMY}
+    public enum Faction { FRIENDLY, ENEMY }
 
-    public int getPathIndex() {
-        return pathNavigator != null ? pathNavigator.getPathIndex() : -1;
-    }
-
-    private Direction adjusted(Direction dir) {
-        return turnMultiplier == 1 ? dir : multiplyDirection(dir, turnMultiplier);
-    }
-
-    public float getTileProgress() {
-        return pathNavigator != null ? pathNavigator.getTileProgress() : 0f;
-    }
-
-    public void setTileProgress(float progress) {
-        if (pathNavigator != null) pathNavigator.setTileProgress(progress);
-    }
+    public int getPathIndex() { return pathNavigator != null ? pathNavigator.getPathIndex() : -1; }
 
     @Override
     public List<String> getInfoLines() {
         List<String> lines = new ArrayList<>();
-        lines.add(this.name);
-        lines.add("health: " + this.health);
+        lines.add(name);
+        lines.add("health: " + health);
         return lines;
     }
 
     @Override
-    public Color getInfoTextColor() {
-        return Color.WHITE; // default
-    }
+    public Color getInfoTextColor() { return Color.WHITE; }
 
     public String getCostText() {
         StringBuilder sb = new StringBuilder();
-
-        if (coinCost > 0) {
-            sb.append("Coins: ").append(coinCost);
-        }
-
+        if (coinCost > 0) sb.append("Coins: ").append(coinCost);
         for (var e : rawResourceCost.entrySet()) {
             if (sb.length() > 0) sb.append("\n");
             sb.append(e.getKey().name()).append(": ").append(e.getValue().intValue());
         }
-
         for (var e : refinedResourceCost.entrySet()) {
             if (sb.length() > 0) sb.append("\n");
             sb.append(e.getKey().name()).append(": ").append(e.getValue().intValue());
         }
-
         return sb.length() == 0 ? "Free" : sb.toString();
     }
 }
