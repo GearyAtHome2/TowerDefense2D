@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 
-import static java.lang.Math.abs;
-
 public abstract class Mob extends Entity implements Cloneable {
 
     public float size;
@@ -120,18 +118,16 @@ public abstract class Mob extends Entity implements Cloneable {
         if (cell == null) return;
 
         handleCellEntry(cell);
-        handleMovement(delta);
-        applyPathWalls(cell, cellSize);
         Cell previousCell = pathNavigator.getPreviousCell();
         if (overlapsCell(previousCell)) {
-            applyPathWalls(previousCell, cellSize);
-            applyMinorOverlapMovement(previousCell, delta);
+//            applyPathWalls(previousCell, cellSize);
+            applyOverlapMovement(previousCell, delta);
+            applyPathWalls(previousCell, cellSize);//apply the walls of the previous cell if I overlap with it
+            //won't do anything on straights, but on corners this matters.
+        } else {
+            handleMovement(delta);
         }
-        Cell nextCell = pathNavigator.getNextCell();
-        if (overlapsCell(nextCell)) {
-            applyPathWalls(nextCell, cellSize);
-            applyMinorOverlapMovement(nextCell, delta);
-        }
+        applyPathWalls(cell, cellSize);//always apply the walls of the "current" cell
         applyKnockback(delta);
         finalizeFrame(delta);
     }
@@ -154,14 +150,14 @@ public abstract class Mob extends Entity implements Cloneable {
         applyMovement(speed, dir, delta);
     }
 
-    protected void applyMinorOverlapMovement(Cell cell, float delta) {
+    protected void applyOverlapMovement(Cell cell, float delta) {
         if (cell == null) return;
         Direction dir = pathNavigator.getLeaveDirectionForCell(cell);
         if (dir == null) return;
 
-        if (abs(vx) + abs(vy) < 1) {//only apply if we're not really moving maybe?
-            applyMovement(speed * 0.05f, dir, delta);
-        }
+//        if (abs(vx) + abs(vy) < 1) {//only apply if we're not really moving maybe?
+            applyMovement(speed, dir, delta);
+//        }
     }
 
     private void applyMovement(float speed, Direction direction, float delta) {
@@ -210,29 +206,30 @@ public abstract class Mob extends Entity implements Cloneable {
             case PATH -> {
                 // Vertical path (UP/DOWN) → walls left/right
                 if (cell.direction == Direction.UP || cell.direction == Direction.DOWN) {
-                    if (xPos < left + collisionRadius) {
-                        xPos = left + collisionRadius;
+                    if (xPos < left) { // removed collisionRadius
+                        xPos = left;
                         vx = -vx * bounceFactor;
                     }
-                    if (xPos + size > right - collisionRadius) {
-                        xPos = right - size - collisionRadius;
+                    if (xPos + size > right) { // removed collisionRadius
+                        xPos = right - size;
                         vx = -vx * bounceFactor;
                     }
                 }
                 // Horizontal path (LEFT/RIGHT) → walls top/bottom
                 else if (cell.direction == Direction.LEFT || cell.direction == Direction.RIGHT) {
-                    if (yPos < bottom + collisionRadius) {
-                        yPos = bottom + collisionRadius;
+                    if (yPos < bottom) { // removed collisionRadius
+                        yPos = bottom;
                         vy = -vy * bounceFactor;
                     }
-                    if (yPos + size > top - collisionRadius) {
-                        yPos = top - size - collisionRadius;
+                    if (yPos + size > top) { // removed collisionRadius
+                        yPos = top - size;
                         vy = -vy * bounceFactor;
                     }
                 }
             }
+
             case TURN -> {
-                handleTurn(cell, cellSize);
+                applyTurnTileWalls(cell, cellSize);
             }
             default -> {
                 // Optionally, clamp mob to cell boundaries for other types
@@ -256,68 +253,20 @@ public abstract class Mob extends Entity implements Cloneable {
         }
     }
 
-    private void handleTurn(Cell cell, int cellSize) {
-        float bounceFactor = 0.2f;
+    protected void applyTurnTileWalls(Cell cell, int cellSize) {
+        if (cell == null) return;
+
         float left = cell.x;
         float right = cell.x + cellSize;
         float bottom = cell.y;
         float top = cell.y + cellSize;
+        float bounceFactor = 0.2f;
 
-        // Determine entry and exit directions for this tile
+        // Determine entry and exit directions
         Direction entryDir = reversed ? cell.reverseNextDirection : cell.direction;
         Direction exitDir = reversed ? cell.reverseDirection : cell.nextDirection;
 
-        // --- Inside corner soft push ---
-        float cx = 0, cy = 0;
-        if ((entryDir == Direction.UP && exitDir == Direction.RIGHT) ||
-            (entryDir == Direction.RIGHT && exitDir == Direction.UP)) {
-            cx = left;
-            cy = bottom;
-        } else if ((entryDir == Direction.RIGHT && exitDir == Direction.DOWN) ||
-            (entryDir == Direction.DOWN && exitDir == Direction.RIGHT)) {
-            cx = left;
-            cy = top;
-        } else if ((entryDir == Direction.DOWN && exitDir == Direction.LEFT) ||
-            (entryDir == Direction.LEFT && exitDir == Direction.DOWN)) {
-            cx = right;
-            cy = top;
-        } else if ((entryDir == Direction.LEFT && exitDir == Direction.UP) ||
-            (entryDir == Direction.UP && exitDir == Direction.LEFT)) {
-            cx = right;
-            cy = bottom;
-        }
-
-        float mx = xPos + size * 0.5f;
-        float my = yPos + size * 0.5f;
-        float dx = mx - cx;
-        float dy = my - cy;
-        float distSq = dx * dx + dy * dy;
-        float minDist = collisionRadius;
-
-        if (distSq < minDist * minDist) {
-            float dist = (float) Math.sqrt(distSq);
-            if (dist < 0.0001f) dist = 0.0001f;
-
-            float nx = dx / dist;
-            float ny = dy / dist;
-
-            float penetration = minDist - dist;
-            float pushFactor = 0.8f;
-            xPos += nx * penetration * pushFactor;
-            yPos += ny * penetration * pushFactor;
-
-            float vn = vx * nx + vy * ny;
-            if (vn < 0f) {
-                vx -= vn * nx;
-                vy -= vn * ny;
-            }
-
-            // small tangential push
-            vx += nx * 0.05f;
-            vy += ny * 0.05f;
-        }
-
-        // --- Entry wall: clamp on the same side as entryDir ---
+        // --- Entry wall (hard clamp on same side as entryDir) ---
         switch (entryDir) {
             case LEFT -> {
                 if (xPos < left + collisionRadius) {
@@ -345,7 +294,7 @@ public abstract class Mob extends Entity implements Cloneable {
             }
         }
 
-        // --- Exit wall: clamp on the opposite side of exitDir ---
+        // --- Exit wall (hard clamp on opposite side of exitDir) ---
         switch (exitDir) {
             case LEFT -> {
                 if (xPos + size > right - collisionRadius) {
@@ -372,7 +321,66 @@ public abstract class Mob extends Entity implements Cloneable {
                 }
             }
         }
+
+        // --- Inner corner as diagonal wall ---
+        float cx = 0f, cy = 0f;
+        boolean isDiagonalUpRight = false; // will help select normal
+
+        if ((entryDir == Direction.UP && exitDir == Direction.RIGHT) ||
+            (entryDir == Direction.LEFT && exitDir == Direction.DOWN)) {
+            cx = right;
+            cy = bottom;
+            isDiagonalUpRight = true;
+        } else if ((entryDir == Direction.RIGHT && exitDir == Direction.UP) ||
+            (entryDir == Direction.DOWN && exitDir == Direction.LEFT)) {
+            cx = left;
+            cy = top;
+            isDiagonalUpRight = true;
+        } else if ((entryDir == Direction.DOWN && exitDir == Direction.RIGHT) ||
+            (entryDir == Direction.LEFT && exitDir == Direction.UP)) {
+            cx = right;
+            cy = top;
+            isDiagonalUpRight = false;
+        } else if ((entryDir == Direction.RIGHT && exitDir == Direction.DOWN) ||
+            (entryDir == Direction.UP && exitDir == Direction.LEFT)) {
+            cx = left;
+            cy = bottom;
+            isDiagonalUpRight = false;
+        }
+
+        // Vector from corner to mob center
+        float mx = xPos + size * 0.5f;
+        float my = yPos + size * 0.5f;
+        float dx = mx - cx;
+        float dy = my - cy;
+        float distSq = dx * dx + dy * dy;
+        float minDist = collisionRadius;
+
+        if (distSq < minDist * minDist) {
+            float dist = (float) Math.sqrt(distSq);
+            if (dist < 0.0001f) dist = 0.0001f;
+
+            // Push mob out of corner
+            float overlap = minDist - dist;
+            xPos += (dx / dist) * overlap;
+            yPos += (dy / dist) * overlap;
+
+            // Diagonal wall normal
+            float sqrt2inv = 1f / (float) Math.sqrt(2f);
+            float nx = isDiagonalUpRight ? -sqrt2inv : sqrt2inv;
+            float ny = sqrt2inv;
+
+            // Reflect velocity over diagonal
+            float dot = vx * nx + vy * ny;
+            vx = vx - 2f * dot * nx;
+            vy = vy - 2f * dot * ny;
+
+            // Apply bounce factor
+            vx *= bounceFactor;
+            vy *= bounceFactor;
+        }
     }
+
 
     private void finalizeFrame(float delta) {
         collisionCooldown = Math.max(0, collisionCooldown - delta);
