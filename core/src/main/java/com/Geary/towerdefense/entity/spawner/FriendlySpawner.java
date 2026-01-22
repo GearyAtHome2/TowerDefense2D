@@ -3,6 +3,7 @@ package com.Geary.towerdefense.entity.spawner;
 import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.entity.mob.friendly.dark.DodgyGangster;
 import com.Geary.towerdefense.entity.mob.friendly.light.ServantOfLight;
+import com.Geary.towerdefense.entity.mob.friendly.nature.Elvis;
 import com.Geary.towerdefense.entity.mob.friendly.nature.StoneGolem;
 import com.Geary.towerdefense.entity.mob.friendly.nature.Wolf;
 import com.Geary.towerdefense.entity.mob.friendly.neutral.ManAtArms;
@@ -34,6 +35,7 @@ public class FriendlySpawner extends Spawner {
         }
         spawnableMobs.add(new Wolf(0, 0));
         spawnableMobs.add(new StoneGolem(0, 0));
+        spawnableMobs.add(new Elvis(0, 0));
         spawnableMobs.add(new DodgyGangster(0, 0));
         spawnableMobs.add(new ServantOfLight(0, 0));
         spawnableMobs.add(new SlapperBot(0, 0));

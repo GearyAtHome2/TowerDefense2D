@@ -1,7 +1,6 @@
 package com.Geary.towerdefense.entity.spawner;
 
 import com.Geary.towerdefense.entity.buildings.Building;
-import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
@@ -40,11 +39,11 @@ public abstract class Spawner extends Building {
      * World-space center of this tile
      */
     protected float getCenterX() {
-        return xPos + GameWorld.cellSize / 2f;
+        return xPos + size / 2f;
     }
 
     protected float getCenterY() {
-        return yPos + GameWorld.cellSize / 2f;
+        return yPos + size / 2f;
     }
 
     @Override

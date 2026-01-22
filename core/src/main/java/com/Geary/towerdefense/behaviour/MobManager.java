@@ -66,7 +66,7 @@ public class MobManager {
                 if (!friendly.isAlive()) continue;
 
                 if (overlaps(enemy, friendly)) {
-                    if (enemy.collisionCooldown <= 0 && friendly.collisionCooldown <= 0) {
+                    if (enemy.collisionCooldown <= 0 || friendly.collisionCooldown <= 0) {
                         enemy.applyDamage(friendly.damage);
                         friendly.applyDamage(enemy.damage);
 
@@ -103,14 +103,11 @@ public class MobManager {
 
     /** Checks if two mobs are overlapping */
     private boolean overlaps(Mob a, Mob b) {
-        float ax = a.xPos + a.collisionRadius;
-        float ay = a.yPos + a.collisionRadius;
-        float bx = b.xPos + b.collisionRadius;
-        float by = b.yPos + b.collisionRadius;
-        float dx = ax - bx;
-        float dy = ay - by;
-        float r = a.collisionRadius + b.collisionRadius;
-        return dx * dx + dy * dy <= r * r;
+        float eps = 0.001f;//tiny buffer to avoid a slight jitter apparently
+        return a.xPos < b.xPos + b.size - eps &&
+            a.xPos + a.size > b.xPos + eps &&
+            a.yPos < b.yPos + b.size - eps &&
+            a.yPos + a.size > b.yPos + eps;
     }
 
     private void applyBounce(Friendly friendly, Enemy enemy) {

@@ -2,8 +2,8 @@ package com.Geary.towerdefense.entity.mob;
 
 import com.Geary.towerdefense.Direction;
 import com.Geary.towerdefense.entity.Entity;
+import com.Geary.towerdefense.entity.mob.friendly.Friendly;
 import com.Geary.towerdefense.entity.mob.navigation.MobPathNavigator;
-import com.Geary.towerdefense.entity.mob.navigation.TileRandomMover;
 import com.Geary.towerdefense.entity.resources.Resource;
 import com.Geary.towerdefense.entity.world.Cell;
 import com.Geary.towerdefense.world.GameWorld;
@@ -36,7 +36,6 @@ public abstract class Mob extends Entity implements Cloneable {
     public boolean reversed = false;
 
     protected MobPathNavigator pathNavigator;
-    protected TileRandomMover randomMover;
 
     protected float speed;      // units per second
     protected float ranMoveProb; // probability for wiggle
@@ -44,8 +43,8 @@ public abstract class Mob extends Entity implements Cloneable {
     public float collisionCooldown = 0f;
 
     protected Mob(float xPos, float yPos, MobStats stats, Order order) {
-        this.xPos = xPos;
-        this.yPos = yPos;
+        this.xPos = xPos - size / 2;
+        this.yPos = yPos - size / 2;
         this.order = order;
 
         this.name = stats.name();
@@ -69,7 +68,6 @@ public abstract class Mob extends Entity implements Cloneable {
 
     public void setPath(List<Cell> path, int cellSize, boolean reverse) {
         pathNavigator = new MobPathNavigator(path, cellSize, reverse);
-        randomMover = new TileRandomMover(cellSize);
 
         // Initialize velocity in the starting cell's direction
         Cell cell = pathNavigator.getCurrentCell();
@@ -120,11 +118,18 @@ public abstract class Mob extends Entity implements Cloneable {
         handleCellEntry(cell);
         Cell previousCell = pathNavigator.getPreviousCell();
         if (overlapsCell(previousCell)) {
-//            applyPathWalls(previousCell, cellSize);
+            if (this instanceof Friendly) {
+                System.out.println("Overlapping previous cell, using that movement instead");
+                System.out.println("using direction: "+pathNavigator.getLeaveDirectionForCell(previousCell));
+                System.out.println("vx vy:"+vx+","+vy);
+            }
             applyOverlapMovement(previousCell, delta);
             applyPathWalls(previousCell, cellSize);//apply the walls of the previous cell if I overlap with it
             //won't do anything on straights, but on corners this matters.
         } else {
+            if (this instanceof Friendly) {
+                System.out.println("No overlap with previous - moving in primary cell direction.");
+            }
             handleMovement(delta);
         }
         applyPathWalls(cell, cellSize);//always apply the walls of the "current" cell
@@ -155,9 +160,7 @@ public abstract class Mob extends Entity implements Cloneable {
         Direction dir = pathNavigator.getLeaveDirectionForCell(cell);
         if (dir == null) return;
 
-//        if (abs(vx) + abs(vy) < 1) {//only apply if we're not really moving maybe?
-            applyMovement(speed, dir, delta);
-//        }
+        applyMovement(speed, dir, delta);
     }
 
     private void applyMovement(float speed, Direction direction, float delta) {
@@ -262,122 +265,61 @@ public abstract class Mob extends Entity implements Cloneable {
         float top = cell.y + cellSize;
         float bounceFactor = 0.2f;
 
-        // Determine entry and exit directions
         Direction entryDir = reversed ? cell.reverseNextDirection : cell.direction;
         Direction exitDir = reversed ? cell.reverseDirection : cell.nextDirection;
 
-        // --- Entry wall (hard clamp on same side as entryDir) ---
         switch (entryDir) {
             case LEFT -> {
-                if (xPos < left + collisionRadius) {
-                    xPos = left + collisionRadius;
+                if (xPos < left) {
+                    xPos = left;
                     vx = -vx * bounceFactor;
                 }
             }
             case RIGHT -> {
-                if (xPos + size > right - collisionRadius) {
-                    xPos = right - size - collisionRadius;
+                if (xPos + size > right) {
+                    xPos = right - size;
                     vx = -vx * bounceFactor;
                 }
             }
             case UP -> {
-                if (yPos + size > top - collisionRadius) {
-                    yPos = top - size - collisionRadius;
+                if (yPos + size > top) {
+                    yPos = top - size;
                     vy = -vy * bounceFactor;
                 }
             }
             case DOWN -> {
-                if (yPos < bottom + collisionRadius) {
-                    yPos = bottom + collisionRadius;
+                if (yPos < bottom) {
+                    yPos = bottom;
                     vy = -vy * bounceFactor;
                 }
             }
         }
 
-        // --- Exit wall (hard clamp on opposite side of exitDir) ---
         switch (exitDir) {
             case LEFT -> {
-                if (xPos + size > right - collisionRadius) {
-                    xPos = right - size - collisionRadius;
+                if (xPos + size > right) {
+                    xPos = right - size;
                     vx = -vx * bounceFactor;
                 }
             }
             case RIGHT -> {
-                if (xPos < left + collisionRadius) {
-                    xPos = left + collisionRadius;
+                if (xPos < left) {
+                    xPos = left;
                     vx = -vx * bounceFactor;
                 }
             }
             case UP -> {
-                if (yPos < bottom + collisionRadius) {
-                    yPos = bottom + collisionRadius;
+                if (yPos < bottom) {
+                    yPos = bottom;
                     vy = -vy * bounceFactor;
                 }
             }
             case DOWN -> {
-                if (yPos + size > top - collisionRadius) {
-                    yPos = top - size - collisionRadius;
+                if (yPos + size > top) {
+                    yPos = top - size;
                     vy = -vy * bounceFactor;
                 }
             }
-        }
-
-        // --- Inner corner as diagonal wall ---
-        float cx = 0f, cy = 0f;
-        boolean isDiagonalUpRight = false; // will help select normal
-
-        if ((entryDir == Direction.UP && exitDir == Direction.RIGHT) ||
-            (entryDir == Direction.LEFT && exitDir == Direction.DOWN)) {
-            cx = right;
-            cy = bottom;
-            isDiagonalUpRight = true;
-        } else if ((entryDir == Direction.RIGHT && exitDir == Direction.UP) ||
-            (entryDir == Direction.DOWN && exitDir == Direction.LEFT)) {
-            cx = left;
-            cy = top;
-            isDiagonalUpRight = true;
-        } else if ((entryDir == Direction.DOWN && exitDir == Direction.RIGHT) ||
-            (entryDir == Direction.LEFT && exitDir == Direction.UP)) {
-            cx = right;
-            cy = top;
-            isDiagonalUpRight = false;
-        } else if ((entryDir == Direction.RIGHT && exitDir == Direction.DOWN) ||
-            (entryDir == Direction.UP && exitDir == Direction.LEFT)) {
-            cx = left;
-            cy = bottom;
-            isDiagonalUpRight = false;
-        }
-
-        // Vector from corner to mob center
-        float mx = xPos + size * 0.5f;
-        float my = yPos + size * 0.5f;
-        float dx = mx - cx;
-        float dy = my - cy;
-        float distSq = dx * dx + dy * dy;
-        float minDist = collisionRadius;
-
-        if (distSq < minDist * minDist) {
-            float dist = (float) Math.sqrt(distSq);
-            if (dist < 0.0001f) dist = 0.0001f;
-
-            // Push mob out of corner
-            float overlap = minDist - dist;
-            xPos += (dx / dist) * overlap;
-            yPos += (dy / dist) * overlap;
-
-            // Diagonal wall normal
-            float sqrt2inv = 1f / (float) Math.sqrt(2f);
-            float nx = isDiagonalUpRight ? -sqrt2inv : sqrt2inv;
-            float ny = sqrt2inv;
-
-            // Reflect velocity over diagonal
-            float dot = vx * nx + vy * ny;
-            vx = vx - 2f * dot * nx;
-            vy = vy - 2f * dot * ny;
-
-            // Apply bounce factor
-            vx *= bounceFactor;
-            vy *= bounceFactor;
         }
     }
 
@@ -449,10 +391,10 @@ public abstract class Mob extends Entity implements Cloneable {
         float right = cell.x + pathNavigator.getCellSize();
         float bottom = cell.y;
         float top = cell.y + pathNavigator.getCellSize();
-
-        return xPos + size > left &&
+        boolean overlaps = xPos + size > left &&
             xPos < right &&
             yPos + size > bottom &&
             yPos < top;
+        return overlaps;
     }
 }
