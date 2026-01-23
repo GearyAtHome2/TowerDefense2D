@@ -11,8 +11,10 @@ import java.util.Map;
 public class IconStore {
 
     private static final Map<Resource.RawResourceType, TextureRegion> RAW_ICONS = new EnumMap<>(Resource.RawResourceType.class);
+
     private static final Map<Resource.RefinedResourceType, TextureRegion> REFINED_ICONS = new EnumMap<>(Resource.RefinedResourceType.class);
     private static final Map<String, TextureRegion> MOB_ICONS = new HashMap<>();
+    private static final Map<String, TextureRegion> AMMO_ICONS = new HashMap<>();
 
     private static final Map<Icon, TextureRegion> SYMBOL_ICONS = new EnumMap<>(Icon.class);
 
@@ -49,6 +51,7 @@ public class IconStore {
         return RAW_ICONS.get(type);
     }
 
+
     public static TextureRegion refinedResource(Resource.RefinedResourceType type) {
         return REFINED_ICONS.get(type);
     }
@@ -71,6 +74,24 @@ public class IconStore {
         }
     }
 
+    public static TextureRegion ammo(String ammoName) {
+        if (ammoName == null) return null;
+
+        String key = ammoName.toLowerCase().replace(" ", "_");
+        TextureRegion icon = AMMO_ICONS.get(key);
+        if (icon != null) return icon;
+
+        try {
+            Texture texture = new Texture("icons/ammo/" + key + ".png");
+            icon = new TextureRegion(texture);
+            AMMO_ICONS.put(key, icon);
+            return icon;
+        } catch (Exception e) {
+            System.err.println("Missing mob icon: " + key);
+            return null;
+        }
+    }
+
 
     public enum Icon {
         ARROW_SYMBOL;
@@ -79,4 +100,6 @@ public class IconStore {
             return this.name();
         }
     }
+
+    //todo: add a dispose() upoin level completion?
 }

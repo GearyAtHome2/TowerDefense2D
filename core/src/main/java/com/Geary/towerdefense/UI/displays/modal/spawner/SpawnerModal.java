@@ -203,6 +203,7 @@ public class SpawnerModal extends Modal {
             int idx = (int) ((x - bounds.x) /
                 (bounds.width / tabs.getTabs().size()));
             tabs.setActiveTabIndex(idx);
+            mobScrollBox.scrollOffset = 0;
             applyActiveTab();
             return true;
         }

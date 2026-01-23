@@ -8,13 +8,14 @@ import java.util.List;
 
 public class ShotgunTower extends Tower {
 
-    // Prototype bullet; used to create new bullets when shooting
     public Bullet selectedAmmo;
 
-    public ShotgunTower(float x, float y) {
-        super(x, y, "Shotgun Tower", new BasicBullet(0.5f, 400f), 0.6f, 0.5f, 175f);
+    public ShotgunTower(float x, float y) {//todo: update these towers to instantiate with a bullet type that works for firing.
+        super(x, y, "Shotgun Tower", new BasicBullet(), 0.6f, 0.5f, 175f);
         this.targetingStrategy = TargetingStrategy.CLOSEST;
         this.simultShots = 5;
+        List<Bullet> supportedBullets = List.of(new BasicBullet(), new BasicBullet(), new BasicBullet(), new BasicBullet(), new BasicBullet(), new BasicBullet());
+        setSupportedAmmo(supportedBullets);
     }
 
     // --- UI Info ---

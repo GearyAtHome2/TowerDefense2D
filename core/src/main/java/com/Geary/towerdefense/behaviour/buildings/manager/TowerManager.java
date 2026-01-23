@@ -88,6 +88,10 @@ public class TowerManager extends BuildingManager<Tower> {
         }
     }
 
+//    public boolean canAffordToShoot(Tower tower){
+//
+//    }
+
     public void unlockTower(String name) {
         allTowerTypes.stream()
             .filter(t -> t.name.equals(name))

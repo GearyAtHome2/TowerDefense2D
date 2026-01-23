@@ -1,30 +1,60 @@
 package com.Geary.towerdefense.entity.mob.bullet;
 
 import com.Geary.towerdefense.entity.mob.enemy.Enemy;
+import com.Geary.towerdefense.entity.resources.Resource;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
+import java.util.EnumMap;
 import java.util.List;
 
 public abstract class Bullet {
 
-    protected float x;
-    protected float y;
-    protected float vx;
-    protected float vy;
-    protected int damage;
-    protected float speed;
-    protected float maxLifeTime;//protect these once fixed
-    protected float lifetime;
+    public float x;
+    public float y;
+    public float vx;
+    public float vy;
+    public int damage;
+    public float speed;
+    public float maxLifeTime;//protect these once fixed
+    public float lifetime;
+    protected float knockback;
+    public String name;
+    public float size;
+    public Color color;
+    EnumMap<Resource.RawResourceType, Double> rawResourceCost;
+    EnumMap<Resource.RefinedResourceType, Double> refinedResourceCost;
+
+    protected Bullet(String name, int damage, float speed, float maxLifeTime, float knockback, float size, Color color) {
+        this.name = name;
+        this.damage = damage;
+        this.speed = speed;
+        this.maxLifeTime = maxLifeTime;
+        this.knockback = knockback;
+        this.size = size;
+        this.color = color;
+    }
 
     // Subclasses must provide these constants
-    public abstract float getSpeed();
+    public float getSpeed() {
+        return speed;
+    }
 
-    protected abstract float getSize();
+    public float getKnockBack() {
+        return knockback;
+    }
 
-    protected abstract float getMaxLifetime();
+    protected float getSize() {
+        return size;
+    }
 
-    protected abstract Color getColor();
+    protected float getMaxLifetime() {
+        return maxLifeTime;
+    }
+
+    protected Color getColor() {
+        return color;
+    }
 
     /**
      * Factory method: creates a new instance for shooting
@@ -35,6 +65,11 @@ public abstract class Bullet {
      * Update position, check collision with enemies, return false if bullet should be removed
      */
     public boolean update(float delta, List<Enemy> enemies) {
+        System.out.println("updating for bullet: "+this.getClass().getName());
+        System.out.println("xy: "+this.x+" : "+this.y);
+        System.out.println("vxy: "+this.vx+" : "+this.vy);
+        System.out.println("size: "+getSize());
+        System.out.println("lt: "+this.lifetime+"/"+this.maxLifeTime);
         lifetime += delta;
         if (lifetime > getMaxLifetime()) return false;
 
@@ -43,6 +78,8 @@ public abstract class Bullet {
 
         x += vx * delta;
         y += vy * delta;
+
+        System.out.println("new xy: "+this.x+" : "+this.y);
 
         Enemy firstHit = null;
         float hitX = x;

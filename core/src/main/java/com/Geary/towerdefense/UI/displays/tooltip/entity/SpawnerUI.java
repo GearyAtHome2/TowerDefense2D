@@ -24,7 +24,7 @@ public class SpawnerUI extends DefaultEntityUI {
         if (entity instanceof FriendlySpawner spawner) {
             addStackedButton("Open Spawner Menu", popupX, popupWidth, scale, 0.2f, 0.6f, 1f,
                 () -> {
-                    world.showSpawnerMenu(spawner, font, camera);
+                    world.showSpawnerModal(spawner, font, camera);
                 });
         }
     }

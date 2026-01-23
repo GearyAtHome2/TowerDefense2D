@@ -5,26 +5,25 @@ import com.badlogic.gdx.graphics.Color;
 
 import java.util.EnumMap;
 
-public class BasicBullet extends Bullet {
+public class KnockBackBullet extends Bullet {
 
     //creates the bullet for modal purposes
-    public BasicBullet() {
-        super("Basic", 1, 280f, 2.8f, 0, 5.3f, Color.GRAY);
+    public KnockBackBullet() {
+        super("Rock", 1, 350f, 0.4f, 10, 0, Color.GRAY);
         EnumMap<Resource.RawResourceType, Double> rawResourceCost =  new EnumMap<>(Resource.RawResourceType.class);
         EnumMap<Resource.RefinedResourceType, Double> refinedResourceCost =  new EnumMap<>(Resource.RefinedResourceType.class);
-        refinedResourceCost.put(Resource.RefinedResourceType.BASIC_AMMO, 1.0);
+        rawResourceCost.put(Resource.RawResourceType.STONE, 1.0);
         setResourceCost(rawResourceCost, refinedResourceCost);
     }
 
     //bullet for game purposes.
-    private BasicBullet(float x, float y, float angle,
-                        float maxLifeTime, float speed, float size, Color color) {
-        super("Basic", 1, speed, maxLifeTime, 0, size ,color);
+    private KnockBackBullet(float x, float y, float angle,
+                            float maxLifeTime, float speed) {
+        super("Rock", 1, speed, maxLifeTime, 10, 8.1f, Color.GRAY);
         this.x = x;
         this.y = y;
         this.vx = (float) Math.cos(angle) * speed;
-        this.vy = (float)
-            Math.sin(angle) * speed;
+        this.vy = (float) Math.sin(angle) * speed;
         this.lifetime = 0;
     }
 
@@ -39,6 +38,6 @@ public class BasicBullet extends Bullet {
 
     @Override
     public Bullet createInstance(float x, float y, float angle) {
-        return new BasicBullet(x, y, angle, this.maxLifeTime, this.speed, this.getSize(), this.getColor());
+        return new KnockBackBullet(x, y, angle, this.maxLifeTime, this.speed);
     }
 }

@@ -20,12 +20,6 @@ public class ShootingHelper {
 
         float angleDiff = AimingHelper.shortestAngleDiff(tower.gunAngle, leadAngle);
         float shootThreshold = (float) Math.toRadians(25);//todo: configure this at some point. It's a bit of a mess tbh
-
-        if (!(Math.abs(angleDiff) <= shootThreshold)){
-            System.out.println("unable to shoot due to angle diff:");
-            System.out.println("threshold:"+shootThreshold);
-            System.out.println("diff"+angleDiff);
-        }
         return Math.abs(angleDiff) <= shootThreshold;
     }
 

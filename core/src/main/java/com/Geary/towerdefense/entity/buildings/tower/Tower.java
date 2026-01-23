@@ -20,6 +20,8 @@ public abstract class Tower extends Building implements Cloneable {
     public float accuracy; // 0 = always miss, 1 = perfect accuracy
     public int simultShots = 1;
     public int burst = 0;
+    public List<Bullet> supportedAmmo;
+    public Bullet selectedAmmo;
 
     protected enum TargetingStrategy {
         CLOSEST,
@@ -32,15 +34,19 @@ public abstract class Tower extends Building implements Cloneable {
     public float gunAngle = (float) Math.PI / 2f;
 
     // Prototype bullet; used to create new bullets when shooting
-    public Bullet selectedAmmo;
 
     public Tower(float x, float y, String name, Bullet ammo, float maxCooldown, float accuracy, float range) {
         super(x, y);
         this.name = name;
         this.selectedAmmo = ammo;
         this.maxCooldown = maxCooldown;
+//        this.maxCooldown=200;
         this.accuracy = accuracy;
         this.range = range;
+    }
+
+    public void setSupportedAmmo(List<Bullet> supportedAmmo){
+        this.supportedAmmo = supportedAmmo;
     }
 
     @Override
@@ -82,6 +88,11 @@ public abstract class Tower extends Building implements Cloneable {
             if (b != null) {
                 bullets.add(b);
                 System.out.println("shooting bullet: " + b);
+                System.out.println("xy: " + b.getCenterX()+" : "+b.getCenterX());
+                System.out.println("speed: " + b.getSpeed());
+                System.out.println("size: " + b.size);
+                System.out.println("vxvy: " + b.vx+":"+b.vy);
+                System.out.println("ML: " + b.maxLifeTime);
             }
         }
         System.out.println("firing all bullets:: "+bullets.size());
@@ -133,6 +144,10 @@ public abstract class Tower extends Building implements Cloneable {
         float aimY = targetY + targetVY * t;
 
         return new float[]{aimX, aimY};
+    }
+
+    public List<Bullet> getSupportedAmmo(){
+        return supportedAmmo;
     }
 
     // --- UI Info ---
