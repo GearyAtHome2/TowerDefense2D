@@ -9,7 +9,7 @@ public class BasicBullet extends Bullet {
 
     //creates the bullet for modal purposes
     public BasicBullet() {
-        super("Basic", 1, 280f, 2.8f, 0, 5.3f, Color.GRAY);
+        super("Basic", 1, 360f, 0.65f, 0, 5.3f, Color.GRAY);
         EnumMap<Resource.RawResourceType, Double> rawResourceCost =  new EnumMap<>(Resource.RawResourceType.class);
         EnumMap<Resource.RefinedResourceType, Double> refinedResourceCost =  new EnumMap<>(Resource.RefinedResourceType.class);
         refinedResourceCost.put(Resource.RefinedResourceType.BASIC_AMMO, 1.0);

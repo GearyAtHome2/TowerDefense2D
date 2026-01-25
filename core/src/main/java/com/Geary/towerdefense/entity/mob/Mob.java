@@ -2,7 +2,6 @@ package com.Geary.towerdefense.entity.mob;
 
 import com.Geary.towerdefense.Direction;
 import com.Geary.towerdefense.entity.Entity;
-import com.Geary.towerdefense.entity.mob.friendly.Friendly;
 import com.Geary.towerdefense.entity.mob.navigation.MobPathNavigator;
 import com.Geary.towerdefense.entity.resources.Resource;
 import com.Geary.towerdefense.entity.world.Cell;
@@ -118,18 +117,10 @@ public abstract class Mob extends Entity implements Cloneable {
         handleCellEntry(cell);
         Cell previousCell = pathNavigator.getPreviousCell();
         if (overlapsCell(previousCell)) {
-            if (this instanceof Friendly) {
-                System.out.println("Overlapping previous cell, using that movement instead");
-                System.out.println("using direction: "+pathNavigator.getLeaveDirectionForCell(previousCell));
-                System.out.println("vx vy:"+vx+","+vy);
-            }
             applyOverlapMovement(previousCell, delta);
             applyPathWalls(previousCell, cellSize);//apply the walls of the previous cell if I overlap with it
             //won't do anything on straights, but on corners this matters.
         } else {
-            if (this instanceof Friendly) {
-                System.out.println("No overlap with previous - moving in primary cell direction.");
-            }
             handleMovement(delta);
         }
         applyPathWalls(cell, cellSize);//always apply the walls of the "current" cell

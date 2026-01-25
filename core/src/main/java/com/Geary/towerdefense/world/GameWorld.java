@@ -4,6 +4,7 @@ import com.Geary.towerdefense.Direction;
 import com.Geary.towerdefense.UI.displays.modal.Modal;
 import com.Geary.towerdefense.UI.displays.modal.manufacturing.FactoryModal;
 import com.Geary.towerdefense.UI.displays.modal.spawner.SpawnerModalManager;
+import com.Geary.towerdefense.UI.displays.modal.tower.TowerModal;
 import com.Geary.towerdefense.UI.displays.modal.tower.TowerModalManager;
 import com.Geary.towerdefense.behaviour.MobManager;
 import com.Geary.towerdefense.behaviour.ResourceManager;
@@ -268,7 +269,7 @@ public class GameWorld {
     }
 
     public void showTowerModal(Tower tower, BitmapFont font, OrthographicCamera uiCamera) {
-        activeModal = towerModalManager.getTowerModal(tower, gameStateManager, font, uiCamera);
+        activeModal = new TowerModal(tower, gameStateManager, font, uiCamera);
     }
 
     public void setActiveModal(Modal modal) {

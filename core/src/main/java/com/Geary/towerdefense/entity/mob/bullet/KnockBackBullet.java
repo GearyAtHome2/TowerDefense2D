@@ -9,7 +9,7 @@ public class KnockBackBullet extends Bullet {
 
     //creates the bullet for modal purposes
     public KnockBackBullet() {
-        super("Rock", 1, 350f, 0.4f, 10, 0, Color.GRAY);
+        super("Rock", 1, 280f, 0.9f, 10, 0, Color.GRAY);
         EnumMap<Resource.RawResourceType, Double> rawResourceCost =  new EnumMap<>(Resource.RawResourceType.class);
         EnumMap<Resource.RefinedResourceType, Double> refinedResourceCost =  new EnumMap<>(Resource.RefinedResourceType.class);
         rawResourceCost.put(Resource.RawResourceType.STONE, 1.0);

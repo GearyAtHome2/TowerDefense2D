@@ -29,18 +29,14 @@ public abstract class Tower extends Building implements Cloneable {
     }
 
     public TargetingStrategy targetingStrategy = TargetingStrategy.CLOSEST;
-    // Current target and gun angle
     public Enemy currentTarget = null;
     public float gunAngle = (float) Math.PI / 2f;
-
-    // Prototype bullet; used to create new bullets when shooting
 
     public Tower(float x, float y, String name, Bullet ammo, float maxCooldown, float accuracy, float range) {
         super(x, y);
         this.name = name;
         this.selectedAmmo = ammo;
         this.maxCooldown = maxCooldown;
-//        this.maxCooldown=200;
         this.accuracy = accuracy;
         this.range = range;
     }
@@ -87,15 +83,8 @@ public abstract class Tower extends Building implements Cloneable {
             Bullet b = ShootingHelper.shoot(this, target, selectedAmmo);
             if (b != null) {
                 bullets.add(b);
-                System.out.println("shooting bullet: " + b);
-                System.out.println("xy: " + b.getCenterX()+" : "+b.getCenterX());
-                System.out.println("speed: " + b.getSpeed());
-                System.out.println("size: " + b.size);
-                System.out.println("vxvy: " + b.vx+":"+b.vy);
-                System.out.println("ML: " + b.maxLifeTime);
             }
         }
-        System.out.println("firing all bullets:: "+bullets.size());
         return bullets;
     }
 

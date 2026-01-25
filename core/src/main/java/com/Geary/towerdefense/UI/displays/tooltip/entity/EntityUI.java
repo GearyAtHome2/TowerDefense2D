@@ -119,14 +119,13 @@ public abstract class EntityUI {
     }
 
 
-
     protected float getPopupX(Entity entity) {
-        // default: next to entity (handles mobs too)
-        return entity.xPos  + 5;
+        float pos = entity.xPos + (2 * entity.collisionRadius)+1000;
+        return pos;
     }
 
     protected float getPopupY(Entity entity) {
-        return entity.yPos;
+        return entity.yPos + (2 * entity.collisionRadius);
     }
 
     protected abstract boolean shouldDrawDeleteButton(Entity entity);
@@ -205,12 +204,15 @@ public abstract class EntityUI {
 
         float preferredX = getPopupX(entity);
 
-        float worldLeft = camera.position.x - camera.viewportWidth * 0.5f * camera.zoom;
-        float worldRight = camera.position.x + camera.viewportWidth * 0.5f * camera.zoom;
+        float halfWidth = camera.viewportWidth * camera.zoom * 0.5f;
 
-        float minX = worldLeft + 5;
-        float maxX = worldRight - popupWidth - 5;
+        float worldLeft  = camera.position.x - halfWidth;
+        float worldRight = camera.position.x + halfWidth;
 
+        float margin = 5f;
+
+        float minX = worldLeft + margin;
+        float maxX = worldRight - popupWidth - margin;
         return MathUtils.clamp(preferredX, minX, maxX);
     }
 

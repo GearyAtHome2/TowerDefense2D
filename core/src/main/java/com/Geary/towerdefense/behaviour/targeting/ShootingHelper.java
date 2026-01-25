@@ -19,7 +19,8 @@ public class ShootingHelper {
         float leadAngle = (float) Math.atan2(dyLead, dxLead);
 
         float angleDiff = AimingHelper.shortestAngleDiff(tower.gunAngle, leadAngle);
-        float shootThreshold = (float) Math.toRadians(25);//todo: configure this at some point. It's a bit of a mess tbh
+        float shootThreshold = (float) Math.toRadians(25);
+
         return Math.abs(angleDiff) <= shootThreshold;
     }
 

@@ -11,8 +11,8 @@ public class TargetingHelper {
         Enemy closest = null;
         float closestDistance = Float.MAX_VALUE;
 
-        float centerX = tower.xPos;
-        float centerY = tower.yPos;
+        float centerX = tower.getCentreX();
+        float centerY = tower.getCentreY();
 
         for (Enemy e : enemies) {
             float dx = e.getCenterX() - centerX;
@@ -31,8 +31,8 @@ public class TargetingHelper {
         Enemy best = null;
         float mostProgressed = 0;
 
-        float centerX = tower.xPos;
-        float centerY = tower.yPos;
+        float centerX = tower.getCentreX();
+        float centerY = tower.getCentreY();
 
         for (Enemy e : enemies) {
             float dx = e.getCenterX() - centerX;
@@ -42,10 +42,6 @@ public class TargetingHelper {
             float tileProgress = e.getPathIndex();
 
             if (distSqu <= (tower.range * tower.range) && tileProgress > mostProgressed) {
-                System.out.println("found enemy at squ distance:"+distSqu);
-                System.out.println("my range^2 is:"+ (tower.range * tower.range));
-                System.out.println("tower location:"+ tower.xPos +", " +tower.yPos);
-                System.out.println("enemy location:"+ e.xPos +", " +e.yPos);
                 mostProgressed = tileProgress;
                 best = e;
             }

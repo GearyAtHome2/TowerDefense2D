@@ -329,7 +329,6 @@ public class GameScreen implements Screen {
 
         selectedEntity = entity;
         activeEntityUI = uiManager.getUIFor(entity);
-
     }
 
     private void clearEntitySelection() {

@@ -65,11 +65,6 @@ public abstract class Bullet {
      * Update position, check collision with enemies, return false if bullet should be removed
      */
     public boolean update(float delta, List<Enemy> enemies) {
-        System.out.println("updating for bullet: "+this.getClass().getName());
-        System.out.println("xy: "+this.x+" : "+this.y);
-        System.out.println("vxy: "+this.vx+" : "+this.vy);
-        System.out.println("size: "+getSize());
-        System.out.println("lt: "+this.lifetime+"/"+this.maxLifeTime);
         lifetime += delta;
         if (lifetime > getMaxLifetime()) return false;
 
@@ -78,8 +73,6 @@ public abstract class Bullet {
 
         x += vx * delta;
         y += vy * delta;
-
-        System.out.println("new xy: "+this.x+" : "+this.y);
 
         Enemy firstHit = null;
         float hitX = x;

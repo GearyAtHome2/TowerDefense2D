@@ -18,12 +18,12 @@ public class DefaultEntityUI extends EntityUI {
 
     @Override
     protected float getPopupX(Entity entity) {
-        return entity.xPos + 5;
+        return entity.xPos + entity.collisionRadius*2;
     }
 
     @Override
     protected float getPopupY(Entity entity) {
-        return entity.yPos + 5;
+        return entity.yPos + entity.collisionRadius*2;
     }
 
     @Override
