@@ -2,6 +2,7 @@ package com.Geary.towerdefense.entity.buildings.tower;
 
 import com.Geary.towerdefense.entity.mob.bullet.BasicBullet;
 import com.Geary.towerdefense.entity.mob.bullet.Bullet;
+import com.Geary.towerdefense.entity.mob.bullet.BulletRepr;
 import com.badlogic.gdx.graphics.Color;
 
 import java.util.List;
@@ -10,11 +11,11 @@ public class ShotgunTower extends Tower {
 
     public Bullet selectedAmmo;
 
-    public ShotgunTower(float x, float y) {//todo: update these towers to instantiate with a bullet type that works for firing.
+    public ShotgunTower(float x, float y) {
         super(x, y, "Shotgun Tower", new BasicBullet(), 0.6f, 0.5f, 175f);
         this.targetingStrategy = TargetingStrategy.CLOSEST;
         this.simultShots = 5;
-        List<Bullet> supportedBullets = List.of(new BasicBullet(), new BasicBullet(), new BasicBullet(), new BasicBullet(), new BasicBullet(), new BasicBullet());
+        List<BulletRepr<? extends Bullet>> supportedBullets = List.of(new BulletRepr<>(new BasicBullet()),new BulletRepr<>(new BasicBullet()), new BulletRepr<>(new BasicBullet()), new BulletRepr<>(new BasicBullet()), new BulletRepr<>(new BasicBullet()), new BulletRepr<>(new BasicBullet()));
         setSupportedAmmo(supportedBullets);
     }
 

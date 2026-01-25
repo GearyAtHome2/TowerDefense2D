@@ -3,7 +3,7 @@ package com.Geary.towerdefense.UI.displays.modal.tower;
 import com.Geary.towerdefense.UI.displays.modal.Modal;
 import com.Geary.towerdefense.UI.displays.modal.scrollbox.VerticalScrollBox;
 import com.Geary.towerdefense.entity.buildings.tower.Tower;
-import com.Geary.towerdefense.entity.mob.bullet.Bullet;
+import com.Geary.towerdefense.entity.mob.bullet.BulletRepr;
 import com.Geary.towerdefense.world.GameStateManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -57,7 +57,7 @@ public class TowerModal extends Modal {
         populateAmmo();
         populateTargeting();
 
-        this.activeEntry = ammoScrollBox.entries.stream().filter(entry -> entry.getBullet().name.equals(tower.selectedAmmo.name)).findFirst().get();
+        this.activeEntry = ammoScrollBox.entries.stream().filter(entry -> entry.getBullet().getName().equals(tower.selectedAmmoRepr.getName())).findFirst().get();
         setActive(activeEntry);
         //what's the point of the activeentry in this class then?
     }
@@ -190,7 +190,7 @@ public class TowerModal extends Modal {
         activeEntry = entry;
         activeEntry.active = true;
 
-        tower.selectedAmmo = entry.getBullet();
+        tower.configureSelectedAmmo(entry.getBullet());
     }
 
     private void drawAmmoInfoBox(ShapeRenderer renderer, SpriteBatch batch) {
@@ -210,11 +210,11 @@ public class TowerModal extends Modal {
 
         if (selectedEntry == null) return;
 
-        Bullet b = selectedEntry.getBullet();
+        BulletRepr b = selectedEntry.getBullet();
 
         batch.begin();
-        font.draw(batch, "Name: " + b.name, boxX + 10, boxY + boxH - 20);
-        font.draw(batch, "Damage: " + b.damage, boxX + 10, boxY + boxH - 45);
+        font.draw(batch, "Name: " + b.getName(), boxX + 10, boxY + boxH - 20);
+        font.draw(batch, "Damage: " + b.getDamage(), boxX + 10, boxY + boxH - 45);
         font.draw(batch, "Speed: " + b.getSpeed(), boxX + 10, boxY + boxH - 70);
         batch.end();
 
@@ -245,7 +245,7 @@ public class TowerModal extends Modal {
 
     private void populateAmmo() {
         List<BulletScrollEntry> entries = new ArrayList<>();
-        for (Bullet bullet : this.tower.supportedAmmo) {
+        for (BulletRepr bullet : this.tower.supportedAmmoRepr) {
             entries.add(new BulletScrollEntry(bullet));
         }
 

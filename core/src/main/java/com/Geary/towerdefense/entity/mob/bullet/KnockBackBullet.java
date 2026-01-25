@@ -9,7 +9,7 @@ public class KnockBackBullet extends Bullet {
 
     //creates the bullet for modal purposes
     public KnockBackBullet() {
-        super("Rock", 1, 280f, 0.9f, 10, 0, Color.GRAY);
+        super("Rock", 1, 180f, 0.9f, 10, 0, Color.DARK_GRAY);
         EnumMap<Resource.RawResourceType, Double> rawResourceCost =  new EnumMap<>(Resource.RawResourceType.class);
         EnumMap<Resource.RefinedResourceType, Double> refinedResourceCost =  new EnumMap<>(Resource.RefinedResourceType.class);
         rawResourceCost.put(Resource.RawResourceType.STONE, 1.0);
@@ -19,7 +19,7 @@ public class KnockBackBullet extends Bullet {
     //bullet for game purposes.
     private KnockBackBullet(float x, float y, float angle,
                             float maxLifeTime, float speed) {
-        super("Rock", 1, speed, maxLifeTime, 10, 8.1f, Color.GRAY);
+        super("Rock", 1, speed, maxLifeTime, 10, 8.1f, Color.DARK_GRAY);
         this.x = x;
         this.y = y;
         this.vx = (float) Math.cos(angle) * speed;

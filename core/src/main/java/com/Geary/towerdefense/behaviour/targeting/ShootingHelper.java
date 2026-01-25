@@ -2,6 +2,7 @@ package com.Geary.towerdefense.behaviour.targeting;
 
 import com.Geary.towerdefense.entity.buildings.tower.Tower;
 import com.Geary.towerdefense.entity.mob.bullet.Bullet;
+import com.Geary.towerdefense.entity.mob.bullet.BulletRepr;
 import com.Geary.towerdefense.entity.mob.enemy.Enemy;
 
 public class ShootingHelper {
@@ -24,7 +25,7 @@ public class ShootingHelper {
         return Math.abs(angleDiff) <= shootThreshold;
     }
 
-    public static Bullet shoot(Tower tower, Enemy target, Bullet ammo) {
+    public static Bullet shoot(Tower tower, Enemy target, BulletRepr bullet) {
         float centerX = tower.getCentreX();
         float centerY = tower.getCentreY();
 
@@ -40,7 +41,7 @@ public class ShootingHelper {
         float angle = tower.gunAngle;
         float maxDeviation = (1f - tower.accuracy) * (float) Math.PI / 6f;
         angle += (Math.random() * 2f - 1f) * maxDeviation;
-        return tower.selectedAmmo.createInstance(
+        return tower.selectedAmmoRepr.createInstance(
             tower.getCentreX(),
             tower.getCentreY(),
             angle

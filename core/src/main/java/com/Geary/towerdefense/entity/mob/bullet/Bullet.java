@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import java.util.EnumMap;
 import java.util.List;
 
+import static com.badlogic.gdx.math.MathUtils.random;
+
 public abstract class Bullet {
 
     public float x;
@@ -28,8 +30,10 @@ public abstract class Bullet {
     protected Bullet(String name, int damage, float speed, float maxLifeTime, float knockback, float size, Color color) {
         this.name = name;
         this.damage = damage;
-        this.speed = speed;
-        this.maxLifeTime = maxLifeTime;
+        float randomSpeedExtension = 1 + random() * 0.1f;//make a bullet randomly go up to 10% faster.
+        this.speed = speed * randomSpeedExtension;
+        float randomLifeTimeExtension = 1 + random() * 0.1f;//make a bullet randomly go up to 10% beyong configured range.
+        this.maxLifeTime = maxLifeTime * randomLifeTimeExtension;
         this.knockback = knockback;
         this.size = size;
         this.color = color;

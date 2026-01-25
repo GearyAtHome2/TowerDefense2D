@@ -5,6 +5,7 @@ import com.Geary.towerdefense.behaviour.targeting.ShootingHelper;
 import com.Geary.towerdefense.behaviour.targeting.TargetingHelper;
 import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.entity.mob.bullet.Bullet;
+import com.Geary.towerdefense.entity.mob.bullet.BulletRepr;
 import com.Geary.towerdefense.entity.mob.enemy.Enemy;
 import com.badlogic.gdx.graphics.Color;
 
@@ -20,8 +21,8 @@ public abstract class Tower extends Building implements Cloneable {
     public float accuracy; // 0 = always miss, 1 = perfect accuracy
     public int simultShots = 1;
     public int burst = 0;
-    public List<Bullet> supportedAmmo;
-    public Bullet selectedAmmo;
+    public BulletRepr<? extends Bullet> selectedAmmoRepr;
+    public List<BulletRepr<? extends Bullet>> supportedAmmoRepr;
 
     protected enum TargetingStrategy {
         CLOSEST,
@@ -32,17 +33,22 @@ public abstract class Tower extends Building implements Cloneable {
     public Enemy currentTarget = null;
     public float gunAngle = (float) Math.PI / 2f;
 
-    public Tower(float x, float y, String name, Bullet ammo, float maxCooldown, float accuracy, float range) {
+    public Tower(float x, float y, String name, Bullet bullet, float maxCooldown, float accuracy, float range) {
         super(x, y);
         this.name = name;
-        this.selectedAmmo = ammo;
         this.maxCooldown = maxCooldown;
         this.accuracy = accuracy;
         this.range = range;
+        configureSelectedAmmo(new BulletRepr<>(bullet));
     }
 
-    public void setSupportedAmmo(List<Bullet> supportedAmmo){
-        this.supportedAmmo = supportedAmmo;
+    public void setSupportedAmmo(List<BulletRepr<? extends Bullet>> supportedAmmo){
+        this.supportedAmmoRepr = supportedAmmo;
+    }
+
+    public void configureSelectedAmmo(BulletRepr<? extends Bullet> repr){
+        repr.template.maxLifeTime = range / repr.getSpeed(); // optional adjustment
+        this.selectedAmmoRepr = repr;
     }
 
     @Override
@@ -77,10 +83,10 @@ public abstract class Tower extends Building implements Cloneable {
     }
 
     public List<Bullet> shoot(Enemy target) {
-        if (target == null || selectedAmmo == null) return List.of();
+        if (target == null || selectedAmmoRepr == null) return List.of();
         List<Bullet> bullets = new ArrayList<>();
         for (int i = 0; i < simultShots; i++) {
-            Bullet b = ShootingHelper.shoot(this, target, selectedAmmo);
+            Bullet b = ShootingHelper.shoot(this, target, selectedAmmoRepr);
             if (b != null) {
                 bullets.add(b);
             }
@@ -114,7 +120,7 @@ public abstract class Tower extends Building implements Cloneable {
         float dx = targetX - startX;
         float dy = targetY - startY;
 
-        float a = targetVX * targetVX + targetVY * targetVY - selectedAmmo.getSpeed() * selectedAmmo.getSpeed();
+        float a = targetVX * targetVX + targetVY * targetVY - selectedAmmoRepr.getSpeed() * selectedAmmoRepr.getSpeed();
         float b = 2f * (dx * targetVX + dy * targetVY);
         float c = dx * dx + dy * dy;
 
@@ -133,10 +139,6 @@ public abstract class Tower extends Building implements Cloneable {
         float aimY = targetY + targetVY * t;
 
         return new float[]{aimX, aimY};
-    }
-
-    public List<Bullet> getSupportedAmmo(){
-        return supportedAmmo;
     }
 
     // --- UI Info ---

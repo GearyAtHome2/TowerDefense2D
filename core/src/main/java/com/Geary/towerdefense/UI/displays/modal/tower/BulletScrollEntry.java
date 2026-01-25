@@ -2,7 +2,7 @@ package com.Geary.towerdefense.UI.displays.modal.tower;
 
 import com.Geary.towerdefense.UI.displays.modal.scrollbox.ScrollEntry;
 import com.Geary.towerdefense.UI.render.icons.IconStore;
-import com.Geary.towerdefense.entity.mob.bullet.Bullet;
+import com.Geary.towerdefense.entity.mob.bullet.BulletRepr;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -13,18 +13,18 @@ import com.badlogic.gdx.math.Rectangle;
 public class BulletScrollEntry implements ScrollEntry {
 
     private final Rectangle bounds = new Rectangle();
-    private final Bullet bullet;
+    private final BulletRepr bullet;
     private final TextureRegion icon;
 
     public boolean selected = false;
     public boolean active = false;
 
-    public BulletScrollEntry(Bullet bullet) {
+    public BulletScrollEntry(BulletRepr bullet) {
         this.bullet = bullet;
         this.bounds.height = 52f;
 
 
-        this.icon = IconStore.ammo(bullet.name);
+        this.icon = IconStore.ammo(bullet.getName());
     }
 
     @Override
@@ -75,12 +75,12 @@ public class BulletScrollEntry implements ScrollEntry {
         float topTextY = bounds.y + bounds.height - 6;
 
         // Name
-        font.draw(batch, bullet.name, textX, topTextY);
+        font.draw(batch, bullet.getName(), textX, topTextY);
 
         // Stats
         font.draw(
             batch,
-            "DMG: " + bullet.damage + "  SPD: " + bullet.getSpeed(),
+            "DMG: " + bullet.getDamage() + "  SPD: " + bullet.getSpeed(),
             textX,
             topTextY - 16
         );
@@ -93,7 +93,7 @@ public class BulletScrollEntry implements ScrollEntry {
         return bounds.contains(x, y);
     }
 
-    public Bullet getBullet() {
+    public BulletRepr getBullet() {
         return bullet;
     }
 }
