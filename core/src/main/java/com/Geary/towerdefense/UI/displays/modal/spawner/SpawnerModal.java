@@ -83,9 +83,6 @@ public class SpawnerModal extends Modal {
         };
 
     private void applyActiveTab() {
-        float totalHeight =
-            tabs.getActiveEntriesTotalHeight(5f, gameStateManager);
-
         Color color = tabs.getActiveTabColor();
 
         List<MobMenuEntry> entries =
@@ -94,7 +91,7 @@ public class SpawnerModal extends Modal {
         mobScrollBox.setBackgroundColor(
             color.r, color.g, color.b, color.a
         );
-        mobScrollBox.setEntries(entries, totalHeight);
+        mobScrollBox.setEntries(entries);
     }
 
     @Override

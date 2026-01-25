@@ -7,7 +7,6 @@ import java.util.EnumMap;
 
 public class BasicBullet extends Bullet {
 
-    //creates the bullet for modal purposes
     public BasicBullet() {
         super("Basic", 1, 360f, 0.65f, 0, 5.3f, Color.GRAY);
         EnumMap<Resource.RawResourceType, Double> rawResourceCost =  new EnumMap<>(Resource.RawResourceType.class);
@@ -16,7 +15,6 @@ public class BasicBullet extends Bullet {
         setResourceCost(rawResourceCost, refinedResourceCost);
     }
 
-    //bullet for game purposes.
     private BasicBullet(float x, float y, float angle,
                         float maxLifeTime, float speed, float size, Color color) {
         super("Basic", 1, speed, maxLifeTime, 0, size ,color);

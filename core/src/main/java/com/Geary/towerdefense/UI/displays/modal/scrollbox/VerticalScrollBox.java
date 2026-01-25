@@ -15,7 +15,7 @@ public class VerticalScrollBox<T extends ScrollEntry> {
     public final Rectangle bounds = new Rectangle();
     public float scrollOffset = 0f;
     private float contentHeight = 0f;
-
+    private float spacing = 5f;
     public final List<T> entries = new ArrayList<>();
 
     // New: background color for scrollbox
@@ -29,33 +29,37 @@ public class VerticalScrollBox<T extends ScrollEntry> {
         bgR = r; bgG = g; bgB = b; bgA = a;
     }
 
-    public void setEntries(List<T> entries, float totalHeight) {
+    public void setEntries(List<T> entries) {
         this.entries.clear();
         this.entries.addAll(entries);
-        this.contentHeight = totalHeight;
         updateEntryPositions();
     }
 
     public void scroll(float deltaY) {
         scrollOffset += deltaY;
+
+
+        if (entries.size()>0){
+            contentHeight = ((entries.get(0).bounds().height + spacing)*entries.size())+15f;
+        } else {
+            contentHeight =0;
+        }
         float maxOffset = Math.max(0, contentHeight - bounds.height);
         if (scrollOffset < 0) scrollOffset = 0;
         if (scrollOffset > maxOffset) scrollOffset = maxOffset;
-
         updateEntryPositions();
     }
 
     private void updateEntryPositions() {
         float y = bounds.y + bounds.height;
-        float spacing = 5f;
 
         for (T entry : entries) {
+            y -= spacing;
             entry.bounds().x = bounds.x + 10;
             entry.bounds().width = bounds.width - 20;
 
             y -= entry.bounds().height;
             entry.bounds().y = y + scrollOffset;
-            y -= spacing;
         }
     }
 

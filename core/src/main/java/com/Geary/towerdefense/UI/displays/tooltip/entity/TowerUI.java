@@ -15,11 +15,6 @@ public class TowerUI extends DefaultEntityUI {
     }
 
     @Override
-    protected boolean shouldDrawDeleteButton(Entity entity) {
-        return false;
-    }
-
-    @Override
     protected void addExtraButtons(Entity entity, float popupX, float popupY, float popupWidth, float popupHeight, float scale) {
         if (entity instanceof Tower tower) {
             addStackedButton("Open Factory Menu", popupX, popupWidth, scale, 0.2f, 0.6f, 1f,

@@ -22,8 +22,6 @@ public class BulletScrollEntry implements ScrollEntry {
     public BulletScrollEntry(BulletRepr bullet) {
         this.bullet = bullet;
         this.bounds.height = 52f;
-
-
         this.icon = IconStore.ammo(bullet.getName());
     }
 

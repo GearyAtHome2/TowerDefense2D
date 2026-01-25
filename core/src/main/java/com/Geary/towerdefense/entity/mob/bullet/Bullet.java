@@ -16,30 +16,32 @@ public abstract class Bullet {
     public float y;
     public float vx;
     public float vy;
+
     public int damage;
-    public float speed;
-    public float maxLifeTime;//protect these once fixed
-    public float lifetime;
     protected float knockback;
+
+    protected float speed;
+
+    public float lifetime;
+    public float maxLifeTime;
+
     public String name;
-    public float size;
-    public Color color;
+    protected float size;
+    protected Color color;
+
     EnumMap<Resource.RawResourceType, Double> rawResourceCost;
     EnumMap<Resource.RefinedResourceType, Double> refinedResourceCost;
 
     protected Bullet(String name, int damage, float speed, float maxLifeTime, float knockback, float size, Color color) {
         this.name = name;
         this.damage = damage;
-        float randomSpeedExtension = 1 + random() * 0.1f;//make a bullet randomly go up to 10% faster.
-        this.speed = speed * randomSpeedExtension;
-        float randomLifeTimeExtension = 1 + random() * 0.1f;//make a bullet randomly go up to 10% beyong configured range.
-        this.maxLifeTime = maxLifeTime * randomLifeTimeExtension;
+        this.speed = speed * (1f + random() * 0.1f);
+        this.maxLifeTime = maxLifeTime * (1f + random() * 0.1f);
         this.knockback = knockback;
         this.size = size;
         this.color = color;
     }
 
-    // Subclasses must provide these constants
     public float getSpeed() {
         return speed;
     }
@@ -60,14 +62,16 @@ public abstract class Bullet {
         return color;
     }
 
-    /**
-     * Factory method: creates a new instance for shooting
-     */
+    public float getCenterX() {
+        return x + getSize() / 2f;
+    }
+
+    public float getCenterY() {
+        return y + getSize() / 2f;
+    }
+
     public abstract Bullet createInstance(float x, float y, float angle);
 
-    /**
-     * Update position, check collision with enemies, return false if bullet should be removed
-     */
     public boolean update(float delta, List<Enemy> enemies) {
         lifetime += delta;
         if (lifetime > getMaxLifetime()) return false;
@@ -87,24 +91,32 @@ public abstract class Bullet {
             if (e.health <= 0) continue;
 
             float left = e.xPos;
-            float right = e.xPos + e.size;
             float bottom = e.yPos;
-            float top = e.yPos + e.size;
+            float right = left + e.size;
+            float top = bottom + e.size;
 
-            if (lineIntersectsRect(startX, startY, x, y, left, bottom, right, top)) {
-                float centerX = (left + right) / 2f;
-                float centerY = (bottom + top) / 2f;
-                float[] closest = closestPointOnLineSegment(startX, startY, x, y, centerX, centerY);
-                float dx = closest[0] - startX;
-                float dy = closest[1] - startY;
-                float distSq = dx * dx + dy * dy;
+            if (!lineIntersectsRect(startX, startY, x, y, left, bottom, right, top)) {
+                continue;
+            }
 
-                if (distSq < closestDistSq) {
-                    closestDistSq = distSq;
-                    firstHit = e;
-                    hitX = closest[0];
-                    hitY = closest[1];
-                }
+            float centerX = (left + right) * 0.5f;
+            float centerY = (bottom + top) * 0.5f;
+
+            float dx = x - startX;
+            float dy = y - startY;
+            float t = projectPoint(startX, startY, dx, dy, centerX, centerY);
+
+            float px = startX + t * dx;
+            float py = startY + t * dy;
+
+            float distSq = (px - startX) * (px - startX)
+                + (py - startY) * (py - startY);
+
+            if (distSq < closestDistSq) {
+                closestDistSq = distSq;
+                firstHit = e;
+                hitX = px;
+                hitY = py;
             }
         }
 
@@ -118,41 +130,37 @@ public abstract class Bullet {
         return true;
     }
 
+    public void draw(ShapeRenderer shapeRenderer) {
+        shapeRenderer.setColor(getColor());
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.rect(
+            x - getSize() / 2f,
+            y - getSize() / 2f,
+            getSize(),
+            getSize()
+        );
+        shapeRenderer.end();
+    }
+
     public void setLifeTime(float lifeTime) {
         this.lifetime = lifeTime;
     }
 
-    /**
-     * Draw bullet on screen
-     */
-    public void draw(ShapeRenderer shapeRenderer) {
-        shapeRenderer.setColor(getColor());
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.rect(x - getSize() / 2f, y - getSize() / 2f, getSize(), getSize());
-        shapeRenderer.end();
+    private float projectPoint(float x, float y, float dx, float dy, float px, float py) {
+        float lenSq = dx * dx + dy * dy;
+        if (lenSq == 0f) return 0f;
+
+        float t = ((px - x) * dx + (py - y) * dy) / lenSq;
+        return Math.max(0f, Math.min(1f, t));
     }
 
-    public float getCenterX() {
-        return x + getSize() / 2f;
-    }
+    private boolean lineIntersectsRect(float x1, float y1, float x2, float y2,
+                                       float left, float bottom, float right, float top) {
 
-    public float getCenterY() {
-        return y + getSize() / 2f;
-    }
-
-    // --- Utility functions for collision detection ---
-    private float[] closestPointOnLineSegment(float x1, float y1, float x2, float y2, float px, float py) {
-        float dx = x2 - x1;
-        float dy = y2 - y1;
-        if (dx == 0 && dy == 0) return new float[]{x1, y1};
-        float t = ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy);
-        t = Math.max(0, Math.min(1, t));
-        return new float[]{x1 + t * dx, y1 + t * dy};
-    }
-
-    private boolean lineIntersectsRect(float x1, float y1, float x2, float y2, float left, float bottom, float right, float top) {
-        if ((x1 >= left && x1 <= right && y1 >= bottom && y1 <= top) ||
-            (x2 >= left && x2 <= right && y2 >= bottom && y2 <= top)) return true;
+        if (pointInRect(x1, y1, left, bottom, right, top) ||
+            pointInRect(x2, y2, left, bottom, right, top)) {
+            return true;
+        }
 
         return lineIntersectsLine(x1, y1, x2, y2, left, bottom, right, bottom) ||
             lineIntersectsLine(x1, y1, x2, y2, left, top, right, top) ||
@@ -160,11 +168,20 @@ public abstract class Bullet {
             lineIntersectsLine(x1, y1, x2, y2, right, bottom, right, top);
     }
 
-    private boolean lineIntersectsLine(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
+    private boolean pointInRect(float x, float y,
+                                float left, float bottom, float right, float top) {
+        return x >= left && x <= right && y >= bottom && y <= top;
+    }
+
+    private boolean lineIntersectsLine(float x1, float y1, float x2, float y2,
+                                       float x3, float y3, float x4, float y4) {
+
         float den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-        if (den == 0) return false;
+        if (den == 0f) return false;
+
         float t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
         float u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den;
-        return t >= 0 && t <= 1 && u >= 0 && u <= 1;
+
+        return t >= 0f && t <= 1f && u >= 0f && u <= 1f;
     }
 }

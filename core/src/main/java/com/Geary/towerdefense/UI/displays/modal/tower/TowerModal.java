@@ -248,12 +248,11 @@ public class TowerModal extends Modal {
         for (BulletRepr bullet : this.tower.supportedAmmoRepr) {
             entries.add(new BulletScrollEntry(bullet));
         }
-
-        ammoScrollBox.setEntries(entries, entries.size() * 41f);
+        ammoScrollBox.setEntries(entries);
     }
 
     private void populateTargeting() {
         List<BulletScrollEntry> entries = new ArrayList<>();
-        targetingScrollBox.setEntries(entries, entries.size() * 41f);
+        targetingScrollBox.setEntries(entries);
     }
 }

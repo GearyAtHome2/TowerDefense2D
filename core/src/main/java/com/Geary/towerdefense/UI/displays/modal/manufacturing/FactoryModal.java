@@ -142,7 +142,7 @@ public class FactoryModal extends Modal {
             entries.add(entry);
         }
 
-        verticalScrollBox.setEntries(entries, entries.size() * 40f);
+        verticalScrollBox.setEntries(entries);
     }
 
 
