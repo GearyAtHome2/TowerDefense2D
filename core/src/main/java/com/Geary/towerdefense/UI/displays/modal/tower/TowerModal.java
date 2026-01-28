@@ -28,10 +28,6 @@ public class TowerModal extends Modal {
     private BulletScrollEntry activeEntry = null;
 
     private final GlyphLayout layout = new GlyphLayout();
-
-    /**
-     * Layout ratios
-     */
     private static class Layout {
         float padding = 0.04f;
         float splitRatio = 0.5f;
@@ -59,9 +55,7 @@ public class TowerModal extends Modal {
 
         this.activeEntry = ammoScrollBox.entries.stream().filter(entry -> entry.getBullet().getName().equals(tower.selectedAmmoRepr.getName())).findFirst().get();
         setActive(activeEntry);
-        //what's the point of the activeentry in this class then?
     }
-
 
     @Override
     protected void layoutButtons() {

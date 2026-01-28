@@ -8,7 +8,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -17,13 +16,13 @@ public class MobMenuEntry implements ScrollEntry {
 
     public interface MobEntryListener {
         void onRecruitClicked(MobMenuEntry entry, int amount);
-
         void onGarrisonClicked(MobMenuEntry entry, int amount);
     }
 
+    public boolean selected = false;
     private boolean affordable = true;
+
     public final Mob templateMob;
-    public final String name;
     public final Rectangle bounds = new Rectangle();
     public Runnable onClick;
 
@@ -32,11 +31,8 @@ public class MobMenuEntry implements ScrollEntry {
 
     private final MobEntryListener listener;
 
-    private static final GlyphLayout layout = new GlyphLayout();
-
     public MobMenuEntry(Mob templateMob, float x, float y, float width, float height, MobEntryListener listener) {
         this.templateMob = templateMob;
-        this.name = templateMob.name;
         this.listener = listener;
         bounds.set(x, y, width, height);
     }
@@ -47,161 +43,83 @@ public class MobMenuEntry implements ScrollEntry {
         float w = bounds.width;
         float h = bounds.height;
 
-        /* ================= Background ================= */
+        // Background (highlight if selected)
+        Color base = computeBackgroundColor(templateMob.order);
+        Color bg = selected ? base.lerp(new Color(1f, 1f, 0.5f, 1f), 0.5f) : base;
 
         renderer.begin(ShapeRenderer.ShapeType.Filled);
-        renderer.setColor(computeBackgroundColor(templateMob.order));
+        renderer.setColor(bg);
         renderer.rect(x, y, w, h);
         renderer.end();
 
-        /* ================= Layout ================= */
+        // Layout
+        float hPad = w * 0.01f;
+        float vPad = h * 0.08f;
+        float rightPadding = w * 0.005f;
 
-        float iconSize = h - 8f;
-        float nameX = x + h + 6f;
+        float iconSize = h * 0.9f;
+        float iconX = x + hPad;
 
-        layout.setText(font, name);
-        float nameW = layout.width;
+        float contentX = iconX + iconSize + hPad;
+        float contentW = w - (iconSize + hPad * 2f + rightPadding);
 
-        float statsX = nameX + nameW + 12f;
-        float statsW = w * 0.22f;
+        float nameW = contentW * 0.25f;
+        float costW = contentW * 0.5f;
+        float buttonW = contentW - nameW - costW;
 
-        float costX = statsX + statsW + 6f;
-        float costW = w * 0.16f;
+        float nameX = contentX;
+        float costX = nameX + nameW;
+        float buttonX = costX + costW;
 
-        float buttonW = 90f;
-        float buttonH = (h - 6f) / 2f;
-        float buttonX = x + w - buttonW - 6f;
-
-        float effectX = costX + costW + 6f;
-        float effectW = buttonX - effectX - 6f;
-
-        /* ================= Text + Icons ================= */
-
-        batch.begin();
-
-        var icon = IconStore.mob(templateMob.name);
-        if (icon != null) {
-            batch.draw(icon, x + 4f, y + 4f, iconSize, iconSize);
-        }
-
-        font.draw(batch, name, nameX, y + h * 0.7f);
-
-        String statsText =
-            "Health: " + templateMob.health + "\n" +
-                "Damage: " + templateMob.damage +
-                (templateMob.armour > 0 ? "\nArmour: " + templateMob.armour : "");
-
-        drawScaledText(font, batch, statsText, statsX, y, statsW, h, 0.7f, 1f);
-
-        // Dim cost text slightly
-        Color old = font.getColor();
-        font.setColor(old.r, old.g, old.b, 0.85f);
-        float costAlpha = affordable ? 0.85f : 0.35f;
-        font.setColor(1f, 1f, 1f, costAlpha);
-
-        drawScaledText(
-            font,
-            batch,
-            templateMob.getCostText(),
-            costX,
-            y,
-            costW,
-            h,
-            0.6f,
-            1f
-        );
-
-        font.setColor(old);
-
-        drawScaledText(
-            font,
-            batch,
-            templateMob.effectText,
-            effectX,
-            y,
-            effectW,
-            h,
-            0.7f,
-            1f
-        );
-
-        batch.end();
-
-        /* ================= Buttons ================= */
-
-        float buttonYTop = y + h - buttonH - 3f;
-        float buttonYBottom = y + 3f;
+        float buttonH = (h - vPad * 3f) / 2f;
+        float buttonYTop = y + h - buttonH - vPad;
+        float buttonYBottom = y + vPad;
 
         recruitButton.set(buttonX, buttonYTop, buttonW, buttonH);
         garrisonButton.set(buttonX, buttonYBottom, buttonW, buttonH);
 
+        // Draw icon, name, cost
+        batch.begin();
+        float costAlpha = affordable ? 0.85f : 0.5f;
+        font.setColor(1f, 1f, 1f, 1f);
+
+        var icon = IconStore.mob(templateMob.name);
+        if (icon != null) batch.draw(icon, iconX, y + (h - iconSize) * 0.5f, iconSize, iconSize);
+
+        font.draw(batch, templateMob.name, nameX, y + h * 0.6f);
+        font.draw(batch, templateMob.getCostText(), costX, y + h * 0.6f);
+        batch.end();
+
+        // Draw buttons
         renderer.begin(ShapeRenderer.ShapeType.Filled);
-        if (affordable) {
-            renderer.setColor(0.1f, 0.7f, 0.1f, 1f);     // bright green
-        } else {
-            renderer.setColor(0.15f, 0.35f, 0.15f, 1f);  // dim green
-        }
+        renderer.setColor(affordable ? 0.1f : 0.15f, affordable ? 0.7f : 0.35f, affordable ? 0.1f : 0.15f, 1f);
         renderer.rect(recruitButton.x, recruitButton.y, recruitButton.width, recruitButton.height);
-        if (affordable) {
-            renderer.setColor(0.5f, 0.5f, 0.5f, 1f);     // normal grey
-        } else {
-            renderer.setColor(0.25f, 0.25f, 0.25f, 1f);  // dim grey
-        }
+
+        renderer.setColor(affordable ? 0.5f : 0.25f, affordable ? 0.5f : 0.25f, affordable ? 0.5f : 0.25f, 1f);
         renderer.rect(garrisonButton.x, garrisonButton.y, garrisonButton.width, garrisonButton.height);
         renderer.end();
 
         batch.begin();
-
-        boolean shift = isShiftHeld();
-
-        String recruitText = shift ? "Recruit x5" : "Recruit";
-        String garrisonText = shift ? "Garrison x5" : "Garrison";
-        drawScaledText(
-            font,
-            batch,
-            recruitText,
-            recruitButton.x + 2f,
-            recruitButton.y,
-            buttonW,
-            buttonH,
-            0.5f,
-            1f
-        );
-        drawScaledText(
-            font,
-            batch,
-            garrisonText,
-            garrisonButton.x + 2f,
-            garrisonButton.y,
-            buttonW,
-            buttonH,
-            0.5f,
-            0.7f
-        );
+        font.setColor(1f, 1f, 1f, costAlpha);
+        font.draw(batch, isShiftHeld() ? "Recruit x5" : "Recruit", recruitButton.x + 4, recruitButton.y + buttonH * 0.7f);
+        font.draw(batch, isShiftHeld() ? "Garrison x5" : "Garrison", garrisonButton.x + 4, garrisonButton.y + buttonH * 0.7f);
         batch.end();
-
     }
 
     public boolean click(float x, float y) {
-        if (!affordable) return false;
+        int amount = isShiftHeld() ? 5 : 1;
 
-        int amount = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)
-            || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)
-            ? 5
-            : 1;
-
-        if (recruitButton.contains(x, y)) {
-            if (listener != null) {
+        // Buttons first (they imply selection, but don't set it here)
+        if (affordable) {
+            if (recruitButton.contains(x, y) && listener != null) {
                 listener.onRecruitClicked(this, amount);
+                return true;
             }
-            return true;
-        }
-
-        if (garrisonButton.contains(x, y)) {
-            if (listener != null) {
+            if (garrisonButton.contains(x, y) && listener != null) {
+                if (onClick != null) onClick.run();
                 listener.onGarrisonClicked(this, amount);
+                return true;
             }
-            return true;
         }
 
         if (bounds.contains(x, y)) {
@@ -213,40 +131,8 @@ public class MobMenuEntry implements ScrollEntry {
     }
 
 
-    private void drawScaledText(
-        BitmapFont font,
-        SpriteBatch batch,
-        String text,
-        float x,
-        float y,
-        float width,
-        float height,
-        float minScale,
-        float alpha
-    ) {
-        font.getData().setScale(1f);
-
-        layout.setText(font, text, font.getColor(), width, com.badlogic.gdx.utils.Align.left, true);
-        if (layout.height == 0) return;
-
-        float scale = Math.min(1f, Math.max(minScale, (height * 0.85f) / layout.height));
-        font.getData().setScale(scale);
-
-        layout.setText(font, text, font.getColor(), width, com.badlogic.gdx.utils.Align.left, true);
-
-        Color c = font.getColor();
-        font.setColor(c.r, c.g, c.b, alpha);
-
-        float textY = y + (height + layout.height) * 0.5f;
-        font.draw(batch, layout, x, textY);
-
-        font.setColor(c);
-        font.getData().setScale(1f);
-    }
-
     private boolean isShiftHeld() {
-        return Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)
-            || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT);
+        return Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT);
     }
 
     public void setAffordable(boolean affordable) {

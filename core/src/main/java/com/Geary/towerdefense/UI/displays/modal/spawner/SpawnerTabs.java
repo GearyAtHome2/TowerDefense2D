@@ -103,13 +103,13 @@ public class SpawnerTabs {
         return entries;
     }
 
-    public float getActiveEntriesTotalHeight(float gap, GameStateManager gsm) {
-        float total = 0f;
-        for (MobMenuEntry e : getActiveEntries(gsm)) {
-            total += e.bounds().height + gap;
-        }
-        return total > 0 ? total - gap : 0;
-    }
+//    public float getActiveEntriesTotalHeight(float gap, GameStateManager gsm) {
+//        float total = 0f;
+//        for (MobMenuEntry e : getActiveEntries(gsm)) {
+//            total += e.bounds().height + gap;
+//        }
+//        return total > 0 ? total - gap : 0;
+//    }
 
     public Color getActiveTabColor() {
         return tabColors.getOrDefault(getActiveTab(), new Color(0.6f, 0.6f, 0.6f, 1f));

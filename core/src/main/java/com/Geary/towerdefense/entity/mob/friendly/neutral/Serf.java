@@ -8,7 +8,7 @@ public class Serf extends FNeutral {
     public static final MobStats STATS = new MobStats(
         "Serf",
         "Serf Effect text...",
-        "Expendable, dependable, and commendable. We love Serfs",
+        "Expendable, dependable, and commendable. We love Serfs.Expendable, dependable, and commendable. We love Serfs.Expendable, dependable, and commendable. We love Serfs.Expendable, dependable, and commendable. We love Serfs",
         0.1f, 220, 5, 0.71f, 28f, 0.8f, 0.3f,
         Color.GREEN,
         2,

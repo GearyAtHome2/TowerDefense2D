@@ -14,7 +14,7 @@ public class ManAtArms extends FNeutral {
         0.13f, 220, 5, 0.69f, 45f,1.4f,  0.2f,
         Color.OLIVE,
         2, // spawnTime
-        0  // armour
+        1  // armour
     );
 
     public ManAtArms(float x, float y) {
