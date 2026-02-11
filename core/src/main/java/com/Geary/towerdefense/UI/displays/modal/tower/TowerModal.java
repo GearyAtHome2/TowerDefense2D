@@ -2,6 +2,7 @@ package com.Geary.towerdefense.UI.displays.modal.tower;
 
 import com.Geary.towerdefense.UI.displays.modal.Modal;
 import com.Geary.towerdefense.UI.displays.modal.scrollbox.VerticalScrollBox;
+import com.Geary.towerdefense.behaviour.targeting.TargetingHelper;
 import com.Geary.towerdefense.entity.buildings.tower.Tower;
 import com.Geary.towerdefense.entity.mob.bullet.BulletRepr;
 import com.Geary.towerdefense.world.GameStateManager;
@@ -21,21 +22,30 @@ public class TowerModal extends Modal {
     private final GameStateManager gameStateManager;
 
     private final VerticalScrollBox<BulletScrollEntry> ammoScrollBox;
-    private final VerticalScrollBox<BulletScrollEntry> targetingScrollBox;
-    private Rectangle selectButtonBounds = new Rectangle();
+    private final VerticalScrollBox<TargetingModeScrollEntry> targetingScrollBox;
 
-    private BulletScrollEntry selectedEntry = null;
-    private BulletScrollEntry activeEntry = null;
+    private BulletScrollEntry selectedAmmoEntry;
+    private BulletScrollEntry activeAmmoEntry;
+
+    private TargetingModeScrollEntry selectedTargeting;
+    private TargetingModeScrollEntry activeTargeting;
+
+    private final InfoBoxRenderer ammoInfoBox;
+    private final InfoBoxRenderer targetingInfoBox;
+
+    private final Rectangle ammoInfoBounds = new Rectangle();
+    private final Rectangle targetingInfoBounds = new Rectangle();
 
     private final GlyphLayout layout = new GlyphLayout();
-    private static class Layout {
+
+    private static class LayoutCfg {
         float padding = 0.04f;
         float splitRatio = 0.5f;
         float leftRatio = 0.45f;
         float titleScale = 1.4f;
     }
 
-    private final Layout cfg = new Layout();
+    private final LayoutCfg cfg = new LayoutCfg();
 
     public TowerModal(
         Tower tower,
@@ -47,19 +57,24 @@ public class TowerModal extends Modal {
         this.tower = tower;
         this.gameStateManager = gameStateManager;
 
-        ammoScrollBox = new VerticalScrollBox<BulletScrollEntry>(0, 0, 0, 0);
-        targetingScrollBox = new VerticalScrollBox<BulletScrollEntry>(0, 0, 0, 0);
+        ammoInfoBox = new InfoBoxRenderer(font);
+        targetingInfoBox = new InfoBoxRenderer(font);
+
+        ammoScrollBox = new VerticalScrollBox<>(0, 0, 0, 0);
+        targetingScrollBox = new VerticalScrollBox<>(0, 0, 0, 0);
 
         populateAmmo();
         populateTargeting();
-
-        this.activeEntry = ammoScrollBox.entries.stream().filter(entry -> entry.getBullet().getName().equals(tower.selectedAmmoRepr.getName())).findFirst().get();
-        setActive(activeEntry);
+        restoreActiveState();
     }
+
+    // ------------------------------------------------------------------------
 
     @Override
     protected void layoutButtons() {
         float pad = bounds.width * cfg.padding;
+        float leftWidth = bounds.width * cfg.leftRatio;
+        float halfHeight = bounds.height * 0.5f - pad * 2;
         float sectionHeight = bounds.height * cfg.splitRatio - pad * 1.5f;
 
         float topY = bounds.y + bounds.height - pad - sectionHeight;
@@ -67,6 +82,20 @@ public class TowerModal extends Modal {
 
         layoutSection(ammoScrollBox, topY, sectionHeight);
         layoutSection(targetingScrollBox, bottomY, sectionHeight);
+
+        ammoInfoBounds.set(
+            bounds.x + pad,
+            bounds.y + bounds.height * 0.5f,
+            leftWidth,
+            halfHeight
+        );
+
+        targetingInfoBounds.set(
+            bounds.x + pad,
+            bounds.y + pad,
+            leftWidth,
+            halfHeight
+        );
     }
 
     private void layoutSection(VerticalScrollBox<?> box, float y, float height) {
@@ -74,7 +103,7 @@ public class TowerModal extends Modal {
         float leftWidth = bounds.width * cfg.leftRatio;
 
         box.bounds.set(
-            bounds.x + pad + leftWidth + pad,
+            bounds.x + pad * 2 + leftWidth,
             y,
             bounds.width - leftWidth - pad * 3,
             height
@@ -84,22 +113,63 @@ public class TowerModal extends Modal {
     }
 
     // ------------------------------------------------------------------------
-    // Drawing
-    // ------------------------------------------------------------------------
 
     @Override
-    protected void drawContent(ShapeRenderer shapeRenderer, SpriteBatch batch) {
-        // Section titles (now at top of each half)
+    protected void drawContent(ShapeRenderer renderer, SpriteBatch batch) {
         drawSectionTitle(batch, "Ammo Selection", true);
         drawSectionTitle(batch, "Targeting Parameters", false);
 
-        // Ammo info box (top-left quadrant)
-        drawAmmoInfoBox(shapeRenderer, batch);
+        ammoInfoBox.draw(
+            renderer,
+            batch,
+            ammoInfoBounds,
+            buildAmmoLines(),
+            selectedAmmoEntry != null
+        );
 
-        // Scroll boxes (right side)
-        ammoScrollBox.draw(shapeRenderer, batch, font, camera);
-        targetingScrollBox.draw(shapeRenderer, batch, font, camera);
+        targetingInfoBox.draw(
+            renderer,
+            batch,
+            targetingInfoBounds,
+            buildTargetingLines(),
+            selectedTargeting != null
+        );
+
+        ammoScrollBox.draw(renderer, batch, font, camera);
+        targetingScrollBox.draw(renderer, batch, font, camera);
     }
+
+    private List<String> buildAmmoLines() {
+        if (selectedAmmoEntry == null) return null;
+
+        BulletRepr bullet = selectedAmmoEntry.getBullet();
+        return List.of(
+            "Name: " + bullet.getName(),
+            "Damage: " + bullet.getDamage(),
+            "Speed: " + bullet.getSpeed()
+        );
+    }
+
+    private List<String> buildTargetingLines() {
+        if (selectedTargeting == null) return null;
+
+        return switch (selectedTargeting.getStrategy()) {
+            case CLOSEST -> List.of(
+                "Targets nearest enemy",
+                "Fast reaction time"
+            );
+            case FURTHEST_PROGRESSED -> List.of(
+                "Targets furthest enemy",
+                "Prevents leaks"
+            );
+            case LARGEST -> List.of(
+                "Targets highest HP",
+                "Best for burst damage"
+            );
+        };
+    }
+
+    // ------------------------------------------------------------------------
 
     private void drawSectionTitle(SpriteBatch batch, String title, boolean top) {
         float pad = bounds.width * cfg.padding;
@@ -108,145 +178,106 @@ public class TowerModal extends Modal {
             : bounds.y + bounds.height * 0.5f - pad - 10;
 
         batch.begin();
-
-        float oldX = font.getScaleX();
-        float oldY = font.getScaleY();
         font.getData().setScale(cfg.titleScale);
-
         layout.setText(font, title);
         font.draw(batch, layout, bounds.x + pad, y);
-
-        font.getData().setScale(oldX, oldY);
+        font.getData().setScale(1f);
         batch.end();
     }
 
-    // ------------------------------------------------------------------------
-    // Input
     // ------------------------------------------------------------------------
 
     @Override
     protected boolean handleClickInside(float x, float y) {
+
         if (ammoScrollBox.contains(x, y)) {
             BulletScrollEntry clicked = ammoScrollBox.click(x, y);
-            if (clicked != null) {
-                setSelected(clicked);
-            }
+            if (clicked != null) setSelectedAmmo(clicked);
             return true;
         }
 
         if (targetingScrollBox.contains(x, y)) {
-            targetingScrollBox.click(x, y);
+            TargetingModeScrollEntry clicked = targetingScrollBox.click(x, y);
+            if (clicked != null) setSelectedTargeting(clicked);
             return true;
         }
 
-        // Select button click
-        if (isSelectButtonClicked(x, y)) {
-            if (selectedEntry != null) {
-                setActive(selectedEntry);
-            }
+        if (selectedAmmoEntry != null &&
+            ammoInfoBox.getSelectButtonBounds().contains(x, y)) {
+            setActiveAmmo(selectedAmmoEntry);
+            return true;
+        }
+
+        if (selectedTargeting != null &&
+            targetingInfoBox.getSelectButtonBounds().contains(x, y)) {
+            setActiveTargeting(selectedTargeting);
             return true;
         }
 
         return false;
     }
 
-    private boolean isSelectButtonClicked(float x, float y) {
-        return selectButtonBounds.contains(x, y);
+    // ------------------------------------------------------------------------
+
+    private void setSelectedAmmo(BulletScrollEntry entry) {
+        if (selectedAmmoEntry != null) selectedAmmoEntry.selected = false;
+        selectedAmmoEntry = entry;
+        selectedAmmoEntry.selected = true;
     }
 
-    @Override
-    protected boolean handleScrollInside(float x, float y, float amountY) {
-        if (ammoScrollBox.contains(x, y)) {
-            ammoScrollBox.scroll(amountY * 10f);
-            return true;
-        }
-
-        if (targetingScrollBox.contains(x, y)) {
-            targetingScrollBox.scroll(amountY * 10f);
-            return true;
-        }
-
-        return false;
-    }
-
-    private void setSelected(BulletScrollEntry entry) {
-        if (selectedEntry != null) {
-            selectedEntry.selected = false;
-        }
-        selectedEntry = entry;
-        selectedEntry.selected = true;
-    }
-
-    private void setActive(BulletScrollEntry entry) {
-        if (activeEntry != null) {
-            activeEntry.active = false;
-        }
-        activeEntry = entry;
-        activeEntry.active = true;
-
+    private void setActiveAmmo(BulletScrollEntry entry) {
+        if (activeAmmoEntry != null) activeAmmoEntry.active = false;
+        activeAmmoEntry = entry;
+        activeAmmoEntry.active = true;
         tower.configureSelectedAmmo(entry.getBullet());
     }
 
-    private void drawAmmoInfoBox(ShapeRenderer renderer, SpriteBatch batch) {
-        float pad = bounds.width * cfg.padding;
-        float leftWidth = bounds.width * cfg.leftRatio;
-
-        float boxX = bounds.x + pad;
-        float boxY = bounds.y + bounds.height * 0.5f;
-        float boxW = leftWidth;
-        float boxH = bounds.height * 0.5f - pad * 2;
-
-        // Background
-        renderer.begin(ShapeRenderer.ShapeType.Filled);
-        renderer.setColor(0.14f, 0.14f, 0.14f, 1f);
-        renderer.rect(boxX, boxY, boxW, boxH);
-        renderer.end();
-
-        if (selectedEntry == null) return;
-
-        BulletRepr b = selectedEntry.getBullet();
-
-        batch.begin();
-        font.draw(batch, "Name: " + b.getName(), boxX + 10, boxY + boxH - 20);
-        font.draw(batch, "Damage: " + b.getDamage(), boxX + 10, boxY + boxH - 45);
-        font.draw(batch, "Speed: " + b.getSpeed(), boxX + 10, boxY + boxH - 70);
-        batch.end();
-
-        drawSelectButton(renderer, batch, boxX, boxY, boxW);
+    private void setSelectedTargeting(TargetingModeScrollEntry entry) {
+        if (selectedTargeting != null) selectedTargeting.selected = false;
+        selectedTargeting = entry;
+        selectedTargeting.selected = true;
     }
 
-    private void drawSelectButton(ShapeRenderer renderer, SpriteBatch batch, float boxX, float boxY, float boxW) {
-        float btnW = boxW * 0.5f;
-        float btnH = 32f;
-        float btnX = boxX + (boxW - btnW) / 2f;
-        float btnY = boxY + 10f;
-
-        selectButtonBounds.set(btnX, btnY, btnW, btnH);
-
-        renderer.begin(ShapeRenderer.ShapeType.Filled);
-        renderer.setColor(0.2f, 0.4f, 0.2f, 1f);
-        renderer.rect(btnX, btnY, btnW, btnH);
-        renderer.end();
-
-        batch.begin();
-        layout.setText(font, "Select");
-        font.draw(batch, layout,
-            btnX + (btnW - layout.width) / 2f,
-            btnY + (btnH + layout.height) / 2f - 4
-        );
-        batch.end();
+    private void setActiveTargeting(TargetingModeScrollEntry entry) {
+        if (activeTargeting != null) activeTargeting.active = false;
+        activeTargeting = entry;
+        activeTargeting.active = true;
+        tower.setTargetingStrategy(entry.getStrategy());
     }
+
+    // ------------------------------------------------------------------------
 
     private void populateAmmo() {
         List<BulletScrollEntry> entries = new ArrayList<>();
-        for (BulletRepr bullet : this.tower.supportedAmmoRepr) {
+        for (BulletRepr bullet : tower.supportedAmmoRepr) {
             entries.add(new BulletScrollEntry(bullet));
         }
         ammoScrollBox.setEntries(entries);
     }
 
     private void populateTargeting() {
-        List<BulletScrollEntry> entries = new ArrayList<>();
+        List<TargetingModeScrollEntry> entries = new ArrayList<>();
+        for (TargetingHelper.TargetingStrategy strategy :
+            TargetingHelper.TargetingStrategy.values()) {
+            entries.add(new TargetingModeScrollEntry(strategy));
+        }
         targetingScrollBox.setEntries(entries);
+    }
+
+    private void restoreActiveState() {
+        for (BulletScrollEntry entry : ammoScrollBox.entries) {
+            if (entry.getBullet().getName()
+                .equals(tower.selectedAmmoRepr.getName())) {
+                setActiveAmmo(entry);
+                break;
+            }
+        }
+
+        for (TargetingModeScrollEntry entry : targetingScrollBox.entries) {
+            if (entry.getStrategy() == tower.targetingStrategy) {
+                setActiveTargeting(entry);
+                break;
+            }
+        }
     }
 }

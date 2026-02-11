@@ -24,12 +24,7 @@ public abstract class Tower extends Building implements Cloneable {
     public BulletRepr<? extends Bullet> selectedAmmoRepr;
     public List<BulletRepr<? extends Bullet>> supportedAmmoRepr;
 
-    protected enum TargetingStrategy {
-        CLOSEST,
-        FURTHEST_PROGRESSED
-    }
-
-    public TargetingStrategy targetingStrategy = TargetingStrategy.CLOSEST;
+    public TargetingHelper.TargetingStrategy targetingStrategy = TargetingHelper.TargetingStrategy.CLOSEST;
     public Enemy currentTarget = null;
     public float gunAngle = (float) Math.PI / 2f;
 
@@ -51,6 +46,10 @@ public abstract class Tower extends Building implements Cloneable {
         this.selectedAmmoRepr = repr;
     }
 
+    public void setTargetingStrategy(TargetingHelper.TargetingStrategy strategy){
+        this.targetingStrategy = strategy;
+    }
+
     @Override
     public Tower clone() {
         try {
@@ -61,20 +60,7 @@ public abstract class Tower extends Building implements Cloneable {
     }
 
     public Enemy findTarget(List<Enemy> enemies){
-        return switch (targetingStrategy) {
-            case CLOSEST -> findClosestTarget(enemies);
-            case FURTHEST_PROGRESSED -> findTargetFurthestProgressed(enemies);
-        };
-    }
-
-    // --- Targeting ---
-    private Enemy findClosestTarget(List<Enemy> enemies) {
-        return TargetingHelper.findClosest(this, enemies);
-    }
-
-
-    private Enemy findTargetFurthestProgressed(List<Enemy> enemies) {
-        return TargetingHelper.findFurthestProgressed(this, enemies);
+        return TargetingHelper.findTargetByStrategy(this, enemies, targetingStrategy);
     }
 
     // --- Shooting / CanShoot ---

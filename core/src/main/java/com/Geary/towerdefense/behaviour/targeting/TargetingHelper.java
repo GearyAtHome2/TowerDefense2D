@@ -7,6 +7,19 @@ import java.util.List;
 
 public class TargetingHelper {
 
+    public enum TargetingStrategy{
+        FURTHEST_PROGRESSED, CLOSEST, LARGEST
+    }
+
+    public static Enemy findTargetByStrategy(Tower tower, List<Enemy> enemies, TargetingStrategy strategy){
+        switch (strategy){
+            case FURTHEST_PROGRESSED -> {return findFurthestProgressed(tower, enemies);}
+            case CLOSEST -> {return findClosest(tower, enemies);}
+//            case LARGEST -> {return findFurthestProgressed(tower, enemies);}
+            default -> {return findClosest(tower, enemies);}
+        }
+    }
+
     public static Enemy findClosest(Tower tower, List<Enemy> enemies) {
         Enemy closest = null;
         float closestDistance = Float.MAX_VALUE;

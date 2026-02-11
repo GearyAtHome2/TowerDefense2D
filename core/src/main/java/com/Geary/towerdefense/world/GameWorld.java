@@ -5,7 +5,6 @@ import com.Geary.towerdefense.UI.displays.modal.Modal;
 import com.Geary.towerdefense.UI.displays.modal.manufacturing.FactoryModal;
 import com.Geary.towerdefense.UI.displays.modal.spawner.SpawnerModalManager;
 import com.Geary.towerdefense.UI.displays.modal.tower.TowerModal;
-import com.Geary.towerdefense.UI.displays.modal.tower.TowerModalManager;
 import com.Geary.towerdefense.behaviour.MobManager;
 import com.Geary.towerdefense.behaviour.ResourceManager;
 import com.Geary.towerdefense.behaviour.SparkManager;
@@ -74,7 +73,6 @@ public class GameWorld {
     private SpawnerManager spawnerManager;
     private GameStateManager gameStateManager;
     private SpawnerModalManager spawnerModalManager;
-    private TowerModalManager towerModalManager;
 
     private Modal activeModal;
 
@@ -105,7 +103,6 @@ public class GameWorld {
         spawnerManager = new SpawnerManager(this);       // no camera
         gameStateManager = new GameStateManager();
         spawnerModalManager = new SpawnerModalManager();
-        towerModalManager = new TowerModalManager();
     }
 
     private void generateWorld(Map<Resource.RawResourceType, Integer> resourceAllocation) {

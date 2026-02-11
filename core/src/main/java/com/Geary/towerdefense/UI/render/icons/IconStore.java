@@ -1,5 +1,6 @@
 package com.Geary.towerdefense.UI.render.icons;
 
+import com.Geary.towerdefense.behaviour.targeting.TargetingHelper;
 import com.Geary.towerdefense.entity.resources.Resource;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -47,6 +48,23 @@ public class IconStore {
         return SYMBOL_ICONS.get(symbol);
     }
 
+    public static TextureRegion targetingStrategy(TargetingHelper.TargetingStrategy strategy) {
+        String strategyName = strategy.name().toLowerCase();
+
+        String key = strategyName.toLowerCase().replace(" ", "_");
+        TextureRegion icon = MOB_ICONS.get(key);
+        if (icon != null) return icon;
+
+        try {
+            Texture texture = new Texture("icons/targetingStrategy/" + key + ".png");
+            icon = new TextureRegion(texture);
+            MOB_ICONS.put(key, icon);
+            return icon;
+        } catch (Exception e) {
+            System.err.println("Missing mob icon: " + key);
+            return null;
+        }
+    }
     public static TextureRegion rawResource(Resource.RawResourceType type) {
         return RAW_ICONS.get(type);
     }
