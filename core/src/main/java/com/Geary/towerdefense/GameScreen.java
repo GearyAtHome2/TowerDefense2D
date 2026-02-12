@@ -1,20 +1,20 @@
 package com.Geary.towerdefense;
 
 import com.Geary.towerdefense.UI.CameraController;
-import com.Geary.towerdefense.UI.gameUI.GameUI;
 import com.Geary.towerdefense.UI.displays.modal.Modal;
 import com.Geary.towerdefense.UI.displays.tooltip.UIClickManager;
 import com.Geary.towerdefense.UI.displays.tooltip.UIManager;
 import com.Geary.towerdefense.UI.displays.tooltip.entity.EntitySelectionHandler;
 import com.Geary.towerdefense.UI.displays.tooltip.entity.EntityUI;
+import com.Geary.towerdefense.UI.gameUI.GameUI;
 import com.Geary.towerdefense.UI.render.*;
 import com.Geary.towerdefense.UI.render.icons.IconStore;
 import com.Geary.towerdefense.UI.render.production.FactoryRenderer;
 import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.entity.mob.Mob;
-import com.Geary.towerdefense.world.GameStateManager;
 import com.Geary.towerdefense.world.GameWorld;
+import com.Geary.towerdefense.world.LevelData;
 import com.Geary.towerdefense.world.PlacementHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -39,7 +39,6 @@ public class GameScreen implements Screen {
     private BitmapFont uiFont;
 
     private GameWorld world;
-    private GameStateManager gameStateManager;
     private CameraController cameraController;
 
     private GameUI gameUI;
@@ -69,20 +68,28 @@ public class GameScreen implements Screen {
     private GameInputProcessor inputProcessor;
     private final Vector3 mouseWorld = new Vector3();
 
+    private final TowerDefenseGame game;
+    private final LevelData levelData;
     private boolean escConsumedByMenu;
+
+
+    public GameScreen(TowerDefenseGame game, LevelData levelData) {
+        this.game = game;
+        this.levelData = levelData;
+    }
 
     @Override
     public void show() {
         IconStore.load();
 
+        world = new GameWorld(levelData);
+        world.initManagers(worldCamera);
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         shapeRenderer.setAutoShapeType(true);
 
         uiFont = new BitmapFont();
         uiFont.getData().setScale(1.5f);
-
-        world = new GameWorld();
 
         setupWorldCamera();
         world.initManagers(worldCamera);
@@ -95,8 +102,8 @@ public class GameScreen implements Screen {
         initInputProcessor();
     }
 
+
     private void initManagers() {
-        gameStateManager = new GameStateManager();
         cameraController = new CameraController(worldCamera, worldViewport, world);
     }
 
@@ -126,7 +133,6 @@ public class GameScreen implements Screen {
             uiFont,
             uiViewport,
             world,
-//            world.getTowerManager(),
             world.getGameStateManager(),
             world.getTransportManager()
         );
@@ -178,8 +184,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        gameStateManager.updateGameSpeedKeys();
-        delta *= gameStateManager.gameSpeed;
+        world.getGameStateManager().updateGameSpeedKeys();
+        delta *= world.getGameStateManager().gameSpeed;
 
         clearScreen();
 
@@ -191,7 +197,7 @@ public class GameScreen implements Screen {
 
         drawWorld();
         gameUI.updateHover(Gdx.input.getX(), Gdx.input.getY());
-        gameUI.drawUI(gameStateManager.paused, gameStateManager.gameSpeed);
+        gameUI.drawUI(world.getGameStateManager().paused, world.getGameStateManager().gameSpeed);
     }
 
     private void updateMenus() {
@@ -225,13 +231,13 @@ public class GameScreen implements Screen {
 
     private void updatePause() {
         if (!escConsumedByMenu && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            gameStateManager.togglePause();
+            world.getGameStateManager().togglePause();
         }
     }
 
     private void updateWorld(float delta) {
         cameraController.update();
-        if (!gameStateManager.paused) {
+        if (!world.getGameStateManager().paused) {
             world.update(delta);
         }
     }

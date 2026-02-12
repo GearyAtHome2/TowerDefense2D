@@ -17,7 +17,7 @@ public class TowerUI extends DefaultEntityUI {
     @Override
     protected void addExtraButtons(Entity entity, float popupX, float popupY, float popupWidth, float popupHeight, float scale) {
         if (entity instanceof Tower tower) {
-            addStackedButton("Open Factory Menu", popupX, popupWidth, scale, 0.2f, 0.6f, 1f,
+            addStackedButton("Open Tower Menu", popupX, popupWidth, scale, 0.2f, 0.6f, 1f,
                 () -> {
                     world.showTowerModal(tower, font, camera);
                 });

@@ -176,9 +176,10 @@ public class TowerModal extends BaseScrollModal {
 
     private void drawSectionTitle(SpriteBatch batch, String title, boolean top) {
         float pad = bounds.width * cfg.padding;
-        float y = top
-            ? bounds.y + bounds.height - pad - 10
-            : bounds.y + bounds.height * 0.5f - pad - 10;
+
+        Rectangle ref = top ? ammoInfoBounds : targetingInfoBounds;
+
+        float y = ref.y + ref.height + 20f;
 
         batch.begin();
         font.getData().setScale(cfg.titleScale);

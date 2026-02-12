@@ -79,18 +79,26 @@ public class GameWorld {
 
     private OrthographicCamera worldCamera;
 
-    public GameWorld() {
+    public GameWorld(LevelData levelData) {
         grid = new Cell[gridWidth][gridHeight];
         occupied = new boolean[gridWidth][gridHeight];
+
         this.resourceManager = new ResourceManager(this);
-        resourceAllocation.put(Resource.RawResourceType.IRON, 2);
-        resourceAllocation.put(Resource.RawResourceType.COAL, 2);
-        resourceAllocation.put(Resource.RawResourceType.COPPER, 2);
-        resourceAllocation.put(Resource.RawResourceType.STONE, 2);
-        resourceAllocation.put(Resource.RawResourceType.TIN, 2);
+
+        // Use levelData if provided, otherwise fallback to defaults
+        if (levelData != null && levelData.getResourceAllocation() != null) {
+            this.resourceAllocation.putAll(levelData.getResourceAllocation());
+        } else {
+            resourceAllocation.put(Resource.RawResourceType.IRON, 2);
+            resourceAllocation.put(Resource.RawResourceType.COAL, 2);
+            resourceAllocation.put(Resource.RawResourceType.COPPER, 2);
+            resourceAllocation.put(Resource.RawResourceType.STONE, 2);
+            resourceAllocation.put(Resource.RawResourceType.TIN, 2);
+        }
 
         generateWorld(resourceAllocation);
     }
+
 
     public void initManagers(OrthographicCamera worldCamera) {
         this.worldCamera = worldCamera;
