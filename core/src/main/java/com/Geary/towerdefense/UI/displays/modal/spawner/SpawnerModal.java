@@ -1,6 +1,6 @@
 package com.Geary.towerdefense.UI.displays.modal.spawner;
 
-import com.Geary.towerdefense.UI.displays.modal.Modal;
+import com.Geary.towerdefense.UI.displays.modal.BaseScrollModal;
 import com.Geary.towerdefense.UI.displays.modal.scrollbox.HorizontalScrollBox;
 import com.Geary.towerdefense.UI.displays.modal.scrollbox.VerticalScrollBox;
 import com.Geary.towerdefense.entity.mob.Mob;
@@ -18,7 +18,7 @@ import com.badlogic.gdx.math.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SpawnerModal extends Modal {
+public class SpawnerModal extends BaseScrollModal {
 
     private static final float TAB_HEIGHT_FRAC = 0.08f;
 
@@ -64,6 +64,9 @@ public class SpawnerModal extends Modal {
         tabRenderer = new SpawnerTabRenderer<>(font, camera);
 
         applyActiveTab();
+        registerScrollBox(mobScrollBox);
+        registerScrollBox(queueScrollBox);
+        registerScrollBox(garrisonScrollBox);
     }
 
     private final MobMenuEntry.MobEntryListener mobEntryListener =
@@ -233,15 +236,37 @@ public class SpawnerModal extends Modal {
 
     @Override
     protected boolean handleClickInside(float x, float y) {
+
         float tabHeight = bounds.height * TAB_HEIGHT_FRAC;
         float tabY = bounds.y + bounds.height - tabHeight;
 
+        // --- Tabs ---
         if (y >= tabY) {
             int idx = (int) ((x - bounds.x) / (bounds.width / tabs.getTabs().size()));
             tabs.setActiveTabIndex(idx);
-            mobScrollBox.scrollOffset = 0;
+            mobScrollBox.resetScroll();
             applyActiveTab();
             return true;
+        }
+
+        // --- Info Box Buttons ---
+        if (selectedMob != null) {
+
+            boolean shift =
+                Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) ||
+                    Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT);
+
+            int amount = shift ? 5 : 1;
+
+            if (infoRecruitButton.contains(x, y)) {
+                mobEntryListener.onRecruitClicked(selectedMob, amount);
+                return true;
+            }
+
+            if (infoGarrisonButton.contains(x, y)) {
+                mobEntryListener.onGarrisonClicked(selectedMob, amount);
+                return true;
+            }
         }
 
         // --- Mob selection ---
@@ -253,41 +278,27 @@ public class SpawnerModal extends Modal {
             return true;
         }
 
+        // --- Garrison scrollbox ---
         if (garrisonScrollBox.contains(x, y)) {
             garrisonScrollBox.click(x, y);
             return true;
         }
 
+        // --- Queue scrollbox ---
         if (queueScrollBox.contains(x, y)) {
             QueueEntry clicked = queueScrollBox.click(x, y);
             if (clicked != null) {
                 removeFromRecruitQueue(clicked);
-                return true;
             }
+            return true;
         }
 
+        // --- Deploy button ---
         if (deployGarrisonButton.contains(x, y)) {
             deployGarrison();
             return true;
         }
 
-        return false;
-    }
-
-    @Override
-    protected boolean handleScrollInside(float x, float y, float amountY) {
-        if (mobScrollBox.contains(x, y)) {
-            mobScrollBox.scroll(amountY * 10f);
-            return true;
-        }
-        if (queueScrollBox.contains(x, y)) {
-            queueScrollBox.scroll(amountY * 10f);
-            return true;
-        }
-        if (garrisonScrollBox.contains(x, y)) {
-            garrisonScrollBox.scroll(amountY * 10f);
-            return true;
-        }
         return false;
     }
 

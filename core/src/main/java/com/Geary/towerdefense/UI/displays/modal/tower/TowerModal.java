@@ -1,6 +1,6 @@
 package com.Geary.towerdefense.UI.displays.modal.tower;
 
-import com.Geary.towerdefense.UI.displays.modal.Modal;
+import com.Geary.towerdefense.UI.displays.modal.BaseScrollModal;
 import com.Geary.towerdefense.UI.displays.modal.scrollbox.VerticalScrollBox;
 import com.Geary.towerdefense.behaviour.targeting.TargetingHelper;
 import com.Geary.towerdefense.entity.buildings.tower.Tower;
@@ -16,7 +16,7 @@ import com.badlogic.gdx.math.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TowerModal extends Modal {
+public class TowerModal extends BaseScrollModal {
 
     private final Tower tower;
     private final GameStateManager gameStateManager;

@@ -38,7 +38,6 @@ public class VerticalScrollBox<T extends ScrollEntry> {
     public void scroll(float deltaY) {
         scrollOffset += deltaY;
 
-
         if (entries.size()>0){
             contentHeight = ((entries.get(0).bounds().height + spacing)*entries.size())+15f;
         } else {
@@ -142,6 +141,10 @@ public class VerticalScrollBox<T extends ScrollEntry> {
 
     public void relayout() {
         updateEntryPositions();
+    }
+
+    public void resetScroll() {
+        scrollOffset = 0f;
     }
 
     public List<T> getEntries() {

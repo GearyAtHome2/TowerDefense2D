@@ -1,6 +1,6 @@
 package com.Geary.towerdefense.UI.displays.modal.manufacturing;
 
-import com.Geary.towerdefense.UI.displays.modal.Modal;
+import com.Geary.towerdefense.UI.displays.modal.BaseScrollModal;
 import com.Geary.towerdefense.UI.displays.modal.scrollbox.VerticalScrollBox;
 import com.Geary.towerdefense.UI.render.icons.TooltipRenderer;
 import com.Geary.towerdefense.entity.buildings.factory.Manufacturing;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class FactoryModal extends Modal {
+public class FactoryModal extends BaseScrollModal {
 
     private final Manufacturing manufacturing;
     private final VerticalScrollBox<RecipeMenuEntry> verticalScrollBox;
