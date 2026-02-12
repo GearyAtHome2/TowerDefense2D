@@ -4,6 +4,7 @@ import com.Geary.towerdefense.UI.displays.modal.scrollbox.ScrollEntry;
 import com.Geary.towerdefense.UI.render.icons.IconStore;
 import com.Geary.towerdefense.entity.mob.bullet.BulletRepr;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -18,6 +19,7 @@ public class BulletScrollEntry implements ScrollEntry {
 
     public boolean selected = false;
     public boolean active = false;
+    public boolean affordable = true; // default to true
 
     public BulletScrollEntry(BulletRepr bullet) {
         this.bullet = bullet;
@@ -55,10 +57,10 @@ public class BulletScrollEntry implements ScrollEntry {
             renderer.end();
         }
 
-        // -------- Outline for ACTIVE --------
+        // Outline for ACTIVE
         if (active) {
             renderer.begin(ShapeRenderer.ShapeType.Line);
-            renderer.setColor(1f, 1f, 0f, 1f); // yellow outline
+            renderer.setColor(1f, 1f, 0f, 1f); // yellow
             renderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
             renderer.end();
         }
@@ -72,18 +74,21 @@ public class BulletScrollEntry implements ScrollEntry {
         float textX = bounds.x + iconSize + 12;
         float topTextY = bounds.y + bounds.height - 6;
 
-        // Name
-        font.draw(batch, bullet.getName(), textX, topTextY);
+        // Name + stats with affordability coloring
+        if (!affordable) {
+            font.setColor(0.5f, 0.5f, 0.5f, 1f); // grey out
+        } else {
+            font.setColor(Color.WHITE);
+        }
 
-        // Stats
-        font.draw(
-            batch,
-            "DMG: " + bullet.getDamage() + "  SPD: " + bullet.getSpeed(),
-            textX,
-            topTextY - 16
-        );
+        font.draw(batch, bullet.getName(), textX, topTextY);
+        font.draw(batch, "DMG: " + bullet.getDamage() + "  SPD: " + bullet.getSpeed(), textX, topTextY - 16);
 
         batch.end();
+    }
+
+    public void setAffordable(boolean affordable) {
+        this.affordable = affordable;
     }
 
     @Override

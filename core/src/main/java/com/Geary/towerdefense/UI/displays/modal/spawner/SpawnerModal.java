@@ -278,9 +278,9 @@ public class SpawnerModal extends BaseScrollModal {
             return true;
         }
 
-        // --- Garrison scrollbox ---
-        if (garrisonScrollBox.contains(x, y)) {
-            garrisonScrollBox.click(x, y);
+        // --- Deploy button ---
+        if (deployGarrisonButton.contains(x, y)) {
+            deployGarrison();
             return true;
         }
 
@@ -293,11 +293,6 @@ public class SpawnerModal extends BaseScrollModal {
             return true;
         }
 
-        // --- Deploy button ---
-        if (deployGarrisonButton.contains(x, y)) {
-            deployGarrison();
-            return true;
-        }
 
         return false;
     }

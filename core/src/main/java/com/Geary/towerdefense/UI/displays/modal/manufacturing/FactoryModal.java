@@ -56,7 +56,8 @@ public class FactoryModal extends BaseScrollModal {
         super(font, camera);
         this.manufacturing = manufacturing;
         this.tooltipRenderer = new TooltipRenderer(font);
-        verticalScrollBox = new VerticalScrollBox(0, 0, 0, 0);
+        verticalScrollBox = new VerticalScrollBox<>(0, 0, 0, 0);
+        registerScrollBox(verticalScrollBox);
         populateScrollBox();
     }
 
@@ -68,8 +69,9 @@ public class FactoryModal extends BaseScrollModal {
 
     @Override
     protected void drawContent(ShapeRenderer shapeRenderer, SpriteBatch batch) {
-        verticalScrollBox.draw(shapeRenderer, batch, font, camera);
-        drawScrollHoods(shapeRenderer);
+//        verticalScrollBox.draw(shapeRenderer, batch, font, camera);
+        drawScrollBoxes(shapeRenderer, batch);
+//        drawScrollHoods(shapeRenderer);
         drawTitle(batch);
         if (hoveredEntry != null) {
             drawTooltip(batch, shapeRenderer, hoveredEntry);
@@ -111,15 +113,6 @@ public class FactoryModal extends BaseScrollModal {
         RecipeMenuEntry clicked = verticalScrollBox.click(x, y);
         if (clicked != null) setActiveEntry(clicked);
         return true;
-    }
-
-    @Override
-    protected boolean handleScrollInside(float x, float y, float amountY) {
-        if (verticalScrollBox.contains(x, y)) {
-            verticalScrollBox.scroll(amountY * 10f); // scroll speed
-            return true;
-        }
-        return false;
     }
 
     private void populateScrollBox() {

@@ -63,6 +63,9 @@ public class TowerModal extends BaseScrollModal {
         ammoScrollBox = new VerticalScrollBox<>(0, 0, 0, 0);
         targetingScrollBox = new VerticalScrollBox<>(0, 0, 0, 0);
 
+        registerScrollBox(ammoScrollBox);
+        registerScrollBox(targetingScrollBox);
+
         populateAmmo();
         populateTargeting();
         restoreActiveState();
@@ -112,10 +115,11 @@ public class TowerModal extends BaseScrollModal {
         box.relayout();
     }
 
-    // ------------------------------------------------------------------------
-
     @Override
     protected void drawContent(ShapeRenderer renderer, SpriteBatch batch) {
+        // Update affordability before drawing
+        updateAmmoAffordability();
+
         drawSectionTitle(batch, "Ammo Selection", true);
         drawSectionTitle(batch, "Targeting Parameters", false);
 
@@ -135,8 +139,7 @@ public class TowerModal extends BaseScrollModal {
             selectedTargeting != null
         );
 
-        ammoScrollBox.draw(renderer, batch, font, camera);
-        targetingScrollBox.draw(renderer, batch, font, camera);
+        drawScrollBoxes(renderer, batch);
     }
 
     private List<String> buildAmmoLines() {
@@ -246,6 +249,12 @@ public class TowerModal extends BaseScrollModal {
     }
 
     // ------------------------------------------------------------------------
+
+    private void updateAmmoAffordability() {
+        for (BulletScrollEntry entry : ammoScrollBox.entries) {
+            entry.setAffordable(gameStateManager.canAfford(entry.getBullet()));
+        }
+    }
 
     private void populateAmmo() {
         List<BulletScrollEntry> entries = new ArrayList<>();

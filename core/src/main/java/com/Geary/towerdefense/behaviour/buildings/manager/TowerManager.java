@@ -4,6 +4,7 @@ import com.Geary.towerdefense.entity.buildings.tower.BasicTower;
 import com.Geary.towerdefense.entity.buildings.tower.ShotgunTower;
 import com.Geary.towerdefense.entity.buildings.tower.Tower;
 import com.Geary.towerdefense.entity.mob.bullet.Bullet;
+import com.Geary.towerdefense.entity.mob.bullet.BulletRepr;
 import com.Geary.towerdefense.entity.world.Cell;
 import com.Geary.towerdefense.world.GameWorld;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -79,18 +80,25 @@ public class TowerManager extends BuildingManager<Tower> {
             if (tower.cooldown <= 0 &&
                 tower.currentTarget != null &&
                 tower.canShoot()) {
-                List<Bullet> bulletsFired = tower.shoot(tower.currentTarget);
-                if (!bulletsFired.isEmpty()) {
-                    bullets.addAll(bulletsFired);
-                    tower.cooldown = tower.maxCooldown;
+
+                // ----------------- NEW: check ammo cost -----------------
+                BulletRepr ammo = tower.selectedAmmoRepr;
+                if (ammo != null && world.getGameStateManager().canAfford(ammo)) {
+
+                    // Subtract the cost
+                    world.getGameStateManager().consumeCost(ammo);
+
+                    // Fire bullets
+                    List<Bullet> bulletsFired = tower.shoot(tower.currentTarget);
+                    if (!bulletsFired.isEmpty()) {
+                        bullets.addAll(bulletsFired);
+                        tower.cooldown = tower.maxCooldown;
+                    }
                 }
             }
         }
     }
 
-//    public boolean canAffordToShoot(Tower tower){
-//
-//    }
 
     public void unlockTower(String name) {
         allTowerTypes.stream()

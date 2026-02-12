@@ -1,6 +1,7 @@
 package com.Geary.towerdefense.world;
 
 import com.Geary.towerdefense.entity.mob.Mob;
+import com.Geary.towerdefense.entity.mob.bullet.BulletRepr;
 import com.Geary.towerdefense.entity.resources.Resource;
 import com.Geary.towerdefense.entity.resources.mapEntity.ResourceType;
 import com.badlogic.gdx.Input;
@@ -91,6 +92,24 @@ public class GameStateManager {
         return true;
     }
 
+    public boolean canAfford(BulletRepr<?> bullet) {
+        // commented out for now until we have a coin costing ammo
+//        if (gameState.coins < bullet.template.coinCost) return false;
+
+        // Raw resources
+        for (var e : bullet.getRawCosts().entrySet()) {
+            double available = gameState.rawResources.getOrDefault(e.getKey(), 0.0);
+            if (available < e.getValue()) return false;
+        }
+
+        // Refined resources
+        for (var e : bullet.getRefinedCosts().entrySet()) {
+            double available = gameState.refinedResources.getOrDefault(e.getKey(), 0.0);
+            if (available < e.getValue()) return false;
+        }
+        return true;
+    }
+
     public boolean consumeCost(Mob mob) {
         if (!canAfford(mob)) return false;
 
@@ -113,5 +132,27 @@ public class GameStateManager {
 
         return true;
     }
+
+    /** Consume resources for a bullet, returns true if successful */
+    public boolean consumeCost(BulletRepr<?> bullet) {
+        if (!canAfford(bullet)) return false;
+
+        // Raw resources
+        for (var e : bullet.getRawCosts().entrySet()) {
+            Resource.RawResourceType type = e.getKey();
+            double current = gameState.rawResources.get(type);
+            gameState.rawResources.put(type, current - e.getValue());
+        }
+
+        // Refined resources
+        for (var e : bullet.getRefinedCosts().entrySet()) {
+            Resource.RefinedResourceType type = e.getKey();
+            double current = gameState.refinedResources.get(type);
+            gameState.refinedResources.put(type, current - e.getValue());
+        }
+
+        return true;
+    }
+
 
 }
