@@ -1,20 +1,29 @@
 package com.Geary.towerdefense;
 
+import com.Geary.towerdefense.entity.resources.Resource;
 import com.Geary.towerdefense.progress.PlayerProgress;
 import com.Geary.towerdefense.screens.LevelSelectScreen;
 import com.Geary.towerdefense.screens.TitleScreen;
 import com.Geary.towerdefense.world.LevelData;
 import com.badlogic.gdx.Game;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class TowerDefenseGame extends Game {
 
     private PlayerProgress playerProgress;
+    private List<LevelData> levels;
 
     @Override
     public void create() {
         playerProgress = new PlayerProgress();
         setScreen(new TitleScreen(this));
     }
+
+    public List<LevelData> getLevels() { return levels;}
 
     public PlayerProgress getPlayerProgress() {
         return playerProgress;
@@ -26,5 +35,22 @@ public class TowerDefenseGame extends Game {
 
     public void goToLevelSelect() {
         setScreen(new LevelSelectScreen(this));
+    }
+
+    public void loadLevels() {
+        levels = new ArrayList<>();
+
+        // Example level 1
+        Map<Resource.RawResourceType, Integer> level1Resources = new HashMap<>();
+        level1Resources.put(Resource.RawResourceType.IRON, 2);
+        level1Resources.put(Resource.RawResourceType.COAL, 2);
+        levels.add(new LevelData("level1", "The First Level", level1Resources));
+
+        // Example level 2
+        Map<Resource.RawResourceType, Integer> level2Resources = new HashMap<>();
+        level2Resources.put(Resource.RawResourceType.IRON, 3);
+        level2Resources.put(Resource.RawResourceType.COAL, 1);
+        level2Resources.put(Resource.RawResourceType.COPPER, 2);
+        levels.add(new LevelData("level2", "Copper Challenge", level2Resources));
     }
 }
