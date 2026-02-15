@@ -1,4 +1,4 @@
-package com.Geary.towerdefense.world;
+package com.Geary.towerdefense.levelSelect;
 
 import com.Geary.towerdefense.entity.resources.Resource;
 

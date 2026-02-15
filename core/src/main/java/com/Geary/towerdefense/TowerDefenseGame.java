@@ -4,7 +4,7 @@ import com.Geary.towerdefense.entity.resources.Resource;
 import com.Geary.towerdefense.progress.PlayerProgress;
 import com.Geary.towerdefense.screens.LevelSelectScreen;
 import com.Geary.towerdefense.screens.TitleScreen;
-import com.Geary.towerdefense.world.LevelData;
+import com.Geary.towerdefense.levelSelect.LevelData;
 import com.badlogic.gdx.Game;
 
 import java.util.ArrayList;
@@ -52,5 +52,11 @@ public class TowerDefenseGame extends Game {
         level2Resources.put(Resource.RawResourceType.COAL, 1);
         level2Resources.put(Resource.RawResourceType.COPPER, 2);
         levels.add(new LevelData("level2", "Copper Challenge", level2Resources));
+
+        Map<Resource.RawResourceType, Integer> level3Resources = new HashMap<>();
+        level3Resources.put(Resource.RawResourceType.IRON, 3);
+        level3Resources.put(Resource.RawResourceType.COAL, 1);
+        level3Resources.put(Resource.RawResourceType.COPPER, 2);
+        levels.add(new LevelData("level2", "Level 3", level3Resources));
     }
 }

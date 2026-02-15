@@ -5,7 +5,7 @@ import com.Geary.towerdefense.UI.render.icons.TooltipRenderer;
 import com.Geary.towerdefense.levelSelect.CameraController;
 import com.Geary.towerdefense.levelSelect.LevelGridGenerator;
 import com.Geary.towerdefense.levelSelect.LevelPopupRenderer;
-import com.Geary.towerdefense.world.LevelData;
+import com.Geary.towerdefense.levelSelect.LevelData;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -61,7 +61,7 @@ public class LevelSelectScreen implements Screen {
         camera.update();
 
         gridGenerator = new LevelGridGenerator();
-        gridGenerator.generateGrid();
+        gridGenerator.generateGrid(levels);
 
         cameraController = new CameraController(camera);
         cameraController.setupInput();

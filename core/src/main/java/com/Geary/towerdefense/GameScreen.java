@@ -14,7 +14,7 @@ import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.entity.mob.Mob;
 import com.Geary.towerdefense.world.GameWorld;
-import com.Geary.towerdefense.world.LevelData;
+import com.Geary.towerdefense.levelSelect.LevelData;
 import com.Geary.towerdefense.world.PlacementHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
