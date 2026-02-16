@@ -1,6 +1,7 @@
 package com.Geary.towerdefense.UI.render.icons;
 
 import com.Geary.towerdefense.behaviour.targeting.TargetingHelper;
+import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.resources.Resource;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -8,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class IconStore {
 
@@ -65,10 +67,10 @@ public class IconStore {
             return null;
         }
     }
+
     public static TextureRegion rawResource(Resource.RawResourceType type) {
         return RAW_ICONS.get(type);
     }
-
 
     public static TextureRegion refinedResource(Resource.RefinedResourceType type) {
         return REFINED_ICONS.get(type);
@@ -108,6 +110,22 @@ public class IconStore {
             System.err.println("Missing mob icon: " + key);
             return null;
         }
+    }
+
+    public static TextureRegion randomMapTileForOrder(Entity.Order order, boolean edge) {
+        String dir = "mapStructures/"+order.name()+"/";
+        String assetName = "";
+        switch (order){
+            case NATURE -> assetName="tree";
+            case WATER -> assetName="sea";
+            default -> assetName="default";
+        }
+        if (edge){
+            assetName+="_border";
+        }
+        int assetSuffix = new Random().nextInt(4)+1;
+        Texture texture = new Texture(dir + assetName + assetSuffix+".png");
+        return new TextureRegion(texture);
     }
 
 

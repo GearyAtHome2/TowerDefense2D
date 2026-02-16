@@ -1,6 +1,7 @@
 package com.Geary.towerdefense.levelSelect;
 
 import com.Geary.towerdefense.entity.Entity;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import java.util.EnumMap;
 
@@ -15,6 +16,8 @@ public class LevelGridCell {
     private boolean isPath = false;
     private boolean isLevel = false;
     public LevelData levelData;
+
+    private TextureRegion cachedIcon; // 🔶 cache for Nature icon
 
     public LevelGridCell(int x, int y) {
         this.xIndex = x;
@@ -90,5 +93,21 @@ public class LevelGridCell {
     public boolean isLevel() { return isLevel; }
 
     public Entity.Order getPrimaryOrder() { return levelData.getPrimaryOrder(); }
+
+    public void setCachedIcon(TextureRegion icon) {
+        this.cachedIcon = icon;
+    }
+
+    public TextureRegion getCachedIcon() {
+        return cachedIcon;
+    }
+
+    public int getX(){
+        return xIndex;
+    }
+
+    public int getY(){
+        return yIndex;
+    }
 
 }

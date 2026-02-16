@@ -39,8 +39,10 @@ public class RowGenerator {
 
             int radius;
             if (rng.nextFloat() < 0.25f) {
+                radius = 7 + rng.nextInt(2); // medium clusters
+            } else if (rng.nextFloat() < 0.5f) {
                 radius = 4 + rng.nextInt(3); // medium clusters
-            } else {
+            }else {
                 radius = 2 + rng.nextInt(2); // small clusters
             }
 
@@ -70,6 +72,41 @@ public class RowGenerator {
                 }
             }
         }
+    }
+
+    public boolean isEdgeCell(int x, int y) {
+        LevelGridCell cell = grid[x][y];
+        Entity.Order myOrder = cell.getDominantOrder();
+
+        if (myOrder == Entity.Order.NEUTRAL) return false;
+
+        float myInfluence = cell.getInfluence(myOrder);
+
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                if (dx == 0 && dy == 0) continue;
+
+                int nx = x + dx;
+                int ny = y + dy;
+
+                if (nx < 0 || nx >= gridWidth) return true;  // grid boundary counts as edge
+                if (ny < 0 || ny >= gridHeight) return true;
+
+                LevelGridCell neighbour = grid[nx][ny];
+
+                // Case 1: neighbour has zero influence for my order
+                if (neighbour.getInfluence(myOrder) <= 0f) {
+                    return true;
+                }
+
+                // Case 2: neighbour dominant order differs
+                if (neighbour.getDominantOrder() != myOrder) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private Entity.Order randomOrder() {

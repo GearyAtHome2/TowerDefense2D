@@ -89,7 +89,7 @@ public class LevelSelectScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
         shapeRenderer.setProjectionMatrix(camera.combined);
 
-        gridGenerator.drawGrid(shapeRenderer);
+        gridGenerator.drawGrid(shapeRenderer, batch);
 
         // draw popup using the hovered cell
         popupRenderer.drawPopup(hoveredCell);
