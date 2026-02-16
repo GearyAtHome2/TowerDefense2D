@@ -1,16 +1,13 @@
 package com.Geary.towerdefense;
 
-import com.Geary.towerdefense.entity.resources.Resource;
+import com.Geary.towerdefense.levelSelect.LevelData;
 import com.Geary.towerdefense.progress.PlayerProgress;
 import com.Geary.towerdefense.screens.LevelSelectScreen;
 import com.Geary.towerdefense.screens.TitleScreen;
-import com.Geary.towerdefense.levelSelect.LevelData;
 import com.badlogic.gdx.Game;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class TowerDefenseGame extends Game {
 
@@ -41,22 +38,30 @@ public class TowerDefenseGame extends Game {
         levels = new ArrayList<>();
 
         // Example level 1
-        Map<Resource.RawResourceType, Integer> level1Resources = new HashMap<>();
-        level1Resources.put(Resource.RawResourceType.IRON, 2);
-        level1Resources.put(Resource.RawResourceType.COAL, 2);
-        levels.add(new LevelData("level1", "The First Level", level1Resources));
+//        Map<Resource.RawResourceType, Integer> level1Resources = new HashMap<>();
+//        level1Resources.put(Resource.RawResourceType.IRON, 2);
+//        level1Resources.put(Resource.RawResourceType.COAL, 2);
+//        levels.add(new LevelData("level1", "The First Level", level1Resources));
+//
+//        // Example level 2
+//        Map<Resource.RawResourceType, Integer> level2Resources = new HashMap<>();
+//        level2Resources.put(Resource.RawResourceType.IRON, 3);
+//        level2Resources.put(Resource.RawResourceType.COAL, 1);
+//        level2Resources.put(Resource.RawResourceType.COPPER, 2);
+//        levels.add(new LevelData("level2", "Copper Challenge", level2Resources));
+//
+//        Map<Resource.RawResourceType, Integer> level3Resources = new HashMap<>();
+//        level3Resources.put(Resource.RawResourceType.IRON, 3);
+//        level3Resources.put(Resource.RawResourceType.COAL, 1);
+//        level3Resources.put(Resource.RawResourceType.COPPER, 2);
+//        levels.add(new LevelData("level2", "Level 3", level3Resources));
 
-        // Example level 2
-        Map<Resource.RawResourceType, Integer> level2Resources = new HashMap<>();
-        level2Resources.put(Resource.RawResourceType.IRON, 3);
-        level2Resources.put(Resource.RawResourceType.COAL, 1);
-        level2Resources.put(Resource.RawResourceType.COPPER, 2);
-        levels.add(new LevelData("level2", "Copper Challenge", level2Resources));
-
-        Map<Resource.RawResourceType, Integer> level3Resources = new HashMap<>();
-        level3Resources.put(Resource.RawResourceType.IRON, 3);
-        level3Resources.put(Resource.RawResourceType.COAL, 1);
-        level3Resources.put(Resource.RawResourceType.COPPER, 2);
-        levels.add(new LevelData("level2", "Level 3", level3Resources));
+//        for (int i=0; i< 20; i++){
+//            Map<Resource.RawResourceType, Integer> levelResources = new HashMap<>();
+//            levelResources.put(Resource.RawResourceType.IRON, 3);
+//            levelResources.put(Resource.RawResourceType.COAL, 1);
+//            levelResources.put(Resource.RawResourceType.COPPER, 2);
+//            levels.add(new LevelData("level"+i, "Level "+i, levelResources));
+//        }
     }
 }

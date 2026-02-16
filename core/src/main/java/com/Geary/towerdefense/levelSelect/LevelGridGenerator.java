@@ -3,7 +3,6 @@ package com.Geary.towerdefense.levelSelect;
 import com.Geary.towerdefense.entity.Entity;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.MathUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,199 +14,272 @@ public class LevelGridGenerator {
     public static final int GRID_HEIGHT = 128;
     public static final float CELL_SIZE = 10f;
 
-    private static final int MIN_LEVEL_DISTANCE = 10;
-    private static final int MAX_LEVEL_DISTANCE = 25;
-    private static final int CLUSTER_RADIUS = 6;
+    private static final int ROW_COUNT = 4;
+    private static final int ROW_HEIGHT = 32;
 
-    public enum CellType { BACKGROUND, PATH, LEVEL }
+    private static final int PATH_MIN_DISTANCE = 10;
+    private static final int PATH_MAX_DISTANCE = 16;
+    private static final int PATH_EDGE_MARGIN = 14; // tiles from edge before turn
+    private final LevelGenerator levelGenerator;
+    private final List<LevelGridCell> levels = new ArrayList<>();
 
-    public static class LevelGridCell {
-        public final int xIndex;
-        public final int yIndex;
-
-        public CellType type;
-        public Entity.Order order;
-        public float clusterFalloff;
-
-        public LevelGridCell(int x, int y) {
-            this.xIndex = x;
-            this.yIndex = y;
-            this.type = CellType.BACKGROUND;
-            this.order = Entity.Order.NEUTRAL;
-            this.clusterFalloff = 1f;
-        }
+    public LevelGridGenerator() {
+        this.levelGenerator = new LevelGenerator();
     }
 
+    int levelIndex = 1;
     private LevelGridCell[][] grid;
 
-    public void generateGrid(List<LevelData> levels) {
-
+    public List<LevelGridCell> generateMap() {
         grid = new LevelGridCell[GRID_WIDTH][GRID_HEIGHT];
         for (int x = 0; x < GRID_WIDTH; x++)
             for (int y = 0; y < GRID_HEIGHT; y++)
                 grid[x][y] = new LevelGridCell(x, y);
 
+        RowGenerator rowGenerator = new RowGenerator(grid, GRID_WIDTH, GRID_HEIGHT, ROW_HEIGHT);
+        for (int i = 0; i < ROW_COUNT; i++)
+            rowGenerator.populateRow(i);
+
+        generateSnakeLevelsPath();
+        return levels;
+    }
+
+    private void generateSnakeLevelsPath() {
         Random rng = new Random();
 
-        List<int[]> levelPositions = new ArrayList<>();
-        List<Entity.Order> levelOrders = new ArrayList<>();
+        int currentX = 10;
+        int currentY = ROW_HEIGHT / 4;
+        int dirX = 1;
+        int rowIndex = 0;
+        int verticalBuffer = 5;
 
-        // 1️⃣ Place first level at bottom-left corner
-        int currentX = 5; // offset from left edge
-        int currentY = 5; // offset from bottom edge
+        while (rowIndex < ROW_COUNT) {
+            int rowMinY = rowIndex * ROW_HEIGHT;
+            int rowMaxY = rowMinY + ROW_HEIGHT - 1;
 
-        for (int i = 0; i < levels.size(); i++) {
+            boolean branchPlaced = false;
 
-            Entity.Order order = randomOrder(rng);
+            currentY = Math.max(rowMinY + verticalBuffer, Math.min(rowMaxY - verticalBuffer, currentY));
+            grid[currentX][currentY] = setLevel(grid[currentX][currentY]);
 
-            levelPositions.add(new int[]{currentX, currentY});
-            levelOrders.add(order);
+            while (true) {
+                int distance = PATH_MIN_DISTANCE + rng.nextInt(PATH_MAX_DISTANCE - PATH_MIN_DISTANCE + 1);
 
-            if (i == levels.size() - 1)
-                break;
+                for (int step = 0; step < distance; step++) {
+                    int vertical = rng.nextInt(3) - 1;
+                    int nextX = Math.max(0, Math.min(GRID_WIDTH - 1, currentX + dirX));
+                    int nextY = Math.max(rowMinY + verticalBuffer, Math.min(rowMaxY - verticalBuffer, currentY + vertical));
 
-            int distance = MIN_LEVEL_DISTANCE +
-                rng.nextInt(MAX_LEVEL_DISTANCE - MIN_LEVEL_DISTANCE + 1);
-
-            int targetX = currentX;
-            int targetY = currentY;
-
-            // Choose an overall outward bias direction
-            int biasX = rng.nextInt(3) - 1;
-            int biasY = rng.nextInt(3) - 1;
-            while (biasX == 0 && biasY == 0) {
-                biasX = rng.nextInt(3) - 1;
-                biasY = rng.nextInt(3) - 1;
-            }
-
-            int lastDirX = biasX;
-            int lastDirY = biasY;
-
-            for (int step = 0; step < distance; step++) {
-
-                int moveX;
-                int moveY;
-
-                if (rng.nextFloat() < 0.7f) { // continue generally outward
-                    moveX = biasX;
-                    moveY = biasY;
-                } else { // wander slightly
-                    moveX = rng.nextInt(3) - 1;
-                    moveY = rng.nextInt(3) - 1;
-                    if (moveX == 0 && moveY == 0) {
-                        moveX = lastDirX;
-                        moveY = lastDirY;
+                    int attempts = 0;
+                    while (attempts < 3) {
+                        boolean adjusted = false;
+                        if (nextY > rowMinY && grid[nextX][nextY - 1].isLevel()) { nextY++; adjusted = true; }
+                        if (nextY < rowMaxY && grid[nextX][nextY + 1].isLevel()) { nextY--; adjusted = true; }
+                        if (!adjusted) break;
+                        attempts++;
                     }
+
+                    currentX = nextX;
+                    currentY = nextY;
+                    grid[currentX][currentY].setPath();
                 }
 
-                // Prevent backtracking
-                if (moveX == -lastDirX && moveY == -lastDirY) {
-                    moveX = lastDirX;
-                    moveY = lastDirY;
+                grid[currentX][currentY] = setLevel(grid[currentX][currentY]);
+
+                boolean atEdge = (dirX == 1 && currentX >= GRID_WIDTH - PATH_EDGE_MARGIN - 5)
+                    || (dirX == -1 && currentX <= PATH_EDGE_MARGIN + 5);
+                boolean safeToBranch = (dirX == 1 && currentX < GRID_WIDTH / 2) || (dirX == -1 && currentX > GRID_WIDTH / 2);
+
+                if (!branchPlaced && safeToBranch && rng.nextFloat() < 0.3f) {
+                    branchPlaced = true;
+                    int[] branchEnd = createBranches(rowIndex, currentX, currentY, dirX, rng);
+                    currentX = branchEnd[0];
+                    currentY = branchEnd[1];
                 }
 
-                targetX = MathUtils.clamp(targetX + moveX, 2, GRID_WIDTH - 3);
-                targetY = MathUtils.clamp(targetY + moveY, 2, GRID_HEIGHT - 3);
+                if (atEdge) {
+                    rowIndex++;
+                    if (rowIndex >= ROW_COUNT) break;
 
-                if (grid[targetX][targetY].type != CellType.LEVEL) {
-                    grid[targetX][targetY].type = CellType.PATH;
-                }
+                    int targetY = rowIndex * ROW_HEIGHT + ROW_HEIGHT / 2;
+                    int loopCounter = 0;
+                    while (currentY != targetY && loopCounter < 100) {
+                        currentY += (currentY < targetY) ? 1 : -1;
 
-                lastDirX = moveX;
-                lastDirY = moveY;
-            }
+                        int attempts = 0;
+                        while (attempts < 3) {
+                            boolean adjusted = false;
+                            if (currentY > 0 && grid[currentX][currentY - 1].isLevel()) { currentY++; adjusted = true; }
+                            if (currentY < GRID_HEIGHT - 1 && grid[currentX][currentY + 1].isLevel()) { currentY--; adjusted = true; }
+                            if (!adjusted) break;
+                            attempts++;
+                        }
 
-            currentX = targetX;
-            currentY = targetY;
-        }
+                        grid[currentX][currentY].setPath();
+                        loopCounter++;
+                    }
 
-        // 2️⃣ Place LEVEL tiles
-        for (int i = 0; i < levelPositions.size(); i++) {
-            int[] pos = levelPositions.get(i);
-            placeLevel(pos[0], pos[1], levelOrders.get(i));
-        }
-
-        // 3️⃣ Build clusters after all paths exist
-        for (int i = 0; i < levelPositions.size(); i++) {
-            int[] pos = levelPositions.get(i);
-            createCluster(pos[0], pos[1], CLUSTER_RADIUS, levelOrders.get(i));
-        }
-    }
-
-    private void placeLevel(int x, int y, Entity.Order order) {
-        LevelGridCell cell = grid[x][y];
-        cell.type = CellType.LEVEL;
-        cell.order = order;
-        cell.clusterFalloff = 0f;
-    }
-
-    private void createCluster(int cx, int cy, int radius, Entity.Order order) {
-        for (int dx = -radius; dx <= radius; dx++) {
-            for (int dy = -radius; dy <= radius; dy++) {
-
-                int gx = cx + dx;
-                int gy = cy + dy;
-
-                if (gx < 0 || gx >= GRID_WIDTH || gy < 0 || gy >= GRID_HEIGHT)
-                    continue;
-
-                LevelGridCell cell = grid[gx][gy];
-
-                if (cell.type == CellType.LEVEL)
-                    continue;
-
-                float dist = (float) Math.sqrt(dx * dx + dy * dy);
-
-                if (dist <= radius) {
-                    cell.order = order;
-                    cell.clusterFalloff = MathUtils.clamp(dist / radius, 0f, 1f);
+                    grid[currentX][currentY] = setLevel(grid[currentX][currentY]);
+                    dirX = -dirX;
+                    break;
                 }
             }
         }
+    }
+
+    private int[] createBranches(int rowIndex, int startX, int startY, int dirX, Random rng) {
+        int rowMinY = rowIndex * ROW_HEIGHT;
+        int rowMaxY = rowMinY + ROW_HEIGHT - 1;
+
+        int branchCount = 2 + rng.nextInt(2);
+        int levelCount = 1 + rng.nextInt(2);
+        int branchLength = PATH_MIN_DISTANCE + rng.nextInt(PATH_MAX_DISTANCE - PATH_MIN_DISTANCE + 1);
+
+        int[] biases = new int[branchCount];
+        if (branchCount == 2) { biases[0] = 1; biases[1] = -1; }
+        else { biases[0] = 1; biases[1] = 0; biases[2] = -1; }
+
+        int[] branchEndX = new int[branchCount];
+        int[] branchEndY = new int[branchCount];
+
+        for (int b = 0; b < branchCount; b++) {
+            int x = startX;
+            int y = startY;
+            int verticalBias = biases[b];
+
+            if (dirX < 0) verticalBias = -verticalBias;
+            int targetY = startY + verticalBias * 5;
+
+            for (int step = 0; step < branchLength; step++) {
+                x = Math.max(0, Math.min(GRID_WIDTH - 1, x + dirX));
+                int vertical = targetY - y;
+                if (vertical != 0) vertical = (vertical > 0) ? 1 : -1;
+                y += vertical;
+                y = Math.max(rowMinY, Math.min(rowMaxY, y));
+
+                int attempts = 0;
+                while (attempts < 3) {
+                    boolean adjusted = false;
+                    if (y > rowMinY && grid[x][y - 1].isLevel()) { y++; adjusted = true; }
+                    if (y < rowMaxY && grid[x][y + 1].isLevel()) { y--; adjusted = true; }
+                    if (!adjusted) break;
+                    attempts++;
+                }
+
+                grid[x][y].setPath();
+            }
+
+            grid[x][y] = setLevel(grid[x][y]);
+            branchEndX[b] = x;
+            branchEndY[b] = y;
+        }
+
+        if (levelCount > 1) {
+            for (int b = 0; b < branchCount; b++) {
+                int x = branchEndX[b];
+                int y = branchEndY[b];
+                for (int l = 1; l < levelCount; l++) {
+                    int segmentLength = PATH_MIN_DISTANCE + rng.nextInt(PATH_MAX_DISTANCE - PATH_MIN_DISTANCE + 1);
+                    for (int step = 0; step < segmentLength; step++) {
+                        x = Math.max(0, Math.min(GRID_WIDTH - 1, x + dirX));
+                        int vertical = rng.nextInt(3) - 1;
+                        y += vertical;
+                        y = Math.max(rowMinY, Math.min(rowMaxY, y));
+
+                        int attempts = 0;
+                        while (attempts < 3) {
+                            boolean adjusted = false;
+                            if (y > rowMinY && grid[x][y - 1].isLevel()) { y++; adjusted = true; }
+                            if (y < rowMaxY && grid[x][y + 1].isLevel()) { y--; adjusted = true; }
+                            if (!adjusted) break;
+                            attempts++;
+                        }
+
+                        grid[x][y].setPath();
+                    }
+                    grid[x][y] = setLevel(grid[x][y]);
+                }
+                branchEndX[b] = x;
+                branchEndY[b] = y;
+            }
+        }
+
+        int reconnectDistance = PATH_MIN_DISTANCE + rng.nextInt(PATH_MAX_DISTANCE - PATH_MIN_DISTANCE + 1);
+        int reconnectX = Math.max(0, Math.min(GRID_WIDTH - 1, branchEndX[0] + dirX * reconnectDistance));
+        int reconnectY = rowMinY + ROW_HEIGHT / 2 + rng.nextInt(7) - 3;
+
+        grid[reconnectX][reconnectY] = setLevel(grid[reconnectX][reconnectY]);
+
+        for (int b = 0; b < branchCount; b++) {
+            int x = branchEndX[b];
+            int y = branchEndY[b];
+            int loopCounter = 0;
+            while ((x != reconnectX || y != reconnectY) && loopCounter < 200) {
+                if (x != reconnectX) x += (x < reconnectX) ? 1 : -1;
+                if (y != reconnectY) y += (y < reconnectY) ? 1 : -1;
+
+                int attempts = 0;
+                while (attempts < 3) {
+                    boolean adjusted = false;
+                    if (y > rowMinY && grid[x][y - 1].isLevel()) { y++; adjusted = true; }
+                    if (y < rowMaxY && grid[x][y + 1].isLevel()) { y--; adjusted = true; }
+                    if (!adjusted) break;
+                    attempts++;
+                }
+
+                grid[x][y].setPath();
+                loopCounter++;
+            }
+        }
+
+        return new int[]{reconnectX, reconnectY};
     }
 
     public void drawGrid(ShapeRenderer shapeRenderer) {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-
         for (int x = 0; x < GRID_WIDTH; x++) {
             for (int y = 0; y < GRID_HEIGHT; y++) {
                 LevelGridCell cell = grid[x][y];
-
                 float wx = x * CELL_SIZE;
                 float wy = y * CELL_SIZE;
 
-                Color baseColor;
-
-                // Background with falloff
-                if (cell.order == Entity.Order.NEUTRAL) {
-                    baseColor = Color.GRAY.cpy();
-                } else {
-                    baseColor = getOrderColor(cell.order)
-                        .cpy()
-                        .lerp(Color.GRAY, cell.clusterFalloff);
+                Color color;
+                if (cell.isLevel()) color = Color.WHITE;
+                else if (cell.isPath()) color = Color.DARK_GRAY;
+                else {
+                    float total = 0f, r = 0f, g = 0f, b = 0f;
+                    for (Entity.Order order : Entity.Order.values()) {
+                        float val = cell.getInfluence(order);
+                        if (val > 0f) {
+                            Color c = getOrderColor(order);
+                            r += c.r * val;
+                            g += c.g * val;
+                            b += c.b * val;
+                            total += val;
+                        }
+                    }
+                    if (total > 0f) { r /= total; g /= total; b /= total; color = new Color(r, g, b, 1f); }
+                    else color = Color.LIGHT_GRAY;
                 }
 
-                // LEVEL overrides
-                if (cell.type == CellType.LEVEL) {
-                    baseColor = getOrderColor(cell.order);
-                }
-
-                // PATH = darkened version of whatever base was
-                else if (cell.type == CellType.PATH) {
-                    baseColor = baseColor.lerp(Color.DARK_GRAY, 0.6f);
-                }
-
-                shapeRenderer.setColor(baseColor);
+                shapeRenderer.setColor(color);
                 shapeRenderer.rect(wx, wy, CELL_SIZE, CELL_SIZE);
             }
         }
+        shapeRenderer.end();
 
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.DARK_GRAY);
+        for (int i = 1; i < ROW_COUNT; i++) {
+            float y = i * ROW_HEIGHT * CELL_SIZE;
+            shapeRenderer.line(0, y, GRID_WIDTH * CELL_SIZE, y);
+        }
         shapeRenderer.end();
     }
 
     private Color getOrderColor(Entity.Order order) {
         return switch (order) {
-            case NEUTRAL -> Color.GRAY;
+            case NEUTRAL -> Color.LIGHT_GRAY;
             case TECH -> Color.CYAN;
             case NATURE -> Color.GREEN;
             case DARK -> Color.PURPLE;
@@ -217,16 +289,12 @@ public class LevelGridGenerator {
         };
     }
 
-    private Entity.Order randomOrder(Random rng) {
-        Entity.Order[] values = Entity.Order.values();
-        Entity.Order order;
-        do {
-            order = values[rng.nextInt(values.length)];
-        } while (order == Entity.Order.NEUTRAL);
-        return order;
-    }
+    public LevelGridCell[][] getGrid() { return grid; }
 
-    public LevelGridCell[][] getGrid() {
-        return grid;
+    public LevelGridCell setLevel(LevelGridCell cell) {
+        LevelData level = levelGenerator.generateLevel(cell, levelIndex);
+        cell.setLevel(level);
+        levels.add(cell);
+        return cell;
     }
 }

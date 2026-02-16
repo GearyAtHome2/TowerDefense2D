@@ -3,9 +3,9 @@ package com.Geary.towerdefense.screens;
 import com.Geary.towerdefense.TowerDefenseGame;
 import com.Geary.towerdefense.UI.render.icons.TooltipRenderer;
 import com.Geary.towerdefense.levelSelect.CameraController;
+import com.Geary.towerdefense.levelSelect.LevelGridCell;
 import com.Geary.towerdefense.levelSelect.LevelGridGenerator;
 import com.Geary.towerdefense.levelSelect.LevelPopupRenderer;
-import com.Geary.towerdefense.levelSelect.LevelData;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -21,7 +21,7 @@ import java.util.List;
 public class LevelSelectScreen implements Screen {
 
     private final TowerDefenseGame game;
-    private List<LevelData> levels;
+    private List<LevelGridCell> levels; // now a list of cells
 
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
@@ -31,7 +31,7 @@ public class LevelSelectScreen implements Screen {
     private TooltipRenderer tooltipRenderer;
     private final Vector3 tmpVec = new Vector3();
 
-    private LevelData hoveredLevel;
+    private LevelGridCell hoveredCell; // track the hovered cell
 
     private LevelGridGenerator gridGenerator;
     private CameraController cameraController;
@@ -43,8 +43,6 @@ public class LevelSelectScreen implements Screen {
 
     @Override
     public void show() {
-        levels = game.getLevels();
-
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
 
@@ -61,7 +59,10 @@ public class LevelSelectScreen implements Screen {
         camera.update();
 
         gridGenerator = new LevelGridGenerator();
-        gridGenerator.generateGrid(levels);
+
+        System.out.println("creting levels");
+        levels = gridGenerator.generateMap();
+        System.out.println("creted levels");
 
         cameraController = new CameraController(camera);
         cameraController.setupInput();
@@ -71,40 +72,50 @@ public class LevelSelectScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0, 1);       // black background (change if you like)
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         cameraController.handlePan(delta);
         cameraController.handleDrag();
         detectHover();
 
-        cameraController.clampToGrid(LevelGridGenerator.GRID_WIDTH, LevelGridGenerator.GRID_HEIGHT, LevelGridGenerator.CELL_SIZE,
-            viewport.getWorldWidth(), viewport.getWorldHeight());
+        cameraController.clampToGrid(LevelGridGenerator.GRID_WIDTH,
+            LevelGridGenerator.GRID_HEIGHT,
+            LevelGridGenerator.CELL_SIZE,
+            viewport.getWorldWidth(),
+            viewport.getWorldHeight());
 
         camera.update();
         batch.setProjectionMatrix(camera.combined);
         shapeRenderer.setProjectionMatrix(camera.combined);
 
         gridGenerator.drawGrid(shapeRenderer);
-        popupRenderer.drawPopup(hoveredLevel);
+
+        // draw popup using the hovered cell
+        popupRenderer.drawPopup(hoveredCell);
     }
 
     private void detectHover() {
         tmpVec.set(Gdx.input.getX(), Gdx.input.getY(), 0);
         camera.unproject(tmpVec);
-        hoveredLevel = null;
+        hoveredCell = null;
 
-        for (int i = 0; i < levels.size(); i++) {
-            float lx = (LevelGridGenerator.GRID_WIDTH / 2 + i * 3) * LevelGridGenerator.CELL_SIZE;
-            float ly = (LevelGridGenerator.GRID_HEIGHT / 2) * LevelGridGenerator.CELL_SIZE;
-            float dx = tmpVec.x - lx, dy = tmpVec.y - ly;
-            if (dx * dx + dy * dy <= LevelGridGenerator.CELL_SIZE * LevelGridGenerator.CELL_SIZE) {
-                hoveredLevel = levels.get(i);
+        for (LevelGridCell cell : levels) {
+            if (!cell.isLevel()) continue;
+
+            float cellX = cell.xIndex * LevelGridGenerator.CELL_SIZE;
+            float cellY = cell.yIndex * LevelGridGenerator.CELL_SIZE;
+            float dx = tmpVec.x - cellX;
+            float dy = tmpVec.y - cellY;
+            float radius = LevelGridGenerator.CELL_SIZE * 0.5f;
+
+            if (dx * dx + dy * dy <= radius * radius) {
+                hoveredCell = cell;
                 break;
             }
         }
 
-        popupRenderer.updateHoveredLevel(hoveredLevel);
+        popupRenderer.updateHoveredLevel(hoveredCell != null ? hoveredCell.levelData : null);
     }
 
     @Override
