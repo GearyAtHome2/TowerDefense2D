@@ -27,7 +27,7 @@ public class LevelPopupRenderer {
         this.batch=batch; this.shapeRenderer=shapeRenderer; this.font=font; this.camera=camera; this.levels=levels;
     }
 
-    public void updateHoveredLevel(LevelData hovered){ this.hoveredLevelData =hovered; }
+    public void updateHoveredLevel(LevelData hovered){ this.hoveredLevelData = hovered; }
 
     public void drawPopup(LevelGridCell hoveredCell) {
         if (hoveredCell == null || !hoveredCell.isLevel()) {
@@ -58,8 +58,9 @@ public class LevelPopupRenderer {
 
         float width = widest + pad * 2, height = lines.size() * rowHeight + pad * 3 + (20f * scale);
         float halfW = camera.viewportWidth * camera.zoom * 0.5f, halfH = camera.viewportHeight * camera.zoom * 0.5f;
-        float x = MathUtils.clamp(wx + 60f, camera.position.x - halfW + 5f, camera.position.x + halfW - width - 5f);
-        float y = MathUtils.clamp(wy + 60f, camera.position.y - halfH + 5f, camera.position.y + halfH - height - 5f);
+        //the 13f is cellsize*1.3 in this case - can use static var eventually maybe
+        float x = MathUtils.clamp(wx + 13f, camera.position.x - halfW + 5f, camera.position.x + halfW - width - 5f);
+        float y = MathUtils.clamp(wy + 13f, camera.position.y - halfH + 5f, camera.position.y + halfH - height - 5f);
 
         // background
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);

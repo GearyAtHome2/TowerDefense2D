@@ -295,6 +295,7 @@ public class LevelGridGenerator {
         LevelData level = levelGenerator.generateLevel(cell, levelIndex);
         cell.setLevel(level);
         levels.add(cell);
+        levelIndex++;
         return cell;
     }
 }

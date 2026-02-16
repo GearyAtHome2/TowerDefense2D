@@ -98,6 +98,7 @@ public class LevelSelectScreen implements Screen {
     private void detectHover() {
         tmpVec.set(Gdx.input.getX(), Gdx.input.getY(), 0);
         camera.unproject(tmpVec);
+
         hoveredCell = null;
 
         for (LevelGridCell cell : levels) {
@@ -105,18 +106,25 @@ public class LevelSelectScreen implements Screen {
 
             float cellX = cell.xIndex * LevelGridGenerator.CELL_SIZE;
             float cellY = cell.yIndex * LevelGridGenerator.CELL_SIZE;
-            float dx = tmpVec.x - cellX;
-            float dy = tmpVec.y - cellY;
-            float radius = LevelGridGenerator.CELL_SIZE * 0.5f;
+            float size  = LevelGridGenerator.CELL_SIZE;
 
-            if (dx * dx + dy * dy <= radius * radius) {
+            boolean inside =
+                tmpVec.x >= cellX &&
+                    tmpVec.x <= cellX + size &&
+                    tmpVec.y >= cellY &&
+                    tmpVec.y <= cellY + size;
+
+            if (inside) {
                 hoveredCell = cell;
                 break;
             }
         }
 
-        popupRenderer.updateHoveredLevel(hoveredCell != null ? hoveredCell.levelData : null);
+        popupRenderer.updateHoveredLevel(
+            hoveredCell != null ? hoveredCell.levelData : null
+        );
     }
+
 
     @Override
     public void resize(int width, int height) {
