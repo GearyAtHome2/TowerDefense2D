@@ -161,6 +161,7 @@ public class LevelPathGenerator {
                 // store order if part of 3-branch split
                 if (branchCount == 3) {
                     LevelGridCell anchor = generator.setLevel(grid[anchorX][anchorY], 3, 3);
+                    anchor.setRegion(3, 3);
 
                     // surround tiles reference anchor
                     for (int dx = -1; dx <= 1; dx++) {
@@ -168,7 +169,7 @@ public class LevelPathGenerator {
                             int levx = anchorX + dx;
                             int levy = anchorY + dy;
                             if (levx == anchorX && levy == anchorY) continue;
-                            grid[levx][levy].setRegion(anchor, 3, 3);
+//                            grid[levx][levy].setRegion(anchor, 3, 3);
                         }
                     }
 
@@ -187,7 +188,7 @@ public class LevelPathGenerator {
                 else if (branchCount == 2) {
                     // Normal 2-arm branches
                     LevelGridCell anchor = generator.setLevel(grid[anchorX][anchorY], 3, 3);
-
+                    anchor.setRegion(3, 3);
                     // Surrounding tiles reference the anchor
                     for (int dx = -1; dx <= 1; dx++) {
                         for (int dy = -1; dy <= 1; dy++) {

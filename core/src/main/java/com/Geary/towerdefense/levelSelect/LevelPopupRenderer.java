@@ -25,16 +25,30 @@ public class LevelPopupRenderer {
     private float popupScale = 1f;
 
     public LevelPopupRenderer(SpriteBatch batch, ShapeRenderer shapeRenderer, BitmapFont font,
-                              OrthographicCamera camera, List<LevelGridCell> levels){
-        this.batch=batch; this.shapeRenderer=shapeRenderer; this.font=font; this.camera=camera; this.levels=levels;
+                              OrthographicCamera camera, List<LevelGridCell> levels) {
+        this.batch = batch;
+        this.shapeRenderer = shapeRenderer;
+        this.font = font;
+        this.camera = camera;
+        this.levels = levels;
     }
 
-    public void updateHoveredLevel(LevelData hovered){ this.hoveredLevelData = hovered; }
+    public void updateHoveredLevel(LevelData hovered) {
+        this.hoveredLevelData = hovered;
+    }
 
     public void drawPopup(LevelGridCell hoveredCell) {
-        if (hoveredCell == null || !hoveredCell.isLevel()) {
+        System.out.println("drawpopup called:" + hoveredCell);
+        if (hoveredCell != null) {
+            System.out.println("hovered cell is level? " + hoveredCell.isLevel());
+            System.out.println("hovered cell has parent? " + hoveredCell.getParentLevelCell());
+        }
+        if (hoveredCell == null || hoveredCell.getParentLevelCell() == null) {
             startButtonBounds.set(0, 0, 0, 0);
             return;
+        }
+        if (hoveredCell.getParentLevelCell() != null) {
+            hoveredCell = hoveredCell.getParentLevelCell();
         }
 
         LevelData hovered = hoveredCell.levelData;
@@ -47,10 +61,10 @@ public class LevelPopupRenderer {
         float pad = 8f * scale, rowHeight = 22f * scale;
         List<String> lines = new ArrayList<>();
         lines.add(hovered.getDisplayName());
-        lines.add("Order: "+hovered.getPrimaryOrder());
+        lines.add("Order: " + hovered.getPrimaryOrder());
         Entity.Order secondaryOrder = hovered.getSecondaryOrder();
-        if (secondaryOrder != Entity.Order.NEUTRAL){
-            lines.add("Secondary Order: "+secondaryOrder);
+        if (secondaryOrder != Entity.Order.NEUTRAL) {
+            lines.add("Secondary Order: " + secondaryOrder);
         }
         lines.add("");
         lines.add("Resources:");
@@ -66,8 +80,8 @@ public class LevelPopupRenderer {
         float width = widest + pad * 2, height = lines.size() * rowHeight + pad * 3 + (20f * scale);
         float halfW = camera.viewportWidth * camera.zoom * 0.5f, halfH = camera.viewportHeight * camera.zoom * 0.5f;
         //the 13f is cellsize*1.3 in this case - can use static var eventually maybe
-        float x = MathUtils.clamp(wx + 13f, camera.position.x - halfW + 5f, camera.position.x + halfW - width - 5f);
-        float y = MathUtils.clamp(wy + 13f, camera.position.y - halfH + 5f, camera.position.y + halfH - height - 5f);
+        float x = MathUtils.clamp(wx + LevelGridGenerator.CELL_SIZE * 2, camera.position.x - halfW + 5f, camera.position.x + halfW - width - 5f);
+        float y = MathUtils.clamp(wy + LevelGridGenerator.CELL_SIZE * 2, camera.position.y - halfH + 5f, camera.position.y + halfH - height - 5f);
 
         // background
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -101,9 +115,9 @@ public class LevelPopupRenderer {
         batch.end();
     }
 
-    private float getPopupScale(){
-        float target = 1f + (camera.zoom-1f)*0.65f;
-        popupScale = MathUtils.lerp(popupScale, MathUtils.clamp(target,0.5f,3f),0.1f);
+    private float getPopupScale() {
+        float target = 1f + (camera.zoom - 1f) * 0.65f;
+        popupScale = MathUtils.lerp(popupScale, MathUtils.clamp(target, 0.5f, 3f), 0.1f);
         return popupScale;
     }
 }

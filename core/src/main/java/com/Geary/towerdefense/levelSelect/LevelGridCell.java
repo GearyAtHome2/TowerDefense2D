@@ -91,8 +91,8 @@ public class LevelGridCell {
         this.levelData = levelData;
         this.isLevel = true;
         this.parentLevelCell = this;
-        this.regionWidth = 1;
-        this.regionHeight = 1;
+        this.regionWidth = 3;
+        this.regionHeight = 3;
     }
     public boolean isLevel() { return isLevel; }
 
@@ -100,7 +100,9 @@ public class LevelGridCell {
         return getParentLevelCell().levelData.getPrimaryOrder();
     }
 
-    public void setCachedIcon(TextureRegion icon) { this.cachedIcon = icon; }
+    public void setCachedIcon(TextureRegion icon) {
+        this.cachedIcon = icon;
+    }
     public TextureRegion getCachedIcon() { return cachedIcon; }
 
     public int getX() { return xIndex; }
@@ -112,6 +114,11 @@ public class LevelGridCell {
         this.regionWidth = width;
         this.regionHeight = height;
         this.isLevel = true;
+    }
+
+    public void setRegion(int width, int height) {
+        this.regionWidth = width;
+        this.regionHeight = height;
     }
 
     public LevelGridCell getParentLevelCell() { return parentLevelCell; }

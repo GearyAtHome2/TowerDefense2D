@@ -21,7 +21,7 @@ import java.util.List;
 public class LevelSelectScreen implements Screen {
 
     private final TowerDefenseGame game;
-    private List<LevelGridCell> levels; // now a list of cells
+    private List<LevelGridCell> levelCells; // now a list of cells
 
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
@@ -60,12 +60,12 @@ public class LevelSelectScreen implements Screen {
 
         gridGenerator = new LevelGridGenerator();
 
-        levels = gridGenerator.generateMap();
+        levelCells = gridGenerator.generateMap();
 
         cameraController = new CameraController(camera);
         cameraController.setupInput();
 
-        popupRenderer = new LevelPopupRenderer(batch, shapeRenderer, uiFont, camera, levels);
+        popupRenderer = new LevelPopupRenderer(batch, shapeRenderer, uiFont, camera, levelCells);
     }
 
     @Override
@@ -87,7 +87,7 @@ public class LevelSelectScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
         shapeRenderer.setProjectionMatrix(camera.combined);
 
-        gridGenerator.drawGrid(shapeRenderer);
+        gridGenerator.drawGrid(shapeRenderer, batch);
 
         // draw popup using the hovered cell
         popupRenderer.drawPopup(hoveredCell);
@@ -99,25 +99,26 @@ public class LevelSelectScreen implements Screen {
 
         hoveredCell = null;
 
-        for (LevelGridCell cell : levels) {
+        for (LevelGridCell cell : levelCells) {
             if (!cell.isLevel()) continue;
+            float regionWidth = cell.getRegionWidth() * LevelGridGenerator.CELL_SIZE;
+            float regionHeight = cell.getRegionHeight() * LevelGridGenerator.CELL_SIZE;
 
-            float cellX = cell.xIndex * LevelGridGenerator.CELL_SIZE;
-            float cellY = cell.yIndex * LevelGridGenerator.CELL_SIZE;
-            float size  = LevelGridGenerator.CELL_SIZE;
+            float regionX = (cell.getRegionX()-1) * LevelGridGenerator.CELL_SIZE;
+            float regionY = (cell.getRegionY()-1) * LevelGridGenerator.CELL_SIZE;
 
             boolean inside =
-                tmpVec.x >= cellX &&
-                    tmpVec.x <= cellX + size &&
-                    tmpVec.y >= cellY &&
-                    tmpVec.y <= cellY + size;
+                tmpVec.x >= regionX &&
+                    tmpVec.x <= regionX + regionWidth &&
+                    tmpVec.y >= regionY &&
+                    tmpVec.y <= regionY + regionHeight;
 
             if (inside) {
+                System.out.println("inside cell of region width: "+cell.getRegionWidth());
                 hoveredCell = cell;
                 break;
             }
         }
-
         popupRenderer.updateHoveredLevel(
             hoveredCell != null ? hoveredCell.levelData : null
         );

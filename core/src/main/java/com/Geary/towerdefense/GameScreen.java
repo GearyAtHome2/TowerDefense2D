@@ -8,13 +8,12 @@ import com.Geary.towerdefense.UI.displays.tooltip.entity.EntitySelectionHandler;
 import com.Geary.towerdefense.UI.displays.tooltip.entity.EntityUI;
 import com.Geary.towerdefense.UI.gameUI.GameUI;
 import com.Geary.towerdefense.UI.render.*;
-import com.Geary.towerdefense.UI.render.icons.IconStore;
 import com.Geary.towerdefense.UI.render.production.FactoryRenderer;
 import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.entity.mob.Mob;
-import com.Geary.towerdefense.world.GameWorld;
 import com.Geary.towerdefense.levelSelect.LevelData;
+import com.Geary.towerdefense.world.GameWorld;
 import com.Geary.towerdefense.world.PlacementHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -80,7 +79,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        IconStore.load();
+//        IconStore.load();//doing this at gamescreen level instead.
 
         world = new GameWorld(levelData);
         world.initManagers(worldCamera);

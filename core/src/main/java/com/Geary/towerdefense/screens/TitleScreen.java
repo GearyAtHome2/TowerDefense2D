@@ -1,6 +1,7 @@
 package com.Geary.towerdefense.screens;
 
 import com.Geary.towerdefense.TowerDefenseGame;
+import com.Geary.towerdefense.UI.render.icons.IconStore;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -25,6 +26,7 @@ public class TitleScreen implements Screen {
 
     @Override
     public void render(float delta) {
+        IconStore.load();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
