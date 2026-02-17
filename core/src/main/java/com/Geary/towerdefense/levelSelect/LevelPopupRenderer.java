@@ -38,11 +38,6 @@ public class LevelPopupRenderer {
     }
 
     public void drawPopup(LevelGridCell hoveredCell) {
-        System.out.println("drawpopup called:" + hoveredCell);
-        if (hoveredCell != null) {
-            System.out.println("hovered cell is level? " + hoveredCell.isLevel());
-            System.out.println("hovered cell has parent? " + hoveredCell.getParentLevelCell());
-        }
         if (hoveredCell == null || hoveredCell.getParentLevelCell() == null) {
             startButtonBounds.set(0, 0, 0, 0);
             return;

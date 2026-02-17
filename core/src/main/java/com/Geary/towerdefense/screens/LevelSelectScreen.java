@@ -4,8 +4,9 @@ import com.Geary.towerdefense.TowerDefenseGame;
 import com.Geary.towerdefense.UI.render.icons.TooltipRenderer;
 import com.Geary.towerdefense.levelSelect.CameraController;
 import com.Geary.towerdefense.levelSelect.LevelGridCell;
-import com.Geary.towerdefense.levelSelect.generation.LevelGridGenerator;
 import com.Geary.towerdefense.levelSelect.LevelPopupRenderer;
+import com.Geary.towerdefense.levelSelect.generation.LevelGridGenerator;
+import com.Geary.towerdefense.levelSelect.generation.OrderAssetRenderer;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -34,6 +35,7 @@ public class LevelSelectScreen implements Screen {
     private LevelGridCell hoveredCell; // track the hovered cell
 
     private LevelGridGenerator gridGenerator;
+    private OrderAssetRenderer orderAssetRenderer;
     private CameraController cameraController;
     private LevelPopupRenderer popupRenderer;
 
@@ -59,9 +61,9 @@ public class LevelSelectScreen implements Screen {
         camera.update();
 
         gridGenerator = new LevelGridGenerator();
-
         levelCells = gridGenerator.generateMap();
-
+        orderAssetRenderer = new OrderAssetRenderer();
+        orderAssetRenderer.scanGrid(gridGenerator.getGrid());
         cameraController = new CameraController(camera);
         cameraController.setupInput();
 
@@ -88,7 +90,7 @@ public class LevelSelectScreen implements Screen {
         shapeRenderer.setProjectionMatrix(camera.combined);
 
         gridGenerator.drawGrid(shapeRenderer, batch);
-
+        orderAssetRenderer.renderAreas(shapeRenderer);
         // draw popup using the hovered cell
         popupRenderer.drawPopup(hoveredCell);
     }
