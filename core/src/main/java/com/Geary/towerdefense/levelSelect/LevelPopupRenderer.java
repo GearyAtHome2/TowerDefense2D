@@ -1,5 +1,7 @@
 package com.Geary.towerdefense.levelSelect;
 
+import com.Geary.towerdefense.entity.Entity;
+import com.Geary.towerdefense.levelSelect.generation.LevelGridGenerator;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -45,6 +47,11 @@ public class LevelPopupRenderer {
         float pad = 8f * scale, rowHeight = 22f * scale;
         List<String> lines = new ArrayList<>();
         lines.add(hovered.getDisplayName());
+        lines.add("Order: "+hovered.getPrimaryOrder());
+        Entity.Order secondaryOrder = hovered.getSecondaryOrder();
+        if (secondaryOrder != Entity.Order.NEUTRAL){
+            lines.add("Secondary Order: "+secondaryOrder);
+        }
         lines.add("");
         lines.add("Resources:");
         hovered.getResourceAllocation().forEach((t, a) -> lines.add(t.name() + ": " + a));

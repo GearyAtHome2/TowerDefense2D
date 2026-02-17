@@ -11,13 +11,17 @@ public class LevelGridCell {
     public final int yIndex;
 
     private final EnumMap<Entity.Order, Float> orderInfluence;
-
-    // --- NEW for path / level ---
     private boolean isPath = false;
     private boolean isLevel = false;
     public LevelData levelData;
 
-    private TextureRegion cachedIcon; // 🔶 cache for Nature icon
+    private TextureRegion cachedIcon;
+
+    // Multi-tile support
+    private LevelGridCell parentLevelCell; // bottom-left anchor for multi-tile level
+    private int regionWidth = 1;
+    private int regionHeight = 1;
+
 
     public LevelGridCell(int x, int y) {
         this.xIndex = x;
@@ -26,6 +30,7 @@ public class LevelGridCell {
         for (Entity.Order o : Entity.Order.values()) {
             orderInfluence.put(o, 0f);
         }
+        this.parentLevelCell = this; // default parent is self
     }
 
     // --- Cluster influence ---
@@ -61,12 +66,9 @@ public class LevelGridCell {
 
         for (Entity.Order o : Entity.Order.values()) {
             float val = orderInfluence.getOrDefault(o, 0f);
-
             if (val > max) {
-                // Shift the previous max down to second max
                 secondMax = max;
                 secondDominant = dominant;
-
                 max = val;
                 dominant = o;
             } else if (val > secondMax && o != dominant) {
@@ -74,7 +76,6 @@ public class LevelGridCell {
                 secondDominant = o;
             }
         }
-
         return secondDominant;
     }
 
@@ -89,25 +90,52 @@ public class LevelGridCell {
     public void setLevel(LevelData levelData) {
         this.levelData = levelData;
         this.isLevel = true;
+        this.parentLevelCell = this;
+        this.regionWidth = 1;
+        this.regionHeight = 1;
     }
     public boolean isLevel() { return isLevel; }
 
-    public Entity.Order getPrimaryOrder() { return levelData.getPrimaryOrder(); }
-
-    public void setCachedIcon(TextureRegion icon) {
-        this.cachedIcon = icon;
+    public Entity.Order getPrimaryOrder() {
+        return getParentLevelCell().levelData.getPrimaryOrder();
     }
 
-    public TextureRegion getCachedIcon() {
-        return cachedIcon;
+    public void setCachedIcon(TextureRegion icon) { this.cachedIcon = icon; }
+    public TextureRegion getCachedIcon() { return cachedIcon; }
+
+    public int getX() { return xIndex; }
+    public int getY() { return yIndex; }
+
+    // --- Multi-tile helpers ---
+    public void setRegion(LevelGridCell parent, int width, int height) {
+        this.parentLevelCell = parent;
+        this.regionWidth = width;
+        this.regionHeight = height;
+        this.isLevel = true;
     }
 
-    public int getX(){
-        return xIndex;
+    public LevelGridCell getParentLevelCell() { return parentLevelCell; }
+    public int getRegionWidth() { return regionWidth; }
+    public int getRegionHeight() { return regionHeight; }
+
+    // bottom-left X of the level region
+    public int getRegionX() {
+        return parentLevelCell.getX();
     }
 
-    public int getY(){
-        return yIndex;
+    // bottom-left Y of the level region
+    public int getRegionY() {
+        return parentLevelCell.getY();
+    }
+
+    // exit X depending on path direction
+    public int getRegionExitX(int dirX) {
+        return dirX > 0 ? getRegionX() + regionWidth - 1 : getRegionX();
+    }
+
+    // exit Y (for now, vertical center of region)
+    public int getRegionExitY() {
+        return getRegionY() + regionHeight / 2;
     }
 
 }

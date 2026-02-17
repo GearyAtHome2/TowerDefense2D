@@ -33,11 +33,8 @@ public class TitleScreen implements Screen {
         batch.end();
 
         if (Gdx.input.justTouched()) {
-            System.out.println("level select clicked");
             game.loadLevels();
-            System.out.println("loaded levels");
             game.setScreen(new LevelSelectScreen(game));
-            System.out.println("screen set");
             dispose();
         }
     }

@@ -4,7 +4,7 @@ import com.Geary.towerdefense.TowerDefenseGame;
 import com.Geary.towerdefense.UI.render.icons.TooltipRenderer;
 import com.Geary.towerdefense.levelSelect.CameraController;
 import com.Geary.towerdefense.levelSelect.LevelGridCell;
-import com.Geary.towerdefense.levelSelect.LevelGridGenerator;
+import com.Geary.towerdefense.levelSelect.generation.LevelGridGenerator;
 import com.Geary.towerdefense.levelSelect.LevelPopupRenderer;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -60,9 +60,7 @@ public class LevelSelectScreen implements Screen {
 
         gridGenerator = new LevelGridGenerator();
 
-        System.out.println("creting levels");
         levels = gridGenerator.generateMap();
-        System.out.println("creted levels");
 
         cameraController = new CameraController(camera);
         cameraController.setupInput();
@@ -89,7 +87,7 @@ public class LevelSelectScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
         shapeRenderer.setProjectionMatrix(camera.combined);
 
-        gridGenerator.drawGrid(shapeRenderer, batch);
+        gridGenerator.drawGrid(shapeRenderer);
 
         // draw popup using the hovered cell
         popupRenderer.drawPopup(hoveredCell);
