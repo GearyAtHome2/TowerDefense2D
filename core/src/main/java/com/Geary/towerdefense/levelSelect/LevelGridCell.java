@@ -13,6 +13,7 @@ public class LevelGridCell {
     private final EnumMap<Entity.Order, Float> orderInfluence;
     private boolean isPath = false;
     private boolean isLevel = false;
+    public boolean isCentreBranch = false;
     public LevelData levelData;
 
     private TextureRegion cachedIcon;

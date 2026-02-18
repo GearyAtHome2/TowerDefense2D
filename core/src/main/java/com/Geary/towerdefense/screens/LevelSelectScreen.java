@@ -91,6 +91,7 @@ public class LevelSelectScreen implements Screen {
 
         gridGenerator.drawGrid(shapeRenderer, batch);
         orderAssetRenderer.renderAreas(shapeRenderer);
+        orderAssetRenderer.render(batch);
         // draw popup using the hovered cell
         popupRenderer.drawPopup(hoveredCell);
     }
@@ -116,7 +117,6 @@ public class LevelSelectScreen implements Screen {
                     tmpVec.y <= regionY + regionHeight;
 
             if (inside) {
-                System.out.println("inside cell of region width: "+cell.getRegionWidth());
                 hoveredCell = cell;
                 break;
             }

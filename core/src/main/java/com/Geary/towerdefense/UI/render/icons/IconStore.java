@@ -6,6 +6,7 @@ import com.Geary.towerdefense.entity.resources.Resource;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
+import javax.swing.*;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -144,6 +145,26 @@ public class IconStore {
         return new TextureRegion(texture);
     }
 
+    public static TextureRegion levelSelectTileNxN(Entity.Order order, int size) {
+//        String dir = "mapStructures/" + order.name() + "/";
+        String dir = "mapStructures/"+order.name()+"/";
+
+        //temporarily overwriting size - will be logic for this later.
+
+        String Nsize="";
+        if (order == Entity.Order.NATURE){
+            Nsize = "4";
+        }
+        if (order == Entity.Order.WATER){
+            Nsize = "1";
+        }
+        String assetName = Nsize + "x" + Nsize;
+
+        String assetSuffix = "_" + (new Random().nextInt(3) + 1);
+        Texture texture = new Texture(dir + assetName + assetSuffix + ".png");
+        return new TextureRegion(texture);
+    }
+
     // --- NEW: Safe shared 3x3 level icon ---
     public static TextureRegion level3x3ForOrder(Entity.Order order) {
         return LEVEL_3X3_ICONS.get(order);
@@ -152,7 +173,10 @@ public class IconStore {
     // --- Icon enum ---
     public enum Icon {
         ARROW_SYMBOL;
-        public String getName() { return this.name(); }
+
+        public String getName() {
+            return this.name();
+        }
     }
 
     // --- NEW: Dispose all loaded textures ---

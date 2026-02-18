@@ -30,8 +30,6 @@ public class LevelGridGenerator {
     private LevelPathGenerator pathGenerator;
     private LevelClusterGenerator clusterGenerator;
 
-    public static final int DEFAULT_LEVEL_REGION = 2;
-
     public LevelGridGenerator() {
         this.levelGenerator = new LevelGenerator();
         this.pathGenerator = new LevelPathGenerator(this);
@@ -46,28 +44,38 @@ public class LevelGridGenerator {
 
         pathGenerator.generateSnakeLevelsPath();
         clusterGenerator.generateLevelClusters();
+        clusterGenerator.generateBackgroundStreaks(10);
         return levelCells;
     }
 
-    public LevelGridCell setLevel(LevelGridCell anchorCell, int width, int height) {
+    /**
+     * Main entry used by cluster generator.
+     * Automatically decides whether this becomes a merged level.
+     */
+    public LevelGridCell setLevel(LevelGridCell anchorCell, int width, int height, boolean branch) {
+
+        // Only allow merges outside of branches
+        if (!branch && shouldCreateMergedCluster(anchorCell)) {
+
+            Entity.Order primary = randomOrder();
+            Entity.Order secondary = randomOrderExcluding(primary);
+
+            return setMergeLevel(anchorCell, primary, secondary, width, height);
+        }
+
         LevelData level = levelGenerator.generateLevel(anchorCell, levelIndex, randomOrder());
 
-        // assign the anchor cell
         anchorCell.setLevel(level);
         levelCells.add(anchorCell);
         levelIndex++;
 
-        // set the 3x3 centered cached icon
         anchorCell.setCachedIcon(createLevelIcon(anchorCell, width, height));
         return anchorCell;
     }
 
-    public LevelGridCell setMergeLevel(LevelGridCell anchorCell, Entity.Order primary, Entity.Order secondary) {
-        return setMergeLevel(anchorCell, primary, secondary, DEFAULT_LEVEL_REGION, DEFAULT_LEVEL_REGION);
-    }
-
     public LevelGridCell setMergeLevel(LevelGridCell anchorCell, Entity.Order primary, Entity.Order secondary,
                                        int width, int height) {
+
         LevelData level = levelGenerator.generateMergeLevel(anchorCell, levelIndex, primary, secondary);
 
         anchorCell.setLevel(level);
@@ -75,7 +83,6 @@ public class LevelGridGenerator {
         levelCells.add(anchorCell);
         levelIndex++;
 
-        // assign 3x3 region to surrounding cells
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
                 int levx = anchorCell.getX() + dx;
@@ -84,21 +91,39 @@ public class LevelGridGenerator {
                 grid[levx][levy].setRegion(anchorCell, width, height);
             }
         }
-        // set the 3x3 centered cached icon
-        anchorCell.setCachedIcon(createLevelIcon(anchorCell, width, height));
 
+        anchorCell.setCachedIcon(createLevelIcon(anchorCell, width, height));
         return anchorCell;
     }
 
     /**
-     * Placeholder for creating a 3x3 TextureRegion centered on the anchor.
-     * Adjust the x/y offset as needed for your image rendering system.
+     * Row-scaled merge probability.
+     * Row 0 = 0%
+     * Row 3 = 40%
      */
-    private TextureRegion createLevelIcon(LevelGridCell anchorCell, int width, int height) {
-        int iconOffsetX = -width / 2; // offset left for centering
-        int iconOffsetY = -height / 2; // offset down for centering
+    private boolean shouldCreateMergedCluster(LevelGridCell cell) {
 
-        // TODO: Replace with actual TextureRegion creation
+        int row = cell.getY() / ROW_HEIGHT;
+
+        if (row <= 0) return false;
+
+        row = Math.min(row, ROW_COUNT - 1);
+
+        float maxChance = 0.4f;
+        float chance = (row / (float) (ROW_COUNT - 1)) * maxChance;
+
+        return rng.nextFloat() < chance;
+    }
+
+    private Entity.Order randomOrderExcluding(Entity.Order exclude) {
+        Entity.Order order;
+        do {
+            order = randomOrder();
+        } while (order == exclude);
+        return order;
+    }
+
+    private TextureRegion createLevelIcon(LevelGridCell anchorCell, int width, int height) {
         TextureRegion tex = IconStore.level3x3ForOrder(anchorCell.getPrimaryOrder());
         return tex;
     }
@@ -108,25 +133,25 @@ public class LevelGridGenerator {
     }
 
     public void drawGrid(ShapeRenderer shapeRenderer, SpriteBatch batch) {
-        // --- Draw base grid (paths and clusters) ---
+
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         for (int x = 0; x < GRID_WIDTH; x++) {
             for (int y = 0; y < GRID_HEIGHT; y++) {
                 LevelGridCell cell = grid[x][y];
                 Color color;
-                //no more level background due to texture drawing
-                if (cell.isPath() && !cell.isLevel()) {//don't want path cells within levels to look like paths though.
+
+                if (cell.isPath() && !cell.isLevel()) {
                     color = Color.DARK_GRAY;
                 } else {
                     color = clusterGenerator.computeCellColor(cell);
                 }
+
                 shapeRenderer.setColor(color);
                 shapeRenderer.rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
             }
         }
         shapeRenderer.end();
 
-        // --- Draw grid lines ---
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(Color.DARK_GRAY);
         for (int i = 1; i < ROW_COUNT; i++) {
@@ -139,17 +164,16 @@ public class LevelGridGenerator {
         for (LevelGridCell cell : levelCells) {
             TextureRegion icon = cell.getCachedIcon();
             if (icon != null) {
-                // Bottom-left anchor of the 3x3 region
+
                 int anchorX = cell.getX() - 1;
                 int anchorY = cell.getY() - 1;
 
-                // Clamp to grid bounds
                 anchorX = clamp(anchorX, 0, GRID_WIDTH - 3);
                 anchorY = clamp(anchorY, 0, GRID_HEIGHT - 3);
 
-                // Convert to world pixels
                 float pixelX = anchorX * CELL_SIZE;
                 float pixelY = anchorY * CELL_SIZE;
+
                 batch.draw(icon, pixelX, pixelY, CELL_SIZE * 3, CELL_SIZE * 3);
             }
         }
@@ -164,15 +188,23 @@ public class LevelGridGenerator {
         return order;
     }
 
+    public Entity.Order randomOrderNonNeutral() {
+        Entity.Order[] values = Entity.Order.values();
+        Entity.Order order;
+        do order = values[rng.nextInt(values.length)];
+        while (order == Entity.Order.NEUTRAL);
+        return order;
+    }
+
     public Color getOrderColor(Entity.Order order) {
         return switch (order) {
-            case NEUTRAL -> Color.LIGHT_GRAY;
-            case TECH -> Color.CYAN;
-            case NATURE -> Color.GREEN;
-            case DARK -> Color.PURPLE;
-            case LIGHT -> Color.YELLOW;
-            case FIRE -> Color.RED;
-            case WATER -> Color.BLUE;
+            case NEUTRAL -> new Color(0.65f, 0.65f, 0.65f, 1f);
+            case TECH -> new Color(0.75f, 0.9f, 1f, 1f);
+            case NATURE -> new Color(0.1f, 0.35f, 0.1f, 1f);
+            case DARK -> new Color(0.25f, 0.2f, 0.3f, 1f);
+            case LIGHT -> new Color(0.95f, 0.95f, 0.9f, 1f);
+            case FIRE -> new Color(0.85f, 0.2f, 0.1f, 1f);
+            case WATER -> new Color(0.6f, 0.8f, 1f, 1f);
         };
     }
 

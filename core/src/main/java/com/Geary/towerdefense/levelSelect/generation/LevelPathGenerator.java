@@ -10,11 +10,12 @@ public class LevelPathGenerator {
     private final LevelGridGenerator generator;
     private final Random rng;
 
-    private static final int PATH_MIN_DISTANCE = 10;
-    private static final int PATH_MAX_DISTANCE = 16;
+    private static final int PATH_MIN_DISTANCE = 14;
+    private static final int PATH_MAX_DISTANCE = 18;
     private static final int PATH_EDGE_MARGIN = 14;
+    private static final double STRAIGHT_CHANCE = 0.4;
 
-    private static final double STRAIGHT_CHANCE = 0.2; // 20% chance to go straight
+    private static final int TARGET_VERTICAL_DISTANCE = 7;
 
     public LevelPathGenerator(LevelGridGenerator generator) {
         this.generator = generator;
@@ -33,11 +34,8 @@ public class LevelPathGenerator {
             int rowMinY = rowIndex * LevelGridGenerator.ROW_HEIGHT;
             int rowMaxY = rowMinY + LevelGridGenerator.ROW_HEIGHT - 1;
 
-            // Clamp starting point so 3x3 fits
             currentY = generator.clamp(currentY, rowMinY + 1 + verticalBuffer, rowMaxY - 1 - verticalBuffer);
-
-            // Place initial 3x3 level
-            placeLevelAt(grid, currentX, currentY);
+            placeLevelAt(grid, currentX, currentY, false);
 
             boolean branchPlaced = false;
 
@@ -47,19 +45,22 @@ public class LevelPathGenerator {
                 for (int step = 0; step < distance; step++) {
                     currentX = generator.clamp(currentX + dirX, 1, LevelGridGenerator.GRID_WIDTH - 2);
 
-                    // 20% chance to skip vertical move
                     if (rng.nextDouble() > STRAIGHT_CHANCE) {
-                        int verticalStep = rng.nextInt(3) - 1;
+                        int remainingVertical = TARGET_VERTICAL_DISTANCE - Math.abs(currentY - (rowMinY + LevelGridGenerator.ROW_HEIGHT / 2));
+                        int verticalStep = 0;
+                        if (remainingVertical > 0) {
+                            verticalStep = rng.nextInt(3) - 1;
+                            if (verticalStep > remainingVertical) verticalStep = remainingVertical;
+                            if (verticalStep < -remainingVertical) verticalStep = -remainingVertical;
+                        }
                         currentY = generator.clamp(currentY + verticalStep, rowMinY + 1, rowMaxY - 1);
                     }
 
                     grid[currentX][currentY].setPath();
                 }
 
-                // Place 3x3 level at current location
-                placeLevelAt(grid, currentX, currentY);
+                placeLevelAt(grid, currentX, currentY, false);
 
-                // Edge detection
                 boolean atEdge = (dirX == 1 && currentX >= LevelGridGenerator.GRID_WIDTH - PATH_EDGE_MARGIN - 2)
                     || (dirX == -1 && currentX <= PATH_EDGE_MARGIN + 1);
                 boolean safeToBranch = (dirX == 1 && currentX < LevelGridGenerator.GRID_WIDTH / 2)
@@ -83,7 +84,7 @@ public class LevelPathGenerator {
                         currentY = generator.clamp(currentY, 1, LevelGridGenerator.GRID_HEIGHT - 2);
                     }
 
-                    placeLevelAt(grid, currentX, currentY);
+                    placeLevelAt(grid, currentX, currentY, false);
                     dirX = -dirX;
                     break;
                 }
@@ -91,19 +92,15 @@ public class LevelPathGenerator {
         }
     }
 
-    /**
-     * Places a 3x3 level centered on (centerX, centerY)
-     */
-    private LevelGridCell placeLevelAt(LevelGridCell[][] grid, int centerX, int centerY) {
+    private LevelGridCell placeLevelAt(LevelGridCell[][] grid, int centerX, int centerY, boolean branch) {
         int width = 3;
         int height = 3;
 
-        // Clamp anchor so 3x3 fully fits
         int anchorX = generator.clamp(centerX, 1, LevelGridGenerator.GRID_WIDTH - 2);
         int anchorY = generator.clamp(centerY, 1, LevelGridGenerator.GRID_HEIGHT - 2);
 
         LevelGridCell anchor = grid[anchorX][anchorY];
-        generator.setLevel(anchor, width, height);
+        generator.setLevel(anchor, width, height, branch);
 
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
@@ -123,8 +120,8 @@ public class LevelPathGenerator {
         int rowMaxY = rowMinY + LevelGridGenerator.ROW_HEIGHT - 1;
 
         int branchCount = 2 + rng.nextInt(2); // 2 or 3 branches
-        if (rowIndex == 0) branchCount = 2; // no complex branches on level 1
-        if (rowIndex == 3) branchCount = 3; // definitely complex branches on level 4
+        if (rowIndex == 0) branchCount = 2;
+        if (rowIndex == 3) branchCount = 3;
 
         int branchDistance = PATH_MIN_DISTANCE + rng.nextInt(PATH_MAX_DISTANCE - PATH_MIN_DISTANCE + 1);
         int[] branchEndX = new int[branchCount];
@@ -135,72 +132,59 @@ public class LevelPathGenerator {
             int x = startX;
             int y = startY;
 
-            int verticalBias;
-            if (branchCount == 2) verticalBias = (b == 0) ? 1 : -1;
-            else if (branchCount == 3) verticalBias = (b == 0) ? 1 : (b == 1) ? -1 : 0;
-            else verticalBias = 0;
+            // Compute target Y based on branch type
+            int targetYOffset;
+            if (branchCount == 2) targetYOffset = (b == 0) ? TARGET_VERTICAL_DISTANCE : -TARGET_VERTICAL_DISTANCE;
+            else if (branchCount == 3)
+                targetYOffset = (b == 0) ? TARGET_VERTICAL_DISTANCE : (b == 1) ? -TARGET_VERTICAL_DISTANCE : 0;
+            else targetYOffset = 0;
+
+            int targetY = generator.clamp(startY + targetYOffset, rowMinY + 1, rowMaxY - 1);
 
             for (int step = 0; step < branchDistance; step++) {
                 x = generator.clamp(x + dirX, 1, LevelGridGenerator.GRID_WIDTH - 2);
 
                 if (rng.nextDouble() > STRAIGHT_CHANCE) {
-                    y = generator.clamp(y + verticalBias, rowMinY + 1, rowMaxY - 1);
+                    if (y < targetY) y++;
+                    else if (y > targetY) y--;
                 }
 
                 grid[x][y].setPath();
             }
 
-            // Place 3x3 level
             int anchorX = generator.clamp(x, 1, LevelGridGenerator.GRID_WIDTH - 2);
             int anchorY = generator.clamp(y, 1, LevelGridGenerator.GRID_HEIGHT - 2);
 
             if (branchCount == 3 && b == 2) {
-                // merge branch uses the two previously generated orders
+                // centre branch: merge the two outer branches
                 generator.setMergeLevel(grid[anchorX][anchorY], mergingOrders[0], mergingOrders[1], 3, 3);
+                grid[anchorX][anchorY].isCentreBranch = true;
             } else {
-                // store order if part of 3-branch split
-                if (branchCount == 3) {
-                    LevelGridCell anchor = generator.setLevel(grid[anchorX][anchorY], 3, 3);
-                    anchor.setRegion(3, 3);
-
-                    // surround tiles reference anchor
-                    for (int dx = -1; dx <= 1; dx++) {
-                        for (int dy = -1; dy <= 1; dy++) {
-                            int levx = anchorX + dx;
-                            int levy = anchorY + dy;
-                            if (levx == anchorX && levy == anchorY) continue;
-//                            grid[levx][levy].setRegion(anchor, 3, 3);
-                        }
+                // upper/lower branch: normal level, no merge
+                LevelGridCell anchor = generator.setLevel(grid[anchorX][anchorY], 3, 3, true);
+                anchor.setRegion(3, 3);
+                for (int dx = -1; dx <= 1; dx++) {
+                    for (int dy = -1; dy <= 1; dy++) {
+                        int levx = anchorX + dx;
+                        int levy = anchorY + dy;
+                        if (levx == anchorX && levy == anchorY) continue;
+                        grid[levx][levy].setRegion(anchor, 3, 3);
                     }
+                }
 
-                    Entity.Order order = anchor.getPrimaryOrder();
-                    if (b == 0) {
-                        mergingOrders[0] = order;
-                    } else if (b == 1) {
-                        // ensure second order is different from the first
+                // Assign mergingOrders for centre branch
+                Entity.Order order = anchor.getPrimaryOrder();
+                if (branchCount == 3) {
+                    if (b == 0) mergingOrders[0] = order;
+                    else if (b == 1) {
                         while (order == mergingOrders[0]) {
-                            order = generator.randomOrder(); // pick another random order until different
-                            anchor.setLevel(generator.setLevel(grid[anchorX][anchorY], 3, 3).levelData); // reassign level with new order
+                            order = generator.randomOrderNonNeutral();
+                            anchor.setLevel(generator.setLevel(grid[anchorX][anchorY], 3, 3, true).levelData);
                         }
                         mergingOrders[1] = order;
                     }
-                }
-                else if (branchCount == 2) {
-                    // Normal 2-arm branches
-                    LevelGridCell anchor = generator.setLevel(grid[anchorX][anchorY], 3, 3);
-                    anchor.setRegion(3, 3);
-                    // Surrounding tiles reference the anchor
-                    for (int dx = -1; dx <= 1; dx++) {
-                        for (int dy = -1; dy <= 1; dy++) {
-                            int levx = anchorX + dx;
-                            int levy = anchorY + dy;
-                            if (levx == anchorX && levy == anchorY) continue;
-                            grid[levx][levy].setRegion(anchor, 3, 3);
-                        }
-                    }
-
-                    // Assign orders to mergingOrders if needed (only matters if later we do 3-branch merges)
-                    mergingOrders[b] = anchor.getPrimaryOrder();
+                } else if (branchCount == 2) {
+                    mergingOrders[b] = order;
                 }
             }
 
@@ -212,7 +196,7 @@ public class LevelPathGenerator {
         int reconnectDistance = PATH_MIN_DISTANCE + rng.nextInt(PATH_MAX_DISTANCE - PATH_MIN_DISTANCE + 1);
         int reconnectX = generator.clamp(branchEndX[0] + dirX * reconnectDistance, 1, LevelGridGenerator.GRID_WIDTH - 2);
         int reconnectY = generator.clamp(rowMinY + LevelGridGenerator.ROW_HEIGHT / 2 + rng.nextInt(7) - 3, 1, LevelGridGenerator.GRID_HEIGHT - 2);
-        placeLevelAt(grid, reconnectX, reconnectY);
+        placeLevelAt(grid, reconnectX, reconnectY, false);
 
         for (int b = 0; b < branchCount; b++) {
             int x = branchEndX[b];
@@ -226,5 +210,4 @@ public class LevelPathGenerator {
 
         return new int[]{reconnectX, reconnectY};
     }
-
 }
