@@ -172,7 +172,6 @@ public class LevelPathGenerator {
                     }
                 }
 
-                // Assign mergingOrders for centre branch
                 Entity.Order order = anchor.getPrimaryOrder();
                 if (branchCount == 3) {
                     if (b == 0) mergingOrders[0] = order;

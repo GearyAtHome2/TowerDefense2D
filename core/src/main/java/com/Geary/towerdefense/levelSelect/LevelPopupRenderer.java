@@ -1,6 +1,7 @@
 package com.Geary.towerdefense.levelSelect;
 
 import com.Geary.towerdefense.entity.Entity;
+import com.Geary.towerdefense.levelSelect.levels.LevelData;
 import com.Geary.towerdefense.levelSelect.generation.LevelGridGenerator;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -63,6 +64,8 @@ public class LevelPopupRenderer {
         }
         lines.add("");
         lines.add("Resources:");
+        System.out.println("attempting to create hover for level "+hovered.getDisplayName());
+        System.out.println("level id "+hovered.getId());
         hovered.getResourceAllocation().forEach((t, a) -> lines.add(t.name() + ": " + a));
 
         GlyphLayout layout = new GlyphLayout();

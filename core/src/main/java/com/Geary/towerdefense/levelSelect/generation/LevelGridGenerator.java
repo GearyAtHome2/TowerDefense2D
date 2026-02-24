@@ -2,7 +2,7 @@ package com.Geary.towerdefense.levelSelect.generation;
 
 import com.Geary.towerdefense.UI.render.icons.IconStore;
 import com.Geary.towerdefense.entity.Entity;
-import com.Geary.towerdefense.levelSelect.LevelData;
+import com.Geary.towerdefense.levelSelect.levels.LevelData;
 import com.Geary.towerdefense.levelSelect.LevelGridCell;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -63,7 +63,7 @@ public class LevelGridGenerator {
             return setMergeLevel(anchorCell, primary, secondary, width, height);
         }
 
-        LevelData level = levelGenerator.generateLevel(anchorCell, levelIndex, randomOrder());
+        LevelData level = levelGenerator.getLevel(randomOrder(), Entity.Order.NEUTRAL, levelIndex);
 
         anchorCell.setLevel(level);
         levelCells.add(anchorCell);
@@ -76,8 +76,9 @@ public class LevelGridGenerator {
     public LevelGridCell setMergeLevel(LevelGridCell anchorCell, Entity.Order primary, Entity.Order secondary,
                                        int width, int height) {
 
-        LevelData level = levelGenerator.generateMergeLevel(anchorCell, levelIndex, primary, secondary);
+        LevelData level = levelGenerator.getLevel(primary, secondary, levelIndex);
 
+        System.out.println("anchor cell level: "+level.getDisplayName());
         anchorCell.setLevel(level);
         anchorCell.setRegion(3, 3);
         levelCells.add(anchorCell);

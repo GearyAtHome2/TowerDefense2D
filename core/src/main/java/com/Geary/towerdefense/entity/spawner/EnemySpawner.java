@@ -1,7 +1,7 @@
 package com.Geary.towerdefense.entity.spawner;
 
 import com.Geary.towerdefense.entity.mob.enemy.Enemy;
-import com.Geary.towerdefense.entity.mob.enemy.Groblin;
+import com.Geary.towerdefense.entity.mob.enemy.neutral.Groblin;
 import com.badlogic.gdx.graphics.Color;
 
 import java.util.ArrayList;

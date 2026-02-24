@@ -25,11 +25,11 @@ public class AreaDetection {
     /**
      * Detect areas without rotation, using unique asset placeholders
      */
-    public List<OrderAssetRenderer.Area> detectNonRotatedAreas(LevelGridCell[][] grid,
-                                                               Entity.Order order,
-                                                               float t4, float t3, float t2, float t1,
-                                                               float skipChance,
-                                                               Random rng) {
+    public List<OrderAssetRenderer.Area> detectSemiRotatedAreas(LevelGridCell[][] grid,
+                                                                Entity.Order order,
+                                                                float t4, float t3, float t2, float t1,
+                                                                float skipChance,
+                                                                Random rng) {
         return detectAreas(grid, order, t4, t3, t2, t1, skipChance, rng, false);
     }
 
@@ -41,7 +41,7 @@ public class AreaDetection {
                                                       float t4, float t3, float t2, float t1,
                                                       float skipChance,
                                                       Random rng,
-                                                      boolean allowRotation) {
+                                                      boolean fullRotation) {
 
         List<OrderAssetRenderer.Area> output = new ArrayList<>();
         boolean[][] used = new boolean[LevelGridGenerator.GRID_WIDTH][LevelGridGenerator.GRID_HEIGHT];
@@ -50,7 +50,7 @@ public class AreaDetection {
         float[] thresholds = {t4, t3, t2, t1};
 
         for (int i = 0; i < sizes.length; i++) {
-            detectAreaOfSize(grid, targetOrder, sizes[i], thresholds[i], skipChance, rng, allowRotation, used, output);
+            detectAreaOfSize(grid, targetOrder, sizes[i], thresholds[i], skipChance, rng, fullRotation, used, output);
         }
 
         return output;
@@ -65,7 +65,7 @@ public class AreaDetection {
                                   float threshold,
                                   float skipChance,
                                   Random rng,
-                                  boolean allowRotation,
+                                  boolean fullRotation,
                                   boolean[][] used,
                                   List<OrderAssetRenderer.Area> output) {
 
@@ -122,8 +122,8 @@ public class AreaDetection {
                 }
             }
 
-            // Apply skip chance consistently
-            if (valid && rng != null && skipChance > 0f && rng.nextFloat() < skipChance) {
+            // Apply skip chance randomly for > 1 sizes
+            if (size > 1 && valid && rng != null && skipChance > 0f && rng.nextFloat() < skipChance) {
                 valid = false;
             }
 
@@ -133,21 +133,32 @@ public class AreaDetection {
                 for (int dy = 0; dy < size; dy++)
                     used[x + dx][y + dy] = true;
 
-            float rotation = allowRotation && rng != null ? 90f * rng.nextInt(4) : 0f;
+            float rotation = fullRotation && rng != null ? 90f * rng.nextInt(4) : 180f * rng.nextInt(2);
 
             // Placeholder icon selection: non-rotated detection could later use unique NxN assets
             TextureRegion icon = null;
-            if (targetOrder == Entity.Order.WATER){
-                if (size == 1) {
-                    icon = IconStore.levelSelectTileNxN(targetOrder, size);
-                }
+            if (targetOrder == Entity.Order.WATER) {
+                icon = IconStore.levelSelectTileNxN(targetOrder, size);
             }
-            if (targetOrder == Entity.Order.NATURE){
+            if (targetOrder == Entity.Order.NATURE) {
+                icon = IconStore.levelSelectTileNxN(targetOrder, size);
+            }
+            if (targetOrder == Entity.Order.DARK) {
+                icon = IconStore.levelSelectTileNxN(targetOrder, size);
+            }
+            if (targetOrder == Entity.Order.TECH) {
+                icon = IconStore.levelSelectTileNxN(targetOrder, size);
+            }
+            if (targetOrder == Entity.Order.FIRE) {
+                icon = IconStore.levelSelectTileNxN(targetOrder, size);
+            }
+            if (targetOrder == Entity.Order.LIGHT) {
+                if (size < 4) size = 1;
                 icon = IconStore.levelSelectTileNxN(targetOrder, size);
             }
 //            TextureRegion icon = IconStore.levelSelectTileNxN(targetOrder, size);
-
             output.add(new OrderAssetRenderer.Area(x, y, size, targetOrder, rotation, icon));
         }
     }
+
 }

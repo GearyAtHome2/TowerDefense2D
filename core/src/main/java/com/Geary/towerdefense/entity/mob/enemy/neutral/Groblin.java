@@ -1,6 +1,7 @@
-package com.Geary.towerdefense.entity.mob.enemy;
+package com.Geary.towerdefense.entity.mob.enemy.neutral;
 
 import com.Geary.towerdefense.entity.mob.MobStats;
+import com.Geary.towerdefense.entity.mob.enemy.Enemy;
 import com.badlogic.gdx.graphics.Color;
 
 

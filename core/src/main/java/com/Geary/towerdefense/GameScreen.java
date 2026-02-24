@@ -12,7 +12,7 @@ import com.Geary.towerdefense.UI.render.production.FactoryRenderer;
 import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.buildings.Building;
 import com.Geary.towerdefense.entity.mob.Mob;
-import com.Geary.towerdefense.levelSelect.LevelData;
+import com.Geary.towerdefense.levelSelect.levels.LevelData;
 import com.Geary.towerdefense.world.GameWorld;
 import com.Geary.towerdefense.world.PlacementHandler;
 import com.badlogic.gdx.Gdx;

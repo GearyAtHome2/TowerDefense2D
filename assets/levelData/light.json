@@ -1,0 +1,212 @@
+[
+  {
+    "id": "light1",
+    "displayName": "Acolyte Shrine of Light",
+    "tier": 1,
+    "resourceAllocation": { "IRON": 2, "COAL": 1, "COPPER": 4 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/acolyte_shrine_of_light.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 1 } ]
+  },
+  {
+    "id": "light2",
+    "displayName": "Monastery of the Star",
+    "tier": 1,
+    "resourceAllocation": { "IRON": 2, "COAL": 1, "COPPER": 4 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/monastery_of_the_star.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 1 } ]
+  },
+  {
+    "id": "light3",
+    "displayName": "Chapel of the Four Points",
+    "tier": 1,
+    "resourceAllocation": { "IRON": 2, "COAL": 1, "COPPER": 4 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/chapel_of_the_four_points.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 1 } ]
+  },
+  {
+    "id": "light4",
+    "displayName": "Sanctuary of Dawn",
+    "tier": 1,
+    "resourceAllocation": { "IRON": 3, "COAL": 1, "COPPER": 4 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/sanctuary_of_dawn.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 2 } ]
+  },
+  {
+    "id": "light5",
+    "displayName": "Illuminated Abbey",
+    "tier": 2,
+    "resourceAllocation": { "IRON": 3, "COAL": 2, "COPPER": 4 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/illuminated_abbey.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 2 } ]
+  },
+  {
+    "id": "light6",
+    "displayName": "Monastery of Radiance",
+    "tier": 2,
+    "resourceAllocation": { "IRON": 3, "COAL": 2, "COPPER": 5 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/monastery_of_radiance.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 2 } ]
+  },
+  {
+    "id": "light7",
+    "displayName": "Temple of the Luminous Bishop",
+    "tier": 2,
+    "resourceAllocation": { "IRON": 3, "COAL": 3, "COPPER": 4 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/temple_of_the_luminous_bishop.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 2 } ]
+  },
+  {
+    "id": "light8",
+    "displayName": "Sanctified Hall of Stars",
+    "tier": 2,
+    "resourceAllocation": { "IRON": 4, "COAL": 2, "COPPER": 4 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/sanctified_hall_of_stars.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 3 } ]
+  },
+  {
+    "id": "light9",
+    "displayName": "Abbey of the First Luminary",
+    "tier": 3,
+    "resourceAllocation": { "IRON": 4, "COAL": 3, "COPPER": 5 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/abbey_of_the_first_luminary.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 3 } ]
+  },
+  {
+    "id": "light10",
+    "displayName": "Cathedral of the Radiant Star",
+    "tier": 3,
+    "resourceAllocation": { "IRON": 5, "COAL": 3, "COPPER": 5 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/cathedral_of_the_radiant_star.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 3 } ]
+  },
+  {
+    "id": "light11",
+    "displayName": "Altar of the Four Points",
+    "tier": 3,
+    "resourceAllocation": { "IRON": 5, "COAL": 3, "COPPER": 6 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/altar_of_the_four_points.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 3 } ]
+  },
+  {
+    "id": "light12",
+    "displayName": "Sanctuary of the High Priest",
+    "tier": 4,
+    "resourceAllocation": { "IRON": 5, "COAL": 4, "COPPER": 6 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/sanctuary_of_the_high_priest.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 4 } ]
+  },
+  {
+    "id": "light13",
+    "displayName": "Temple of the Illuminated Council",
+    "tier": 4,
+    "resourceAllocation": { "IRON": 6, "COAL": 4, "COPPER": 6 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/temple_of_the_illuminated_council.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 4 } ]
+  },
+  {
+    "id": "light14",
+    "displayName": "Monastery of the Sacred Star",
+    "tier": 4,
+    "resourceAllocation": { "IRON": 6, "COAL": 5, "COPPER": 6 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/monastery_of_the_sacred_star.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 4 } ]
+  },
+  {
+    "id": "light15",
+    "displayName": "Abbey of the Luminous Messiah",
+    "tier": 5,
+    "resourceAllocation": { "IRON": 6, "COAL": 6, "COPPER": 7 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/abbey_of_the_luminous_messiah.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 5 } ]
+  },
+  {
+    "id": "light16",
+    "displayName": "Sanctified Spire of Illumination",
+    "tier": 5,
+    "resourceAllocation": { "IRON": 7, "COAL": 6, "COPPER": 7 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/sanctified_spire_of_illumination.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 5 } ]
+  },
+  {
+    "id": "light17",
+    "displayName": "Cathedral of the Radiant Luminary",
+    "tier": 5,
+    "resourceAllocation": { "IRON": 7, "COAL": 7, "COPPER": 7 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/cathedral_of_the_radiant_luminary.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 5 } ]
+  },
+  {
+    "id": "light18",
+    "displayName": "Sanctum of the Enlightened Bishop",
+    "tier": 6,
+    "resourceAllocation": { "IRON": 8, "COAL": 7, "COPPER": 8 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/sanctum_of_the_enlightened_bishop.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 6 } ]
+  },
+  {
+    "id": "light19",
+    "displayName": "Temple of the Illuminated Messiah",
+    "tier": 6,
+    "resourceAllocation": { "IRON": 8, "COAL": 8, "COPPER": 8 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/temple_of_the_illuminated_messiah.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 6 } ]
+  },
+  {
+    "id": "light20",
+    "displayName": "Sanctuary of the Luminous Star",
+    "tier": 6,
+    "resourceAllocation": { "IRON": 9, "COAL": 8, "COPPER": 9 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/sanctuary_of_the_luminous_star.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 6 } ]
+  },
+  {
+    "id": "light21",
+    "displayName": "Cathedral of the Ascendant Luminary",
+    "tier": 7,
+    "resourceAllocation": { "IRON": 10, "COAL": 9, "COPPER": 10 },
+    "primaryOrder": "LIGHT",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/cathedral_of_the_ascendant_luminary.png",
+    "enemies": [ { "enemyType": "Acolyte", "cost": 7 } ]
+  }
+]

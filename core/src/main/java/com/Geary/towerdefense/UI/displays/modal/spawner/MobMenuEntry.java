@@ -147,10 +147,10 @@ public class MobMenuEntry implements ScrollEntry {
     private Color computeBackgroundColor(Mob.Order order) {
         return switch (order) {
             case NEUTRAL -> new Color(0.45f, 0.45f, 0.45f, 1f);
-            case TECH -> new Color(0.3f, 0.35f, 0.5f, 1f);
+            case TECH -> new Color(0.32f, 0.35f, 0.35f, 1f);
             case NATURE -> new Color(0.15f, 0.55f, 0.15f, 1f);
             case DARK -> new Color(0.05f, 0.05f, 0.05f, 1f);
-            case LIGHT -> new Color(0.65f, 0.65f, 0.45f, 1f);
+            case LIGHT -> new Color(0.95f, 0.95f, 0.75f, 1f);
             case FIRE -> new Color(0.65f, 0.15f, 0.1f, 1f);
             case WATER -> new Color(0.15f, 0.3f, 0.65f, 1f);
         };

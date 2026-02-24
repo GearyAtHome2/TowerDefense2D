@@ -52,7 +52,19 @@ public class OrderAssetRenderer {
             THRESHOLD_4x4, THRESHOLD_3x3, THRESHOLD_2x2, THRESHOLD_1x1, SKIP_CHANCE, rng));
 
         // WATER uses non-rotated detection with skip chance applied
-        detectedAreas.addAll(detectionHelper.detectNonRotatedAreas(grid, Entity.Order.WATER,
+        detectedAreas.addAll(detectionHelper.detectSemiRotatedAreas(grid, Entity.Order.WATER,
+            THRESHOLD_4x4, THRESHOLD_3x3, THRESHOLD_2x2, THRESHOLD_1x1, SKIP_CHANCE, rng));
+
+        detectedAreas.addAll(detectionHelper.detectRotatedAreas(grid, Entity.Order.DARK,
+            THRESHOLD_4x4, THRESHOLD_3x3, THRESHOLD_2x2, THRESHOLD_1x1, SKIP_CHANCE, rng));
+
+        detectedAreas.addAll(detectionHelper.detectRotatedAreas(grid, Entity.Order.TECH,
+            THRESHOLD_4x4, THRESHOLD_3x3, THRESHOLD_2x2, THRESHOLD_1x1, SKIP_CHANCE, rng));
+
+        detectedAreas.addAll(detectionHelper.detectRotatedAreas(grid, Entity.Order.FIRE,
+            THRESHOLD_4x4, THRESHOLD_3x3, THRESHOLD_2x2, THRESHOLD_1x1, SKIP_CHANCE, rng));
+
+        detectedAreas.addAll(detectionHelper.detectRotatedAreas(grid, Entity.Order.LIGHT,
             THRESHOLD_4x4, THRESHOLD_3x3, THRESHOLD_2x2, THRESHOLD_1x1, SKIP_CHANCE, rng));
     }
 

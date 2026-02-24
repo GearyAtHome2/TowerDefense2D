@@ -25,7 +25,7 @@ import com.Geary.towerdefense.entity.resources.Resource;
 import com.Geary.towerdefense.entity.spawner.EnemySpawner;
 import com.Geary.towerdefense.entity.spawner.FriendlySpawner;
 import com.Geary.towerdefense.entity.world.Cell;
-import com.Geary.towerdefense.levelSelect.LevelData;
+import com.Geary.towerdefense.levelSelect.levels.LevelData;
 import com.Geary.towerdefense.pathGeneration.PathGenerator;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;

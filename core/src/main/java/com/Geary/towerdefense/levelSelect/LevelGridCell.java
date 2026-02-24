@@ -1,6 +1,7 @@
 package com.Geary.towerdefense.levelSelect;
 
 import com.Geary.towerdefense.entity.Entity;
+import com.Geary.towerdefense.levelSelect.levels.LevelData;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import java.util.EnumMap;

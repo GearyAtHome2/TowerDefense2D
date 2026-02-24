@@ -1,0 +1,212 @@
+[
+  {
+    "id": "fire1",
+    "displayName": "Smouldering Smokepit",
+    "tier": 1,
+    "resourceAllocation": { "STONE": 2, "COAL": 3, "COPPER": 2 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/smouldering_smokepit.png",
+    "enemies": [ { "enemyType": "Imp", "cost": 2 } ]
+  },
+  {
+    "id": "fire2",
+    "displayName": "Pyre Spirits",
+    "tier": 1,
+    "resourceAllocation": { "IRON": 1, "COAL": 3, "COPPER": 2 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/pyre_spirits.png",
+    "enemies": [ { "enemyType": "Imp", "cost": 2 }, { "enemyType": "Groblin", "cost": 1 } ]
+  },
+  {
+    "id": "fire3",
+    "displayName": "Cinder Pits",
+    "tier": 1,
+    "resourceAllocation": { "STONE": 3, "COAL": 2, "COPPER": 1 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/cinder_pits.png",
+    "enemies": [ { "enemyType": "Imp", "cost": 2 } ]
+  },
+  {
+    "id": "fire4",
+    "displayName": "Ashen Hollow",
+    "tier": 1,
+    "resourceAllocation": { "STONE": 2, "COAL": 3, "IRON": 1 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/ashen_hollow.png",
+    "enemies": [ { "enemyType": "Groblin", "cost": 2 } ]
+  },
+  {
+    "id": "fire5",
+    "displayName": "Sulphur Vent",
+    "tier": 2,
+    "resourceAllocation": { "STONE": 2, "COAL": 4, "COPPER": 2 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/sulphur_vent.png",
+    "enemies": [ { "enemyType": "Imp", "cost": 2 } ]
+  },
+  {
+    "id": "fire6",
+    "displayName": "Volcanic Crater",
+    "tier": 2,
+    "resourceAllocation": { "IRON": 1, "COAL": 5, "STONE": 2 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/volcanic_crater.png",
+    "enemies": [ { "enemyType": "Imp", "cost": 3 }, { "enemyType": "Groblin", "cost": 1 } ]
+  },
+  {
+    "id": "fire7",
+    "displayName": "Infernal Caldera",
+    "tier": 2,
+    "resourceAllocation": { "STONE": 3, "COAL": 5, "IRON": 2 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/infernal_caldera.png",
+    "enemies": [ { "enemyType": "Imp", "cost": 3 }, { "enemyType": "Groblin", "cost": 2 } ]
+  },
+  {
+    "id": "fire8",
+    "displayName": "Ember Gorge",
+    "tier": 2,
+    "resourceAllocation": { "STONE": 2, "COAL": 3, "COPPER": 2 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/ember_gorge.png",
+    "enemies": [ { "enemyType": "Imp", "cost": 2 } ]
+  },
+  {
+    "id": "fire9",
+    "displayName": "Blazing Ravine",
+    "tier": 3,
+    "resourceAllocation": { "STONE": 3, "COAL": 4, "IRON": 2 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/blazing_ravine.png",
+    "enemies": [ { "enemyType": "Imp", "cost": 3 } ]
+  },
+  {
+    "id": "fire10",
+    "displayName": "Scorching Plateau",
+    "tier": 3,
+    "resourceAllocation": { "IRON": 2, "COAL": 5, "COPPER": 2 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/scorching_plateau.png",
+    "enemies": [ { "enemyType": "Imp", "cost": 3 }, { "enemyType": "Groblin", "cost": 1 } ]
+  },
+  {
+    "id": "fire11",
+    "displayName": "Flameheart Canyon",
+    "tier": 3,
+    "resourceAllocation": { "STONE": 3, "COAL": 5, "COPPER": 3 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/flameheart_canyon.png",
+    "enemies": [ { "enemyType": "Imp", "cost": 2 }, { "enemyType": "Groblin", "cost": 2 } ]
+  },
+  {
+    "id": "fire12",
+    "displayName": "Charred Timberlands",
+    "tier": 4,
+    "resourceAllocation": { "STONE": 2, "COAL": 5, "IRON": 3 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/charred_timberlands.png",
+    "enemies": [ { "enemyType": "Groblin", "cost": 3 } ]
+  },
+  {
+    "id": "fire13",
+    "displayName": "Molten Hollow",
+    "tier": 4,
+    "resourceAllocation": { "STONE": 3, "COAL": 6, "COPPER": 3 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/molten_hollow.png",
+    "enemies": [ { "enemyType": "Imp", "cost": 3 } ]
+  },
+  {
+    "id": "fire14",
+    "displayName": "Scalding Ravine",
+    "tier": 4,
+    "resourceAllocation": { "IRON": 3, "COAL": 6, "STONE": 2 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/scalding_ravine.png",
+    "enemies": [ { "enemyType": "Imp", "cost": 3 }, { "enemyType": "Groblin", "cost": 2 } ]
+  },
+  {
+    "id": "fire15",
+    "displayName": "Hellfire Bastion",
+    "tier": 5,
+    "resourceAllocation": { "STONE": 3, "COAL": 7, "COPPER": 3 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/hellfire_bastion.png",
+    "enemies": [ { "enemyType": "Imp", "cost": 4 }, { "enemyType": "Groblin", "cost": 2 } ]
+  },
+  {
+    "id": "fire16",
+    "displayName": "Lavaforge Summit",
+    "tier": 5,
+    "resourceAllocation": { "IRON": 3, "COAL": 7, "STONE": 3 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/lavaforge_summit.png",
+    "enemies": [ { "enemyType": "Imp", "cost": 4 }, { "enemyType": "Groblin", "cost": 3 } ]
+  },
+  {
+    "id": "fire17",
+    "displayName": "Volcanic Bastion",
+    "tier": 5,
+    "resourceAllocation": { "STONE": 4, "COAL": 8, "IRON": 2 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/volcanic_bastion.png",
+    "enemies": [ { "enemyType": "Imp", "cost": 4 }, { "enemyType": "Groblin", "cost": 3 } ]
+  },
+  {
+    "id": "fire18",
+    "displayName": "Ashen Inferno",
+    "tier": 6,
+    "resourceAllocation": { "IRON": 4, "COAL": 9, "COPPER": 3 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/ashen_inferno.png",
+    "enemies": [ { "enemyType": "Imp", "cost": 5 }, { "enemyType": "Groblin", "cost": 3 } ]
+  },
+  {
+    "id": "fire19",
+    "displayName": "Cauterizing Depths",
+    "tier": 6,
+    "resourceAllocation": { "STONE": 4, "COAL": 9, "IRON": 4 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/cauterizing_depths.png",
+    "enemies": [ { "enemyType": "Imp", "cost": 5 }, { "enemyType": "Groblin", "cost": 4 } ]
+  },
+  {
+    "id": "fire20",
+    "displayName": "Obsidian Furnace",
+    "tier": 6,
+    "resourceAllocation": { "IRON": 5, "COAL": 10, "STONE": 3 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/obsidian_furnace.png",
+    "enemies": [ { "enemyType": "Imp", "cost": 5 }, { "enemyType": "Groblin", "cost": 4 } ]
+  },
+  {
+    "id": "fire21",
+    "displayName": "Hellstorm Citadel",
+    "tier": 7,
+    "resourceAllocation": { "STONE": 5, "COAL": 10, "IRON": 5 },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/hellstorm_citadel.png",
+    "enemies": [ { "enemyType": "Imp", "cost": 6 }, { "enemyType": "Groblin", "cost": 5 } ]
+  }
+]

@@ -3,14 +3,15 @@ package com.Geary.towerdefense.UI.render.icons;
 import com.Geary.towerdefense.behaviour.targeting.TargetingHelper;
 import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.resources.Resource;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import javax.swing.*;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
+
+import static com.Geary.towerdefense.entity.Entity.Order.WATER;
 
 public class IconStore {
 
@@ -23,8 +24,11 @@ public class IconStore {
     // --- NEW: Shared 3x3 level icons per order ---
     private static final EnumMap<Entity.Order, TextureRegion> LEVEL_3X3_ICONS = new EnumMap<>(Entity.Order.class);
 
+    // --- NEW: Preloaded level select tiles (order -> size -> list of TextureRegions) ---
+    private static final EnumMap<Entity.Order, Map<Integer, List<TextureRegion>>> LEVEL_SELECT_TILES = new EnumMap<>(Entity.Order.class);
+
     public static void load() {
-        // --- Existing icons ---
+        // --- Existing icon loading ---
         for (Resource.RawResourceType type : Resource.RawResourceType.values()) {
             RAW_ICONS.put(
                 type,
@@ -46,24 +50,37 @@ public class IconStore {
             );
         }
 
-        // --- NEW: Initialize shared 3x3 level icons ---
+        // --- Shared 3x3 level icons ---
         String dir = "mapStructures/level/";
         for (Entity.Order order : Entity.Order.values()) {
-            if (order == Entity.Order.NEUTRAL) continue; // skip NEUTRAL
-
-            String assetName;
-            switch (order) {
-                case TECH -> assetName = "dark_placeholder";
-                case NATURE -> assetName = "dark_placeholder";
-                case DARK -> assetName = "dark_placeholder";
-                case LIGHT -> assetName = "dark_placeholder";
-                case FIRE -> assetName = "dark_placeholder";
-                case WATER -> assetName = "dark_placeholder";
-                default -> assetName = "dark_placeholder";
-            }
-
-            Texture tex = new Texture(dir + assetName + ".png"); // load once
+            if (order == Entity.Order.NEUTRAL) continue;
+            String assetName = "dark_placeholder"; // placeholder for now
+            Texture tex = new Texture(dir + assetName + ".png");
             LEVEL_3X3_ICONS.put(order, new TextureRegion(tex));
+        }
+
+        // --- Preload all levelSelectTileNxN assets dynamically ---
+        for (Entity.Order order : Entity.Order.values()) {
+            if (order == Entity.Order.NEUTRAL) continue;
+
+            Map<Integer, List<TextureRegion>> sizeMap = new HashMap<>();
+            for (int size = 1; size <= 4; size++) {
+                List<TextureRegion> tiles = new ArrayList<>();
+                int suffix = 1;
+
+                while (true) {
+                    String path = "mapStructures/" + order.name() + "/" + size + "x" + size + "_" + suffix + ".png";
+
+                    FileHandle fh = Gdx.files.internal(path);
+                    if (!fh.exists()) break;
+                    Texture tex = new Texture(fh);
+                    tiles.add(new TextureRegion(tex));
+                    suffix++;
+                }
+
+                if (!tiles.isEmpty()) sizeMap.put(size, tiles);
+            }
+            LEVEL_SELECT_TILES.put(order, sizeMap);
         }
     }
 
@@ -73,11 +90,9 @@ public class IconStore {
     }
 
     public static TextureRegion targetingStrategy(TargetingHelper.TargetingStrategy strategy) {
-        String strategyName = strategy.name().toLowerCase();
-        String key = strategyName.toLowerCase().replace(" ", "_");
+        String key = strategy.name().toLowerCase().replace(" ", "_");
         TextureRegion icon = MOB_ICONS.get(key);
         if (icon != null) return icon;
-
         try {
             Texture texture = new Texture("icons/targetingStrategy/" + key + ".png");
             icon = new TextureRegion(texture);
@@ -102,7 +117,6 @@ public class IconStore {
         String key = mobName.toLowerCase().replace(" ", "_");
         TextureRegion icon = MOB_ICONS.get(key);
         if (icon != null) return icon;
-
         try {
             Texture texture = new Texture("icons/mobs/" + key + ".png");
             icon = new TextureRegion(texture);
@@ -119,7 +133,6 @@ public class IconStore {
         String key = ammoName.toLowerCase().replace(" ", "_");
         TextureRegion icon = AMMO_ICONS.get(key);
         if (icon != null) return icon;
-
         try {
             Texture texture = new Texture("icons/ammo/" + key + ".png");
             icon = new TextureRegion(texture);
@@ -146,31 +159,21 @@ public class IconStore {
     }
 
     public static TextureRegion levelSelectTileNxN(Entity.Order order, int size) {
-//        String dir = "mapStructures/" + order.name() + "/";
-        String dir = "mapStructures/"+order.name()+"/";
-
-        //temporarily overwriting size - will be logic for this later.
-
-        String Nsize="";
-        if (order == Entity.Order.NATURE){
-            Nsize = "4";
+        Map<Integer, List<TextureRegion>> sizeMap = LEVEL_SELECT_TILES.get(order);
+        if (sizeMap == null) return null;
+        if (order == WATER && size < 4) {
+            size = 1;
         }
-        if (order == Entity.Order.WATER){
-            Nsize = "1";
-        }
-        String assetName = Nsize + "x" + Nsize;
+        List<TextureRegion> tiles = sizeMap.get(size);
 
-        String assetSuffix = "_" + (new Random().nextInt(3) + 1);
-        Texture texture = new Texture(dir + assetName + assetSuffix + ".png");
-        return new TextureRegion(texture);
+        if (tiles == null || tiles.isEmpty()) return null;
+        return tiles.get(new Random().nextInt(tiles.size()));
     }
 
-    // --- NEW: Safe shared 3x3 level icon ---
     public static TextureRegion level3x3ForOrder(Entity.Order order) {
         return LEVEL_3X3_ICONS.get(order);
     }
 
-    // --- Icon enum ---
     public enum Icon {
         ARROW_SYMBOL;
 
@@ -179,7 +182,6 @@ public class IconStore {
         }
     }
 
-    // --- NEW: Dispose all loaded textures ---
     public static void dispose() {
         RAW_ICONS.values().forEach(tr -> tr.getTexture().dispose());
         REFINED_ICONS.values().forEach(tr -> tr.getTexture().dispose());
@@ -187,5 +189,15 @@ public class IconStore {
         AMMO_ICONS.values().forEach(tr -> tr.getTexture().dispose());
         SYMBOL_ICONS.values().forEach(tr -> tr.getTexture().dispose());
         LEVEL_3X3_ICONS.values().forEach(tr -> tr.getTexture().dispose());
+
+        // Dispose preloaded level select tiles
+        for (Map<Integer, List<TextureRegion>> sizeMap : LEVEL_SELECT_TILES.values()) {
+            for (List<TextureRegion> tiles : sizeMap.values()) {
+                for (TextureRegion tr : tiles) {
+                    tr.getTexture().dispose();
+                }
+            }
+        }
+        LEVEL_SELECT_TILES.clear();
     }
 }

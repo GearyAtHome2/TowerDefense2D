@@ -1,0 +1,212 @@
+[
+  {
+    "id": "nature1",
+    "displayName": "Spider Den",
+    "tier": 1,
+    "resourceAllocation": { "IRON": 3, "COAL": 2, "COPPER": 2 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/spider_den.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 1 } ]
+  },
+  {
+    "id": "nature2",
+    "displayName": "Venomous Thicket",
+    "tier": 1,
+    "resourceAllocation": { "IRON": 3, "COAL": 2, "COPPER": 2 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/venomous_thicket.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 1 } ]
+  },
+  {
+    "id": "nature3",
+    "displayName": "Wolf Warren",
+    "tier": 1,
+    "resourceAllocation": { "IRON": 3, "COAL": 2, "COPPER": 3 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/wolf_warren.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 1 } ]
+  },
+  {
+    "id": "nature4",
+    "displayName": "Beetle Swarm Grove",
+    "tier": 1,
+    "resourceAllocation": { "IRON": 3, "COAL": 3, "COPPER": 2 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/beetle_swarm_grove.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 2 } ]
+  },
+  {
+    "id": "nature5",
+    "displayName": "Viper Nest",
+    "tier": 2,
+    "resourceAllocation": { "IRON": 4, "COAL": 3, "COPPER": 2 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/viper_nest.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 2 } ]
+  },
+  {
+    "id": "nature6",
+    "displayName": "Feral Grove",
+    "tier": 2,
+    "resourceAllocation": { "IRON": 4, "COAL": 3, "COPPER": 3 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/feral_grove.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 2 } ]
+  },
+  {
+    "id": "nature7",
+    "displayName": "Corrupted Hollow",
+    "tier": 2,
+    "resourceAllocation": { "IRON": 4, "COAL": 4, "COPPER": 3 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/corrupted_hollow.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 3 } ]
+  },
+  {
+    "id": "nature8",
+    "displayName": "Arachnid Warrens",
+    "tier": 2,
+    "resourceAllocation": { "IRON": 4, "COAL": 4, "COPPER": 4 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/arachnid_warrens.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 3 } ]
+  },
+  {
+    "id": "nature9",
+    "displayName": "Bear Den Cluster",
+    "tier": 3,
+    "resourceAllocation": { "IRON": 5, "COAL": 4, "COPPER": 4 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/bear_den_cluster.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 3 } ]
+  },
+  {
+    "id": "nature10",
+    "displayName": "Insect Hive Grove",
+    "tier": 3,
+    "resourceAllocation": { "IRON": 5, "COAL": 5, "COPPER": 4 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/insect_hive_grove.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 3 } ]
+  },
+  {
+    "id": "nature11",
+    "displayName": "Wicked Thicket",
+    "tier": 3,
+    "resourceAllocation": { "IRON": 5, "COAL": 5, "COPPER": 5 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/wicked_thicket.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 3 } ]
+  },
+  {
+    "id": "nature12",
+    "displayName": "Viper Pit",
+    "tier": 4,
+    "resourceAllocation": { "IRON": 6, "COAL": 5, "COPPER": 5 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/viper_pit.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 4 } ]
+  },
+  {
+    "id": "nature13",
+    "displayName": "Corrupted Glade",
+    "tier": 4,
+    "resourceAllocation": { "IRON": 6, "COAL": 5, "COPPER": 6 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/corrupted_glade.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 4 } ]
+  },
+  {
+    "id": "nature14",
+    "displayName": "Shadowwood Hollow",
+    "tier": 4,
+    "resourceAllocation": { "IRON": 6, "COAL": 6, "COPPER": 5 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/shadowwood_hollow.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 4 } ]
+  },
+  {
+    "id": "nature15",
+    "displayName": "Arachnid Nest Complex",
+    "tier": 5,
+    "resourceAllocation": { "IRON": 7, "COAL": 6, "COPPER": 6 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/arachnid_nest_complex.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 5 } ]
+  },
+  {
+    "id": "nature16",
+    "displayName": "Beast Warrens",
+    "tier": 5,
+    "resourceAllocation": { "IRON": 7, "COAL": 7, "COPPER": 6 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/beast_warrens.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 5 } ]
+  },
+  {
+    "id": "nature17",
+    "displayName": "Corrupted Den Cluster",
+    "tier": 5,
+    "resourceAllocation": { "IRON": 7, "COAL": 7, "COPPER": 7 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/corrupted_den_cluster.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 5 } ]
+  },
+  {
+    "id": "nature18",
+    "displayName": "Shadow Glade of Predators",
+    "tier": 6,
+    "resourceAllocation": { "IRON": 8, "COAL": 7, "COPPER": 7 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/shadow_glade_of_predators.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 6 } ]
+  },
+  {
+    "id": "nature19",
+    "displayName": "Venomous Nesting Grounds",
+    "tier": 6,
+    "resourceAllocation": { "IRON": 8, "COAL": 8, "COPPER": 7 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/venomous_nesting_grounds.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 6 } ]
+  },
+  {
+    "id": "nature20",
+    "displayName": "Predator Warren Complex",
+    "tier": 6,
+    "resourceAllocation": { "IRON": 8, "COAL": 8, "COPPER": 8 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/predator_warren_complex.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 6 } ]
+  },
+  {
+    "id": "nature21",
+    "displayName": "Primeval Beast Citadel",
+    "tier": 7,
+    "resourceAllocation": { "IRON": 9, "COAL": 9, "COPPER": 9 },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/primeval_beast_citadel.png",
+    "enemies": [ { "enemyType": "Spider", "cost": 7 } ]
+  }
+]

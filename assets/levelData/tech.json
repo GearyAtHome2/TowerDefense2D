@@ -1,0 +1,212 @@
+[
+  {
+    "id": "tech1",
+    "displayName": "Abandoned Power Node",
+    "tier": 1,
+    "resourceAllocation": { "IRON": 3, "COAL": 3, "COPPER": 4 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/abandoned_power_node.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 2 } ]
+  },
+  {
+    "id": "tech2",
+    "displayName": "Rusty Circuit Hub",
+    "tier": 1,
+    "resourceAllocation": { "IRON": 2, "COAL": 3, "COPPER": 4 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/rusty_circuit_hub.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 2 } ]
+  },
+  {
+    "id": "tech3",
+    "displayName": "Decommissioned Server Farm",
+    "tier": 1,
+    "resourceAllocation": { "IRON": 3, "COAL": 2, "COPPER": 3 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/decommissioned_server_farm.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 2 } ]
+  },
+  {
+    "id": "tech4",
+    "displayName": "Old Robotics Lab",
+    "tier": 1,
+    "resourceAllocation": { "IRON": 3, "COAL": 3, "COPPER": 2 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/old_robotics_lab.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 2 } ]
+  },
+  {
+    "id": "tech5",
+    "displayName": "Power Substation",
+    "tier": 2,
+    "resourceAllocation": { "IRON": 4, "COAL": 3, "COPPER": 3 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/power_substation.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 3 } ]
+  },
+  {
+    "id": "tech6",
+    "displayName": "Neon Data Hub",
+    "tier": 2,
+    "resourceAllocation": { "IRON": 3, "COAL": 4, "COPPER": 4 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/neon_data_hub.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 3 } ]
+  },
+  {
+    "id": "tech7",
+    "displayName": "Cybernetic Assembly Line",
+    "tier": 2,
+    "resourceAllocation": { "IRON": 4, "COAL": 4, "COPPER": 3 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/cybernetic_assembly_line.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 3 } ]
+  },
+  {
+    "id": "tech8",
+    "displayName": "AI Research Facility",
+    "tier": 2,
+    "resourceAllocation": { "IRON": 3, "COAL": 3, "COPPER": 4 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/ai_research_facility.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 3 } ]
+  },
+  {
+    "id": "tech9",
+    "displayName": "Overclocked Factory Floor",
+    "tier": 3,
+    "resourceAllocation": { "IRON": 4, "COAL": 4, "COPPER": 4 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/overclocked_factory_floor.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 4 } ]
+  },
+  {
+    "id": "tech10",
+    "displayName": "Voltage Control Hub",
+    "tier": 3,
+    "resourceAllocation": { "IRON": 5, "COAL": 4, "COPPER": 3 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/voltage_control_hub.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 4 } ]
+  },
+  {
+    "id": "tech11",
+    "displayName": "Encrypted Server Vault",
+    "tier": 3,
+    "resourceAllocation": { "IRON": 4, "COAL": 5, "COPPER": 4 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/encrypted_server_vault.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 4 } ]
+  },
+  {
+    "id": "tech12",
+    "displayName": "Industrial Drone Bay",
+    "tier": 4,
+    "resourceAllocation": { "IRON": 5, "COAL": 5, "COPPER": 4 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/industrial_drone_bay.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 5 } ]
+  },
+  {
+    "id": "tech13",
+    "displayName": "High-Energy Reactor",
+    "tier": 4,
+    "resourceAllocation": { "IRON": 5, "COAL": 6, "COPPER": 3 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/high_energy_reactor.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 5 } ]
+  },
+  {
+    "id": "tech14",
+    "displayName": "Autonomous Control Hub",
+    "tier": 4,
+    "resourceAllocation": { "IRON": 4, "COAL": 6, "COPPER": 4 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/autonomous_control_hub.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 5 } ]
+  },
+  {
+    "id": "tech15",
+    "displayName": "Overcharged Grid Node",
+    "tier": 5,
+    "resourceAllocation": { "IRON": 6, "COAL": 6, "COPPER": 5 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/overcharged_grid_node.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 6 } ]
+  },
+  {
+    "id": "tech16",
+    "displayName": "Quantum Data Nexus",
+    "tier": 5,
+    "resourceAllocation": { "IRON": 6, "COAL": 5, "COPPER": 6 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/quantum_data_nexus.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 6 } ]
+  },
+  {
+    "id": "tech17",
+    "displayName": "Cyborg Assembly Complex",
+    "tier": 5,
+    "resourceAllocation": { "IRON": 5, "COAL": 7, "COPPER": 5 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/cyborg_assembly_complex.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 6 } ]
+  },
+  {
+    "id": "tech18",
+    "displayName": "AI Core Citadel",
+    "tier": 6,
+    "resourceAllocation": { "IRON": 6, "COAL": 8, "COPPER": 6 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/ai_core_citadel.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 7 } ]
+  },
+  {
+    "id": "tech19",
+    "displayName": "Overclocked Data Fortress",
+    "tier": 6,
+    "resourceAllocation": { "IRON": 7, "COAL": 8, "COPPER": 6 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/overclocked_data_fortress.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 7 } ]
+  },
+  {
+    "id": "tech20",
+    "displayName": "Hypergrid Power Core",
+    "tier": 6,
+    "resourceAllocation": { "IRON": 7, "COAL": 9, "COPPER": 7 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/hypergrid_power_core.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 7 } ]
+  },
+  {
+    "id": "tech21",
+    "displayName": "Sentinel AI Citadel",
+    "tier": 7,
+    "resourceAllocation": { "IRON": 8, "COAL": 10, "COPPER": 8 },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/sentinel_ai_citadel.png",
+    "enemies": [ { "enemyType": "Cyborg", "cost": 8 } ]
+  }
+]

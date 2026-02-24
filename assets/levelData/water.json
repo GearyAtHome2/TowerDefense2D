@@ -1,0 +1,212 @@
+[
+  {
+    "id": "water1",
+    "displayName": "Icy Lagoon",
+    "tier": 1,
+    "resourceAllocation": { "STONE": 2, "COAL": 1 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/icy_lagoon.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 2 } ]
+  },
+  {
+    "id": "water2",
+    "displayName": "Frostbrook",
+    "tier": 1,
+    "resourceAllocation": { "STONE": 1, "TIN": 2 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/frostbrook.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 2 } ]
+  },
+  {
+    "id": "water3",
+    "displayName": "Glacial Springs",
+    "tier": 1,
+    "resourceAllocation": { "STONE": 2, "COPPER": 1 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/glacial_springs.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 1 } ]
+  },
+  {
+    "id": "water4",
+    "displayName": "Frozen Mire",
+    "tier": 1,
+    "resourceAllocation": { "STONE": 3, "TIN": 1 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/frozen_mire.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 2 } ]
+  },
+  {
+    "id": "water5",
+    "displayName": "Bog of Whispers",
+    "tier": 2,
+    "resourceAllocation": { "STONE": 2, "IRON": 1 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/bog_of_whispers.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 2 } ]
+  },
+  {
+    "id": "water6",
+    "displayName": "Sludge Fen",
+    "tier": 2,
+    "resourceAllocation": { "STONE": 1, "COAL": 2 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/sludge_fen.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 2 } ]
+  },
+  {
+    "id": "water7",
+    "displayName": "Whirlpool Basin",
+    "tier": 2,
+    "resourceAllocation": { "STONE": 2, "COPPER": 2 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/whirlpool_basin.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 3 } ]
+  },
+  {
+    "id": "water8",
+    "displayName": "Frozen Bog",
+    "tier": 2,
+    "resourceAllocation": { "TIN": 2, "IRON": 1 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/frozen_bog.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 2 } ]
+  },
+  {
+    "id": "water9",
+    "displayName": "Raging River",
+    "tier": 3,
+    "resourceAllocation": { "STONE": 2, "COPPER": 2, "COAL": 1 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/raging_river.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 3 } ]
+  },
+  {
+    "id": "water10",
+    "displayName": "Stormbreaker Rapids",
+    "tier": 3,
+    "resourceAllocation": { "STONE": 3, "IRON": 1, "COPPER": 1 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/stormbreaker_rapids.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 3 } ]
+  },
+  {
+    "id": "water11",
+    "displayName": "Frostbite Fjord",
+    "tier": 3,
+    "resourceAllocation": { "STONE": 2, "TIN": 2, "COAL": 1 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/frostbite_fjord.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 3 } ]
+  },
+  {
+    "id": "water12",
+    "displayName": "Glacial Torrent",
+    "tier": 4,
+    "resourceAllocation": { "IRON": 2, "COPPER": 2, "STONE": 2 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/glacial_torrent.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 4 } ]
+  },
+  {
+    "id": "water13",
+    "displayName": "Mire of Malice",
+    "tier": 4,
+    "resourceAllocation": { "STONE": 2, "TIN": 3, "IRON": 1 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/mire_of_malice.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 4 } ]
+  },
+  {
+    "id": "water14",
+    "displayName": "Icicle Chasm",
+    "tier": 4,
+    "resourceAllocation": { "COPPER": 2, "COAL": 2, "TIN": 1 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/icicle_chasm.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 4 } ]
+  },
+  {
+    "id": "water15",
+    "displayName": "Frozen Whirlpool",
+    "tier": 5,
+    "resourceAllocation": { "IRON": 3, "COAL": 2, "TIN": 1 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/frozen_whirlpool.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 5 } ]
+  },
+  {
+    "id": "water16",
+    "displayName": "Bog of Dread",
+    "tier": 5,
+    "resourceAllocation": { "STONE": 3, "IRON": 2, "COPPER": 2 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/bog_of_dread.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 5 } ]
+  },
+  {
+    "id": "water17",
+    "displayName": "Icebound Rapids",
+    "tier": 5,
+    "resourceAllocation": { "IRON": 2, "COPPER": 3, "COAL": 2 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/icebound_rapids.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 5 } ]
+  },
+  {
+    "id": "water18",
+    "displayName": "Glacial Maelstrom",
+    "tier": 6,
+    "resourceAllocation": { "IRON": 3, "TIN": 3, "COAL": 2 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/glacial_maelstrom.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 6 } ]
+  },
+  {
+    "id": "water19",
+    "displayName": "Obsidian Swamp",
+    "tier": 6,
+    "resourceAllocation": { "STONE": 3, "IRON": 4, "COPPER": 2 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/obsidian_swamp.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 6 } ]
+  },
+  {
+    "id": "water20",
+    "displayName": "Frozen Abyss",
+    "tier": 6,
+    "resourceAllocation": { "IRON": 4, "TIN": 3, "COAL": 2 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/frozen_abyss.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 6 } ]
+  },
+  {
+    "id": "water21",
+    "displayName": "Glacier Throne",
+    "tier": 7,
+    "resourceAllocation": { "IRON": 5, "TIN": 4, "COPPER": 3 },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/glacier_throne.png",
+    "enemies": [ { "enemyType": "Mermaid", "cost": 7 } ]
+  }
+]

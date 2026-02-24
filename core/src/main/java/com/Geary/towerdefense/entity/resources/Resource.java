@@ -17,7 +17,7 @@ public class Resource {
 
         @Override
         public String getName() {
-            return this.name(); // or a prettier name if you want
+            return this.name();
         }
     }
 

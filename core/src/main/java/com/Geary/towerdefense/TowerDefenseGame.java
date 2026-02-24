@@ -1,6 +1,6 @@
 package com.Geary.towerdefense;
 
-import com.Geary.towerdefense.levelSelect.LevelData;
+import com.Geary.towerdefense.levelSelect.levels.LevelData;
 import com.Geary.towerdefense.progress.PlayerProgress;
 import com.Geary.towerdefense.screens.LevelSelectScreen;
 import com.Geary.towerdefense.screens.TitleScreen;

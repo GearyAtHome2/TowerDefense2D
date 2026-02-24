@@ -1,0 +1,212 @@
+[
+  {
+    "id": "dark1",
+    "displayName": "Ghoul Lair",
+    "tier": 1,
+    "resourceAllocation": { "IRON": 2, "COAL": 3, "COPPER": 1 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/ghoul_lair.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 1 } ]
+  },
+  {
+    "id": "dark2",
+    "displayName": "Cursed Nest",
+    "tier": 1,
+    "resourceAllocation": { "IRON": 2, "COAL": 3, "COPPER": 2 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/cursed_nest.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 1 } ]
+  },
+  {
+    "id": "dark3",
+    "displayName": "Necrotic Pit",
+    "tier": 1,
+    "resourceAllocation": { "IRON": 2, "COAL": 2, "COPPER": 2 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/necrotic_pit.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 1 } ]
+  },
+  {
+    "id": "dark4",
+    "displayName": "Shadow Den",
+    "tier": 1,
+    "resourceAllocation": { "IRON": 3, "COAL": 2, "COPPER": 1 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/shadow_den.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 2 } ]
+  },
+  {
+    "id": "dark5",
+    "displayName": "Haunted Spire",
+    "tier": 2,
+    "resourceAllocation": { "IRON": 3, "COAL": 3, "COPPER": 2 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/haunted_spire.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 2 } ]
+  },
+  {
+    "id": "dark6",
+    "displayName": "Crypt of Shadows",
+    "tier": 2,
+    "resourceAllocation": { "IRON": 3, "COAL": 4, "COPPER": 2 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/crypt_of_shadows.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 2 } ]
+  },
+  {
+    "id": "dark7",
+    "displayName": "Ghoul Burrow",
+    "tier": 2,
+    "resourceAllocation": { "IRON": 4, "COAL": 3, "COPPER": 2 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/ghoul_burrow.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 3 } ]
+  },
+  {
+    "id": "dark8",
+    "displayName": "Shadow Maw",
+    "tier": 2,
+    "resourceAllocation": { "IRON": 3, "COAL": 4, "COPPER": 3 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/shadow_maw.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 2 } ]
+  },
+  {
+    "id": "dark9",
+    "displayName": "Bone Pit",
+    "tier": 3,
+    "resourceAllocation": { "IRON": 4, "COAL": 5, "COPPER": 3 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/bone_pit.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 3 } ]
+  },
+  {
+    "id": "dark10",
+    "displayName": "Nightfall Bastion",
+    "tier": 3,
+    "resourceAllocation": { "IRON": 4, "COAL": 4, "COPPER": 4 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/nightfall_bastion.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 3 } ]
+  },
+  {
+    "id": "dark11",
+    "displayName": "Necrotic Warren",
+    "tier": 3,
+    "resourceAllocation": { "IRON": 5, "COAL": 4, "COPPER": 3 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/necrotic_warren.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 3 } ]
+  },
+  {
+    "id": "dark12",
+    "displayName": "Haunted Bastion",
+    "tier": 4,
+    "resourceAllocation": { "IRON": 5, "COAL": 5, "COPPER": 4 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/haunted_bastion.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 4 } ]
+  },
+  {
+    "id": "dark13",
+    "displayName": "Abyssal Hold",
+    "tier": 4,
+    "resourceAllocation": { "IRON": 5, "COAL": 6, "COPPER": 3 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/abyssal_hold.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 4 } ]
+  },
+  {
+    "id": "dark14",
+    "displayName": "Shadowspire Keep",
+    "tier": 4,
+    "resourceAllocation": { "IRON": 6, "COAL": 5, "COPPER": 4 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/shadowspire_keep.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 4 } ]
+  },
+  {
+    "id": "dark15",
+    "displayName": "Cursed Maw",
+    "tier": 5,
+    "resourceAllocation": { "IRON": 6, "COAL": 6, "COPPER": 5 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/cursed_maw.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 5 } ]
+  },
+  {
+    "id": "dark16",
+    "displayName": "Bone Citadel",
+    "tier": 5,
+    "resourceAllocation": { "IRON": 6, "COAL": 7, "COPPER": 5 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/bone_citadel.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 5 } ]
+  },
+  {
+    "id": "dark17",
+    "displayName": "Necrotic Abyss",
+    "tier": 5,
+    "resourceAllocation": { "IRON": 7, "COAL": 6, "COPPER": 5 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/necrotic_abyss.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 5 } ]
+  },
+  {
+    "id": "dark18",
+    "displayName": "Shadow Maw Fortress",
+    "tier": 6,
+    "resourceAllocation": { "IRON": 7, "COAL": 7, "COPPER": 6 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/shadow_maw_fortress.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 6 } ]
+  },
+  {
+    "id": "dark19",
+    "displayName": "Obsidian Refuge",
+    "tier": 6,
+    "resourceAllocation": { "IRON": 8, "COAL": 7, "COPPER": 6 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/obsidian_refuge.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 6 } ]
+  },
+  {
+    "id": "dark20",
+    "displayName": "Nightmare Hold",
+    "tier": 6,
+    "resourceAllocation": { "IRON": 8, "COAL": 8, "COPPER": 6 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/nightmare_hold.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 6 } ]
+  },
+  {
+    "id": "dark21",
+    "displayName": "Void Requiem",
+    "tier": 7,
+    "resourceAllocation": { "IRON": 9, "COAL": 9, "COPPER": 7 },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NEUTRAL",
+    "texturePath": "textures/void_requiem.png",
+    "enemies": [ { "enemyType": "Ghoul", "cost": 7 } ]
+  }
+]
