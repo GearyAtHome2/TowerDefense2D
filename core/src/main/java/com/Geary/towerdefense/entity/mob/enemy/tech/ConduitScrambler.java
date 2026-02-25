@@ -5,19 +5,19 @@ import com.Geary.towerdefense.entity.mob.enemy.Enemy;
 import com.badlogic.gdx.graphics.Color;
 
 
-public class Cyborg extends Enemy {
+public class ConduitScrambler extends Enemy {
 
     public static final MobStats STATS = new MobStats(
-        "Cyborg",
+        "Cable Creeper",
         "",
-        "cyborg",
-        0.15f, 8, 5, 0.45f, 23f, 1.3f, 0.01f,
-        Color.GRAY,
+        "Cable Creeper",
+        0.15f, 10, 8, 0.6f, 32f, 0.53f, 0.3f,
+        Color.DARK_GRAY,//GREY/GREEN/BROWN?
         2,
-        2
+        0
     );
 
-    public Cyborg(float x, float y) {
+    public ConduitScrambler(float x, float y) {
         super(x, y, STATS);
     }
 }

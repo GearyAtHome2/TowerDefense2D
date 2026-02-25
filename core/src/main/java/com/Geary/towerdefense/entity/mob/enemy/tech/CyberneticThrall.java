@@ -5,19 +5,19 @@ import com.Geary.towerdefense.entity.mob.enemy.Enemy;
 import com.badlogic.gdx.graphics.Color;
 
 
-public class Cyborg extends Enemy {
+public class CyberneticThrall extends Enemy {
 
     public static final MobStats STATS = new MobStats(
-        "Cyborg",
-        "",
-        "cyborg",
-        0.15f, 8, 5, 0.45f, 23f, 1.3f, 0.01f,
-        Color.GRAY,
+        "Cybernetic Thrall",
+        "Something about this wasting away over time?",
+        "Cybernetic Thrall",
+        0.12f, 6, 4, 0.63f, 29f, 0.8f, 0.26f,
+        Color.CYAN,
         2,
-        2
+        0
     );
 
-    public Cyborg(float x, float y) {
+    public CyberneticThrall(float x, float y) {
         super(x, y, STATS);
     }
 }

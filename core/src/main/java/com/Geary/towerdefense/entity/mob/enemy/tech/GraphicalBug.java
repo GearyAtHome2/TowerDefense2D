@@ -5,19 +5,19 @@ import com.Geary.towerdefense.entity.mob.enemy.Enemy;
 import com.badlogic.gdx.graphics.Color;
 
 
-public class Cyborg extends Enemy {
+public class GraphicalBug extends Enemy {
 
     public static final MobStats STATS = new MobStats(
-        "Cyborg",
+        "Graphical Bug",
         "",
-        "cyborg",
-        0.15f, 8, 5, 0.45f, 23f, 1.3f, 0.01f,
-        Color.GRAY,
+        "Graphical Bug",
+        0.02f, 2, 1, 0.33f, 8f, 0.12f, 0.5f,
+        Color.BLACK,
         2,
-        2
+        0
     );
 
-    public Cyborg(float x, float y) {
+    public GraphicalBug(float x, float y) {
         super(x, y, STATS);
     }
 }

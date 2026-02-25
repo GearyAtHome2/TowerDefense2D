@@ -5,19 +5,19 @@ import com.Geary.towerdefense.entity.mob.enemy.Enemy;
 import com.badlogic.gdx.graphics.Color;
 
 
-public class Cyborg extends Enemy {
+public class MechanicalHound extends Enemy {
 
     public static final MobStats STATS = new MobStats(
-        "Cyborg",
-        "",
-        "cyborg",
-        0.15f, 8, 5, 0.45f, 23f, 1.3f, 0.01f,
+        "MechanicalHound",
+        "Applies Venom, Armour penetration",
+        "MechanicalHound",
+        0.18f, 12, 11, 0.25f, 20f, 1.1f, 0.2f,
         Color.GRAY,
         2,
-        2
+        1
     );
 
-    public Cyborg(float x, float y) {
+    public MechanicalHound(float x, float y) {
         super(x, y, STATS);
     }
 }

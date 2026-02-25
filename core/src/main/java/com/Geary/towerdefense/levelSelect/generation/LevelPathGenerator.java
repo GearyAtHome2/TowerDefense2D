@@ -114,7 +114,7 @@ public class LevelPathGenerator {
         LevelGridCell anchor = grid[anchorX][anchorY];
 
         tierProgress++;
-        if (tierProgress > 8) {
+        if (tierProgress > 6) {
             levelTier++;
             tierProgress = 0;
             index++;
@@ -150,7 +150,7 @@ public class LevelPathGenerator {
         int branchDistance = PATH_MIN_DISTANCE + rng.nextInt(PATH_MAX_DISTANCE - PATH_MIN_DISTANCE + 1);
         int[] branchEndX = new int[branchCount];
         int[] branchEndY = new int[branchCount];
-        Entity.Order[] mergingOrders = new Entity.Order[2];
+        Entity.Order[] mergingOrders = new Entity.Order[2]; // outer branch orders
 
         for (int b = 0; b < branchCount; b++) {
             int x = startX;
@@ -165,14 +165,13 @@ public class LevelPathGenerator {
 
             int targetY = generator.clamp(startY + targetYOffset, rowMinY + 1, rowMaxY - 1);
 
+            // Draw branch path
             for (int step = 0; step < branchDistance; step++) {
                 x = generator.clamp(x + dirX, 1, LevelGridGenerator.GRID_WIDTH - 2);
-
                 if (rng.nextDouble() > STRAIGHT_CHANCE) {
                     if (y < targetY) y++;
                     else if (y > targetY) y--;
                 }
-
                 grid[x][y].setPath();
             }
 
@@ -180,11 +179,11 @@ public class LevelPathGenerator {
             int anchorY = generator.clamp(y, 1, LevelGridGenerator.GRID_HEIGHT - 2);
 
             if (branchCount == 3 && b == 2) {
-                // centre branch: merge the two outer branches
+                // Center branch: merge the two outer branches
                 generator.setMergeLevel(grid[anchorX][anchorY], mergingOrders[0], mergingOrders[1], 3, 3, levelTier);
                 grid[anchorX][anchorY].isCentreBranch = true;
             } else {
-                // upper/lower branch: normal level, no merge
+                // Top/bottom branch: normal level
                 LevelGridCell anchor = generator.setLevel(grid[anchorX][anchorY], 3, 3, true, levelTier);
                 anchor.setRegion(3, 3);
                 for (int dx = -1; dx <= 1; dx++) {
@@ -196,17 +195,23 @@ public class LevelPathGenerator {
                     }
                 }
 
+                // Store outer branch orders BEFORE center branch
                 Entity.Order order = anchor.getPrimaryOrder();
                 if (branchCount == 3) {
                     if (b == 0) mergingOrders[0] = order;
                     else if (b == 1) {
-                        while (order == mergingOrders[0]) {
-                            order = generator.randomOrderNonNeutral();
-                            anchor.setLevel(generator.setLevel(grid[anchorX][anchorY], 3, 3, true, levelTier).levelData);
+                        // ensure top/bottom orders are different
+                        if (order == mergingOrders[0]) {
+                            order = (order == Entity.Order.LIGHT) ? Entity.Order.DARK : Entity.Order.LIGHT;
+                            anchor.levelData.setPrimaryOrder(order);
                         }
                         mergingOrders[1] = order;
                     }
                 } else if (branchCount == 2) {
+                    if (b == 1 && anchor.getPrimaryOrder() == mergingOrders[0]) {
+                        order = (order == Entity.Order.LIGHT) ? Entity.Order.DARK : Entity.Order.LIGHT;
+                        anchor.levelData.setPrimaryOrder(order);
+                    }
                     mergingOrders[b] = order;
                 }
             }

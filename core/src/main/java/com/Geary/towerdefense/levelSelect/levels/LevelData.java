@@ -3,6 +3,8 @@ package com.Geary.towerdefense.levelSelect.levels;
 import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.entity.mob.enemy.Enemy;
 import com.Geary.towerdefense.entity.resources.Resource;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Json;
@@ -73,10 +75,21 @@ public class LevelData implements Json.Serializable {
 
     public TextureRegion getTexture() {
         if (texture == null && texturePath != null) {
-            texture = new TextureRegion(new Texture(texturePath));
+            try {
+                FileHandle file = Gdx.files.internal(texturePath);
+                if (file.exists()) {
+                    texture = new TextureRegion(new Texture(file));
+                } else {
+                    texture = null;
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to load texture: " + texturePath + " | " + e.getMessage());
+                texture = null;
+            }
         }
         return texture;
     }
+
     public void setTexture(TextureRegion texture) { this.texture = texture; }
 
     public ArrayList<EnemySpawnInfo> getEnemies() { return enemies; }

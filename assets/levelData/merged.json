@@ -1705,26 +1705,50 @@
   },
   {
     "id": "nature_tech_1",
-    "displayName": "Nature vs Tech Outpost I",
+    "displayName": "Skittering Servers",
     "tier": 3,
     "resourceAllocation": {
-      "IRON": 4,
-      "COAL": 4,
+      "IRON": 2,
+      "STONE": 2,
       "COPPER": 4
     },
     "primaryOrder": "NATURE",
     "secondaryOrder": "TECH",
-    "texturePath": "textures/nature_tech_1.png",
+    "texturePath": "levelImages/skittering_servers.png",
     "enemies": [
       {
-        "enemyType": "Spider",
+        "enemyType": "NanoBot",
+        "cost": 1
+      },
+      {
+        "enemyType": "GraphicalBug",
+        "cost": 1
+      },
+      {
+        "enemyType": "OctoBit",
+        "cost": 1
+      },
+      {
+        "enemyType": "WireCrawler",
         "cost": 2
+      },
+      {
+        "enemyType": "CableCreeper",
+        "cost": 4
+      },
+      {
+        "enemyType": "ConduitScrambler",
+        "cost": 6
+      },
+      {
+        "enemyType": "NetworkCtenizidae",
+        "cost": 0
       }
     ]
   },
   {
     "id": "nature_tech_2",
-    "displayName": "Nature vs Tech Outpost II",
+    "displayName": "Webspun Generators",
     "tier": 3,
     "resourceAllocation": {
       "IRON": 4,
@@ -1733,17 +1757,37 @@
     },
     "primaryOrder": "NATURE",
     "secondaryOrder": "TECH",
-    "texturePath": "textures/nature_tech_2.png",
+    "texturePath": "levelImages/webspun_generators.png",
     "enemies": [
       {
-        "enemyType": "Spider",
-        "cost": 2
+        "enemyType": "StaticNanoBot",
+        "cost": 1
+      },
+      {
+        "enemyType": "CableCreeper",
+        "cost": 4
+      },
+      {
+        "enemyType": "ConduitScrambler",
+        "cost": 6
+      },
+      {
+        "enemyType": "FibreOpticDeinopidae",
+        "cost": 8
+      },
+      {
+        "enemyType": "NetworkCtenizidae",
+        "cost": 10
+      },
+      {
+        "enemyType": "Electarantula",
+        "cost": 0
       }
     ]
   },
   {
     "id": "nature_tech_3",
-    "displayName": "Nature vs Tech Outpost III",
+    "displayName": "Humming Transmissions",
     "tier": 3,
     "resourceAllocation": {
       "IRON": 5,
@@ -1752,30 +1796,83 @@
     },
     "primaryOrder": "NATURE",
     "secondaryOrder": "TECH",
-    "texturePath": "textures/nature_tech_3.png",
+    "texturePath": "levelImages/humming_transmissions.png",
     "enemies": [
       {
-        "enemyType": "Spider",
+        "enemyType": "StaticNanoBot",
+        "cost": 1
+      },
+      {
+        "enemyType": "CapacitorBeetle",
         "cost": 2
+      },
+      {
+        "enemyType": "FibreOpticDeinopidae",
+        "cost": 8
+      },
+      {
+        "enemyType": "NetworkCtenizidae",
+        "cost": 10
+      },
+      {
+        "enemyType": "Electarantula",
+        "cost": 12
+      },
+      {
+        "enemyType": "InsulatedCtenidid",
+        "cost": 0
       }
     ]
   },
   {
     "id": "nature_tech_4",
-    "displayName": "Nature vs Tech Citadel",
+    "displayName": "The Web Core",
     "tier": 7,
     "resourceAllocation": {
-      "IRON": 8,
-      "COAL": 8,
-      "COPPER": 8
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 5,
+      "STONE": 2
     },
     "primaryOrder": "NATURE",
     "secondaryOrder": "TECH",
-    "texturePath": "textures/nature_tech_4.png",
+    "texturePath": "levelImages/web_core.png",
     "enemies": [
       {
-        "enemyType": "Spider",
-        "cost": 4
+        "enemyType": "CapacitorBeetle",
+        "cost": 2
+      },
+      {
+        "enemyType": "FibreOpticDeinopidae",
+        "cost": 8
+      },
+      {
+        "enemyType": "NetworkCtenizidae",
+        "cost": 10
+      },
+      {
+        "enemyType": "CyborgRedback",
+        "cost": 10
+      },
+      {
+        "enemyType": "Electarantula",
+        "cost": 12
+      },
+      {
+        "enemyType": "InsulatedCtenidid",
+        "cost": 12
+      },
+      {
+        "enemyType": "AmpereHuntsman",
+        "cost": 15
+      },
+      {
+        "enemyType": "GoliathStatorBreaker",
+        "cost": 15
+      },
+      {
+        "enemyType": "WidowOfTheCore",
+        "cost": 0
       }
     ]
   },
