@@ -86,6 +86,8 @@ public class LevelData implements Json.Serializable {
         return secondaryOrder != Entity.Order.NEUTRAL;
     }
 
+    public int getTier(){ return tier;}
+
     // ----------------- JSON Serialization
     @Override
     public void write(Json json) {

@@ -4,7 +4,6 @@ import com.Geary.towerdefense.entity.Entity;
 import com.Geary.towerdefense.levelSelect.levels.LevelData;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 public class LevelGenerator {
@@ -33,26 +32,72 @@ public class LevelGenerator {
         mergedLevels.putAll(loader.loadLevels("levelData/merged.json"));
     }
 
-    public LevelData getLevel(Entity.Order primary, Entity.Order secondary, int index) {
+    public LevelData getLevel(Entity.Order primary, Entity.Order secondary, int tier) {
+
+        if (secondary != Entity.Order.NEUTRAL) {
+            if (tier < 7) tier = 3; // all non-final merged levels are t3.
+        }
+
         Map<String, LevelData> sourceMap = getSourceMap(primary, secondary);
+
         if (sourceMap.isEmpty()) {
-            System.out.println("WARNING: source map is empty for primary=" + primary + ", secondary=" + secondary);
+            System.out.println("WARNING: source map empty for "
+                + primary + " / " + secondary);
             return null;
         }
 
-        List<LevelData> levels = sourceMap.values().stream().toList();
-        if (index < levels.size()) return levels.get(index);
-        return levels.get(0); // fallback
-    }
+        int currentTier = tier;
 
-    public List<LevelData> getAllLevels(Entity.Order primary, Entity.Order secondary) {
-        return getSourceMap(primary, secondary).values().stream().toList();
+        while (currentTier <= 10) { // adjust max tier if needed
+
+            for (Map.Entry<String, LevelData> entry : sourceMap.entrySet()) {
+
+                LevelData level = entry.getValue();
+
+                if (level.getTier() == currentTier) {
+                    removeFromBackingMap(entry.getKey(), primary, secondary);
+                    System.out.println("generated level: "
+                        + level.getDisplayName() + ", tier: " + currentTier);
+                    return level;
+                }
+            }
+
+            currentTier++; // try next tier up
+        }
+
+        System.out.println("WARNING: No level found for tier "
+            + tier + " or higher ("
+            + primary + " / " + secondary + ")");
+
+        return null;
     }
 
     private Map<String, LevelData> getSourceMap(Entity.Order primary, Entity.Order secondary) {
+
         if (secondary != Entity.Order.NEUTRAL) {
-            return mergedLevels;
+            return mergedLevels.entrySet()
+                .stream()
+                .filter(entry -> {
+                    LevelData levelData = entry.getValue();
+
+                    boolean matchesPrimary =
+                        levelData.getPrimaryOrder() == primary
+                            || levelData.getSecondaryOrder() == primary;
+
+                    boolean matchesSecondary =
+                        levelData.getPrimaryOrder() == secondary
+                            || levelData.getSecondaryOrder() == secondary;
+
+                    return matchesPrimary && matchesSecondary;
+                })
+                .collect(java.util.stream.Collectors.toMap(
+                    Map.Entry::getKey,
+                    Map.Entry::getValue,
+                    (a, b) -> a,
+                    LinkedHashMap::new
+                ));
         }
+
         return switch (primary) {
             case FIRE -> fireLevels;
             case WATER -> waterLevels;
@@ -62,5 +107,22 @@ public class LevelGenerator {
             case TECH -> techLevels;
             default -> new LinkedHashMap<>();
         };
+    }
+
+    private void removeFromBackingMap(String key, Entity.Order primary, Entity.Order secondary) {
+
+        if (secondary != Entity.Order.NEUTRAL) {
+            mergedLevels.remove(key);
+            return;
+        }
+
+        switch (primary) {
+            case FIRE -> fireLevels.remove(key);
+            case WATER -> waterLevels.remove(key);
+            case DARK -> darkLevels.remove(key);
+            case LIGHT -> lightLevels.remove(key);
+            case NATURE -> natureLevels.remove(key);
+            case TECH -> techLevels.remove(key);
+        }
     }
 }

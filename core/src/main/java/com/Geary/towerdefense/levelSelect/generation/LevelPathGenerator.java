@@ -17,6 +17,10 @@ public class LevelPathGenerator {
 
     private static final int TARGET_VERTICAL_DISTANCE = 7;
 
+    int levelTier = 1;
+    int tierProgress = 0;
+    int index = 0;
+
     public LevelPathGenerator(LevelGridGenerator generator) {
         this.generator = generator;
         this.rng = new Random();
@@ -59,10 +63,13 @@ public class LevelPathGenerator {
                     grid[currentX][currentY].setPath();
                 }
 
-                placeLevelAt(grid, currentX, currentY, false);
-
                 boolean atEdge = (dirX == 1 && currentX >= LevelGridGenerator.GRID_WIDTH - PATH_EDGE_MARGIN - 2)
                     || (dirX == -1 && currentX <= PATH_EDGE_MARGIN + 1);
+                boolean finalLevel = atEdge && rowIndex == LevelGridGenerator.ROW_COUNT - 1;
+                placeLevelAt(grid, currentX, currentY, false, finalLevel);
+
+//                boolean atEdge = (dirX == 1 && currentX >= LevelGridGenerator.GRID_WIDTH - PATH_EDGE_MARGIN - 2)
+//                    || (dirX == -1 && currentX <= PATH_EDGE_MARGIN + 1);
                 boolean safeToBranch = (dirX == 1 && currentX < LevelGridGenerator.GRID_WIDTH / 2)
                     || (dirX == -1 && currentX > LevelGridGenerator.GRID_WIDTH / 2);
 
@@ -89,10 +96,15 @@ public class LevelPathGenerator {
                     break;
                 }
             }
+            System.out.println("generated levels:  " + index);
         }
     }
 
     private LevelGridCell placeLevelAt(LevelGridCell[][] grid, int centerX, int centerY, boolean branch) {
+        return placeLevelAt(grid, centerX, centerY, branch, false);
+    }
+
+    private LevelGridCell placeLevelAt(LevelGridCell[][] grid, int centerX, int centerY, boolean branch, boolean lastLevel) {
         int width = 3;
         int height = 3;
 
@@ -100,7 +112,20 @@ public class LevelPathGenerator {
         int anchorY = generator.clamp(centerY, 1, LevelGridGenerator.GRID_HEIGHT - 2);
 
         LevelGridCell anchor = grid[anchorX][anchorY];
-        generator.setLevel(anchor, width, height, branch);
+
+        tierProgress++;
+        if (tierProgress > 8) {
+            levelTier++;
+            tierProgress = 0;
+            index++;
+        }
+        if (levelTier > 7) levelTier=7;
+        if (lastLevel) {
+            System.out.println("last level confirmed at leveltier: " + levelTier);
+            levelTier = 7;
+        }
+        System.out.println("placing level of tier " + levelTier);
+        generator.setLevel(anchor, width, height, branch, levelTier);
 
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
@@ -110,7 +135,6 @@ public class LevelPathGenerator {
                 grid[x][y].setRegion(anchor, width, height);
             }
         }
-
         return anchor;
     }
 
@@ -157,11 +181,11 @@ public class LevelPathGenerator {
 
             if (branchCount == 3 && b == 2) {
                 // centre branch: merge the two outer branches
-                generator.setMergeLevel(grid[anchorX][anchorY], mergingOrders[0], mergingOrders[1], 3, 3);
+                generator.setMergeLevel(grid[anchorX][anchorY], mergingOrders[0], mergingOrders[1], 3, 3, levelTier);
                 grid[anchorX][anchorY].isCentreBranch = true;
             } else {
                 // upper/lower branch: normal level, no merge
-                LevelGridCell anchor = generator.setLevel(grid[anchorX][anchorY], 3, 3, true);
+                LevelGridCell anchor = generator.setLevel(grid[anchorX][anchorY], 3, 3, true, levelTier);
                 anchor.setRegion(3, 3);
                 for (int dx = -1; dx <= 1; dx++) {
                     for (int dy = -1; dy <= 1; dy++) {
@@ -178,7 +202,7 @@ public class LevelPathGenerator {
                     else if (b == 1) {
                         while (order == mergingOrders[0]) {
                             order = generator.randomOrderNonNeutral();
-                            anchor.setLevel(generator.setLevel(grid[anchorX][anchorY], 3, 3, true).levelData);
+                            anchor.setLevel(generator.setLevel(grid[anchorX][anchorY], 3, 3, true, levelTier).levelData);
                         }
                         mergingOrders[1] = order;
                     }

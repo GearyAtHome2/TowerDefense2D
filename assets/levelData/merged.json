@@ -1,392 +1,2162 @@
 [
   {
     "id": "fire_nature1",
-    "displayName": "Infernal Grove",
+    "displayName": "Smouldering peat",
     "tier": 3,
-    "resourceAllocation": { "IRON": 4, "COAL": 5, "COPPER": 3 },
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 3
+    },
     "primaryOrder": "FIRE",
     "secondaryOrder": "NATURE",
-    "texturePath": "textures/infernal_grove.png",
+    "texturePath": "textures/smouldering_peat.png",
     "enemies": [
-      { "enemyType": "Imp", "cost": 2 },
-      { "enemyType": "Spider", "cost": 1 }
+      {
+        "enemyType": "Imp",
+        "cost": 2
+      },
+      {
+        "enemyType": "Spider",
+        "cost": 1
+      }
     ]
   },
   {
     "id": "fire_nature2",
-    "displayName": "Blazing Predator Citadel",
-    "tier": 7,
-    "resourceAllocation": { "IRON": 7, "COAL": 8, "COPPER": 5 },
+    "displayName": "Magma Wasp",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
     "primaryOrder": "FIRE",
     "secondaryOrder": "NATURE",
-    "texturePath": "textures/blazing_predator_citadel.png",
+    "texturePath": "textures/magma_wasp.png",
     "enemies": [
-      { "enemyType": "Imp", "cost": 3 },
-      { "enemyType": "Spider", "cost": 3 }
+      {
+        "enemyType": "Imp",
+        "cost": 2
+      },
+      {
+        "enemyType": "Spider",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "fire_nature3",
+    "displayName": "Giant Bombardier Beetle",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 5
+    },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NATURE",
+    "texturePath": "textures/giant_bombardier.png",
+    "enemies": [
+      {
+        "enemyType": "Imp",
+        "cost": 2
+      },
+      {
+        "enemyType": "Spider",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "fire_nature4",
+    "displayName": "Pyrhogus, Yagisuki Ent",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 6
+    },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "NATURE",
+    "texturePath": "textures/pyrhogus.png",
+    "enemies": [
+      {
+        "enemyType": "Imp",
+        "cost": 4
+      },
+      {
+        "enemyType": "Spider",
+        "cost": 3
+      }
     ]
   },
   {
     "id": "fire_water1",
-    "displayName": "Scalding Mire",
+    "displayName": "Scalding Rivers",
     "tier": 3,
-    "resourceAllocation": { "IRON": 4, "COAL": 5, "COPPER": 4 },
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
     "primaryOrder": "FIRE",
     "secondaryOrder": "WATER",
-    "texturePath": "textures/scalding_mire.png",
+    "texturePath": "textures/scalding_geyser.png",
     "enemies": [
-      { "enemyType": "Imp", "cost": 2 },
-      { "enemyType": "Water Elemental", "cost": 2 }
+      {
+        "enemyType": "Imp",
+        "cost": 2
+      }
     ]
   },
   {
     "id": "fire_water2",
-    "displayName": "Boiling Flood Basin",
-    "tier": 7,
-    "resourceAllocation": { "IRON": 7, "COAL": 8, "COPPER": 6 },
+    "displayName": "Steam Elementals",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 5
+    },
     "primaryOrder": "FIRE",
     "secondaryOrder": "WATER",
-    "texturePath": "textures/boiling_flood_basin.png",
+    "texturePath": "textures/steam_elementals.png",
     "enemies": [
-      { "enemyType": "Imp", "cost": 3 },
-      { "enemyType": "Water Elemental", "cost": 3 }
+      {
+        "enemyType": "Imp",
+        "cost": 2
+      }
     ]
   },
   {
-    "id": "fire_tech1",
-    "displayName": "Smoldering Foundry",
+    "id": "fire_water3",
+    "displayName": "Superheated Geyser field",
     "tier": 3,
-    "resourceAllocation": { "IRON": 5, "COAL": 5, "COPPER": 5 },
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 5
+    },
     "primaryOrder": "FIRE",
-    "secondaryOrder": "TECH",
-    "texturePath": "textures/smoldering_foundry.png",
+    "secondaryOrder": "WATER",
+    "texturePath": "textures/superheated_geysers.png",
     "enemies": [
-      { "enemyType": "Imp", "cost": 2 },
-      { "enemyType": "Cyborg", "cost": 2 }
+      {
+        "enemyType": "Imp",
+        "cost": 2
+      }
     ]
   },
   {
-    "id": "fire_tech2",
-    "displayName": "Molten Gear Fortress",
+    "id": "fire_water4",
+    "displayName": "Overboil Furnace",
     "tier": 7,
-    "resourceAllocation": { "IRON": 8, "COAL": 8, "COPPER": 7 },
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 7
+    },
     "primaryOrder": "FIRE",
-    "secondaryOrder": "TECH",
-    "texturePath": "textures/molten_gear_fortress.png",
+    "secondaryOrder": "WATER",
+    "texturePath": "textures/overboil_furnace.png",
     "enemies": [
-      { "enemyType": "Imp", "cost": 3 },
-      { "enemyType": "Cyborg", "cost": 3 }
+      {
+        "enemyType": "Imp",
+        "cost": 4
+      }
     ]
   },
   {
-    "id": "fire_dark1",
-    "displayName": "Ashen Crypt",
+    "id": "fire_light_1",
+    "displayName": "Radiant Pyre Outpost I",
     "tier": 3,
-    "resourceAllocation": { "IRON": 5, "COAL": 5, "COPPER": 4 },
-    "primaryOrder": "FIRE",
-    "secondaryOrder": "DARK",
-    "texturePath": "textures/ashen_crypt.png",
-    "enemies": [
-      { "enemyType": "Imp", "cost": 2 },
-      { "enemyType": "Ghoul", "cost": 3 }
-    ]
-  },
-  {
-    "id": "fire_dark2",
-    "displayName": "Volcanic Shadow Bastion",
-    "tier": 7,
-    "resourceAllocation": { "IRON": 8, "COAL": 8, "COPPER": 6 },
-    "primaryOrder": "FIRE",
-    "secondaryOrder": "DARK",
-    "texturePath": "textures/volcanic_shadow_bastion.png",
-    "enemies": [
-      { "enemyType": "Imp", "cost": 3 },
-      { "enemyType": "Ghoul", "cost": 4 }
-    ]
-  },
-  {
-    "id": "fire_light1",
-    "displayName": "Radiant Pyre",
-    "tier": 3,
-    "resourceAllocation": { "IRON": 5, "COAL": 5, "COPPER": 5 },
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 5
+    },
     "primaryOrder": "FIRE",
     "secondaryOrder": "LIGHT",
-    "texturePath": "textures/radiant_pyre.png",
+    "texturePath": "textures/fire_light_1.png",
     "enemies": [
-      { "enemyType": "Imp", "cost": 2 },
-      { "enemyType": "Acolyte", "cost": 2 }
+      {
+        "enemyType": "Imp",
+        "cost": 2
+      },
+      {
+        "enemyType": "Acolyte",
+        "cost": 2
+      }
     ]
   },
   {
-    "id": "fire_light2",
+    "id": "fire_light_2",
+    "displayName": "Radiant Pyre Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "LIGHT",
+    "texturePath": "textures/fire_light_2.png",
+    "enemies": [
+      {
+        "enemyType": "Imp",
+        "cost": 2
+      },
+      {
+        "enemyType": "Acolyte",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "fire_light_3",
+    "displayName": "Radiant Pyre Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 5
+    },
+    "primaryOrder": "FIRE",
+    "secondaryOrder": "LIGHT",
+    "texturePath": "textures/fire_light_3.png",
+    "enemies": [
+      {
+        "enemyType": "Imp",
+        "cost": 2
+      },
+      {
+        "enemyType": "Acolyte",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "fire_light_4",
     "displayName": "Blazing Luminarium",
     "tier": 7,
-    "resourceAllocation": { "IRON": 8, "COAL": 8, "COPPER": 6 },
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 6
+    },
     "primaryOrder": "FIRE",
     "secondaryOrder": "LIGHT",
-    "texturePath": "textures/blazing_luminarium.png",
+    "texturePath": "textures/fire_light_4.png",
     "enemies": [
-      { "enemyType": "Imp", "cost": 3 },
-      { "enemyType": "Acolyte", "cost": 3 }
+      {
+        "enemyType": "Imp",
+        "cost": 3
+      },
+      {
+        "enemyType": "Acolyte",
+        "cost": 3
+      }
     ]
   },
   {
-    "id": "water_nature1",
-    "displayName": "Flooded Grove",
+    "id": "water_fire_1",
+    "displayName": "Water vs Fire Outpost I",
     "tier": 3,
-    "resourceAllocation": { "IRON": 4, "COAL": 4, "COPPER": 4 },
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
     "primaryOrder": "WATER",
-    "secondaryOrder": "NATURE",
-    "texturePath": "textures/flooded_grove.png",
+    "secondaryOrder": "FIRE",
+    "texturePath": "textures/water_fire_1.png",
     "enemies": [
-      { "enemyType": "Water Elemental", "cost": 2 },
-      { "enemyType": "Spider", "cost": 1 }
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
     ]
   },
   {
-    "id": "water_nature2",
-    "displayName": "Swamp of Predators",
+    "id": "water_fire_2",
+    "displayName": "Water vs Fire Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "FIRE",
+    "texturePath": "textures/water_fire_2.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "water_fire_3",
+    "displayName": "Water vs Fire Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "FIRE",
+    "texturePath": "textures/water_fire_3.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "water_fire_4",
+    "displayName": "Water vs Fire Citadel",
     "tier": 7,
-    "resourceAllocation": { "IRON": 7, "COAL": 7, "COPPER": 6 },
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
     "primaryOrder": "WATER",
-    "secondaryOrder": "NATURE",
-    "texturePath": "textures/swamp_of_predators.png",
+    "secondaryOrder": "FIRE",
+    "texturePath": "textures/water_fire_4.png",
     "enemies": [
-      { "enemyType": "Water Elemental", "cost": 3 },
-      { "enemyType": "Spider", "cost": 3 }
+      {
+        "enemyType": "Groblin",
+        "cost": 4
+      }
     ]
   },
   {
-    "id": "water_tech1",
-    "displayName": "Flooded Data Vault",
+    "id": "water_dark_1",
+    "displayName": "Water vs Dark Outpost I",
     "tier": 3,
-    "resourceAllocation": { "IRON": 4, "COAL": 4, "COPPER": 5 },
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "DARK",
+    "texturePath": "textures/water_dark_1.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "water_dark_2",
+    "displayName": "Water vs Dark Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "DARK",
+    "texturePath": "textures/water_dark_2.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "water_dark_3",
+    "displayName": "Water vs Dark Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "DARK",
+    "texturePath": "textures/water_dark_3.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "water_dark_4",
+    "displayName": "Water vs Dark Citadel",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "DARK",
+    "texturePath": "textures/water_dark_4.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 4
+      }
+    ]
+  },
+  {
+    "id": "water_light_1",
+    "displayName": "Water vs Light Outpost I",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "LIGHT",
+    "texturePath": "textures/water_light_1.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "water_light_2",
+    "displayName": "Water vs Light Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "LIGHT",
+    "texturePath": "textures/water_light_2.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "water_light_3",
+    "displayName": "Water vs Light Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "LIGHT",
+    "texturePath": "textures/water_light_3.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "water_light_4",
+    "displayName": "Water vs Light Citadel",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "LIGHT",
+    "texturePath": "textures/water_light_4.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 4
+      }
+    ]
+  },
+  {
+    "id": "water_nature_1",
+    "displayName": "Water vs Nature Outpost I",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NATURE",
+    "texturePath": "textures/water_nature_1.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "water_nature_2",
+    "displayName": "Water vs Nature Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NATURE",
+    "texturePath": "textures/water_nature_2.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "water_nature_3",
+    "displayName": "Water vs Nature Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NATURE",
+    "texturePath": "textures/water_nature_3.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "water_nature_4",
+    "displayName": "Water vs Nature Citadel",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "WATER",
+    "secondaryOrder": "NATURE",
+    "texturePath": "textures/water_nature_4.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 4
+      }
+    ]
+  },
+  {
+    "id": "water_tech_1",
+    "displayName": "Water vs Tech Outpost I",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
     "primaryOrder": "WATER",
     "secondaryOrder": "TECH",
-    "texturePath": "textures/flooded_data_vault.png",
+    "texturePath": "textures/water_tech_1.png",
     "enemies": [
-      { "enemyType": "Water Elemental", "cost": 2 },
-      { "enemyType": "Cyborg", "cost": 2 }
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
     ]
   },
   {
-    "id": "water_tech2",
-    "displayName": "Submerged Reactor",
-    "tier": 7,
-    "resourceAllocation": { "IRON": 7, "COAL": 8, "COPPER": 7 },
+    "id": "water_tech_2",
+    "displayName": "Water vs Tech Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
     "primaryOrder": "WATER",
     "secondaryOrder": "TECH",
-    "texturePath": "textures/submerged_reactor.png",
+    "texturePath": "textures/water_tech_2.png",
     "enemies": [
-      { "enemyType": "Water Elemental", "cost": 3 },
-      { "enemyType": "Cyborg", "cost": 3 }
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
     ]
   },
   {
-    "id": "water_dark1",
-    "displayName": "Drowned Crypt",
+    "id": "water_tech_3",
+    "displayName": "Water vs Tech Outpost III",
     "tier": 3,
-    "resourceAllocation": { "IRON": 5, "COAL": 5, "COPPER": 4 },
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
     "primaryOrder": "WATER",
-    "secondaryOrder": "DARK",
-    "texturePath": "textures/drowned_crypt.png",
+    "secondaryOrder": "TECH",
+    "texturePath": "textures/water_tech_3.png",
     "enemies": [
-      { "enemyType": "Water Elemental", "cost": 2 },
-      { "enemyType": "Ghoul", "cost": 3 }
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
     ]
   },
   {
-    "id": "water_dark2",
-    "displayName": "Abyssal Flood",
+    "id": "water_tech_4",
+    "displayName": "Water vs Tech Citadel",
     "tier": 7,
-    "resourceAllocation": { "IRON": 8, "COAL": 8, "COPPER": 6 },
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
     "primaryOrder": "WATER",
-    "secondaryOrder": "DARK",
-    "texturePath": "textures/abyssal_flood.png",
+    "secondaryOrder": "TECH",
+    "texturePath": "textures/water_tech_4.png",
     "enemies": [
-      { "enemyType": "Water Elemental", "cost": 3 },
-      { "enemyType": "Ghoul", "cost": 4 }
+      {
+        "enemyType": "Groblin",
+        "cost": 4
+      }
     ]
   },
   {
-    "id": "water_light1",
-    "displayName": "Luminous Lagoon",
+    "id": "dark_fire_1",
+    "displayName": "Dark vs Fire Outpost I",
     "tier": 3,
-    "resourceAllocation": { "IRON": 5, "COAL": 5, "COPPER": 5 },
-    "primaryOrder": "WATER",
-    "secondaryOrder": "LIGHT",
-    "texturePath": "textures/luminous_lagoon.png",
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "FIRE",
+    "texturePath": "textures/dark_fire_1.png",
     "enemies": [
-      { "enemyType": "Water Elemental", "cost": 2 },
-      { "enemyType": "Acolyte", "cost": 2 }
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
     ]
   },
   {
-    "id": "water_light2",
-    "displayName": "Sanctuary of Tides",
+    "id": "dark_fire_2",
+    "displayName": "Dark vs Fire Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "FIRE",
+    "texturePath": "textures/dark_fire_2.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_fire_3",
+    "displayName": "Dark vs Fire Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "FIRE",
+    "texturePath": "textures/dark_fire_3.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_fire_4",
+    "displayName": "Dark vs Fire Citadel",
     "tier": 7,
-    "resourceAllocation": { "IRON": 8, "COAL": 8, "COPPER": 6 },
-    "primaryOrder": "WATER",
-    "secondaryOrder": "LIGHT",
-    "texturePath": "textures/sanctuary_of_tides.png",
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "FIRE",
+    "texturePath": "textures/dark_fire_4.png",
     "enemies": [
-      { "enemyType": "Water Elemental", "cost": 3 },
-      { "enemyType": "Acolyte", "cost": 3 }
+      {
+        "enemyType": "Groblin",
+        "cost": 4
+      }
     ]
   },
   {
-    "id": "tech_dark1",
-    "displayName": "Obsidian Lab",
+    "id": "dark_water_1",
+    "displayName": "Dark vs Water Outpost I",
     "tier": 3,
-    "resourceAllocation": { "IRON": 5, "COAL": 5, "COPPER": 5 },
-    "primaryOrder": "TECH",
-    "secondaryOrder": "DARK",
-    "texturePath": "textures/obsidian_lab.png",
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "WATER",
+    "texturePath": "textures/dark_water_1.png",
     "enemies": [
-      { "enemyType": "Cyborg", "cost": 2 },
-      { "enemyType": "Ghoul", "cost": 3 }
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
     ]
   },
   {
-    "id": "tech_dark2",
-    "displayName": "Shadow Reactor",
+    "id": "dark_water_2",
+    "displayName": "Dark vs Water Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "WATER",
+    "texturePath": "textures/dark_water_2.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_water_3",
+    "displayName": "Dark vs Water Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "WATER",
+    "texturePath": "textures/dark_water_3.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_water_4",
+    "displayName": "Dark vs Water Citadel",
     "tier": 7,
-    "resourceAllocation": { "IRON": 8, "COAL": 8, "COPPER": 7 },
-    "primaryOrder": "TECH",
-    "secondaryOrder": "DARK",
-    "texturePath": "textures/shadow_reactor.png",
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "WATER",
+    "texturePath": "textures/dark_water_4.png",
     "enemies": [
-      { "enemyType": "Cyborg", "cost": 3 },
-      { "enemyType": "Ghoul", "cost": 4 }
+      {
+        "enemyType": "Groblin",
+        "cost": 4
+      }
     ]
   },
   {
-    "id": "tech_light1",
-    "displayName": "Luminous Control Hub",
+    "id": "dark_light_1",
+    "displayName": "Dark vs Light Outpost I",
     "tier": 3,
-    "resourceAllocation": { "IRON": 5, "COAL": 5, "COPPER": 5 },
-    "primaryOrder": "TECH",
-    "secondaryOrder": "LIGHT",
-    "texturePath": "textures/luminous_control_hub.png",
-    "enemies": [
-      { "enemyType": "Cyborg", "cost": 2 },
-      { "enemyType": "Acolyte", "cost": 2 }
-    ]
-  },
-  {
-    "id": "tech_light2",
-    "displayName": "Sanctum of the Illuminated Machine",
-    "tier": 7,
-    "resourceAllocation": { "IRON": 8, "COAL": 8, "COPPER": 7 },
-    "primaryOrder": "TECH",
-    "secondaryOrder": "LIGHT",
-    "texturePath": "textures/sanctum_of_illuminated_machine.png",
-    "enemies": [
-      { "enemyType": "Cyborg", "cost": 3 },
-      { "enemyType": "Acolyte", "cost": 3 }
-    ]
-  },
-  {
-    "id": "tech_nature1",
-    "displayName": "Mechanical Grove",
-    "tier": 3,
-    "resourceAllocation": { "IRON": 5, "COAL": 5, "COPPER": 4 },
-    "primaryOrder": "TECH",
-    "secondaryOrder": "NATURE",
-    "texturePath": "textures/mechanical_grove.png",
-    "enemies": [
-      { "enemyType": "Cyborg", "cost": 2 },
-      { "enemyType": "Spider", "cost": 2 }
-    ]
-  },
-  {
-    "id": "tech_nature2",
-    "displayName": "Automated Predator Den",
-    "tier": 7,
-    "resourceAllocation": { "IRON": 8, "COAL": 8, "COPPER": 6 },
-    "primaryOrder": "TECH",
-    "secondaryOrder": "NATURE",
-    "texturePath": "textures/automated_predator_den.png",
-    "enemies": [
-      { "enemyType": "Cyborg", "cost": 3 },
-      { "enemyType": "Spider", "cost": 3 }
-    ]
-  },
-  {
-    "id": "dark_light1",
-    "displayName": "Shadowed Chapel",
-    "tier": 3,
-    "resourceAllocation": { "IRON": 5, "COAL": 5, "COPPER": 5 },
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
     "primaryOrder": "DARK",
     "secondaryOrder": "LIGHT",
-    "texturePath": "textures/shadowed_chapel.png",
+    "texturePath": "textures/dark_light_1.png",
     "enemies": [
-      { "enemyType": "Ghoul", "cost": 3 },
-      { "enemyType": "Acolyte", "cost": 2 }
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
     ]
   },
   {
-    "id": "dark_light2",
-    "displayName": "Sanctuary of Twilight",
-    "tier": 7,
-    "resourceAllocation": { "IRON": 8, "COAL": 8, "COPPER": 6 },
+    "id": "dark_light_2",
+    "displayName": "Dark vs Light Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
     "primaryOrder": "DARK",
     "secondaryOrder": "LIGHT",
-    "texturePath": "textures/sanctuary_of_twilight.png",
+    "texturePath": "textures/dark_light_2.png",
     "enemies": [
-      { "enemyType": "Ghoul", "cost": 4 },
-      { "enemyType": "Acolyte", "cost": 3 }
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
     ]
   },
   {
-    "id": "dark_nature1",
-    "displayName": "Shadowed Hollow",
+    "id": "dark_light_3",
+    "displayName": "Dark vs Light Outpost III",
     "tier": 3,
-    "resourceAllocation": { "IRON": 5, "COAL": 5, "COPPER": 4 },
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "LIGHT",
+    "texturePath": "textures/dark_light_3.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_light_4",
+    "displayName": "Dark vs Light Citadel",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "LIGHT",
+    "texturePath": "textures/dark_light_4.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 4
+      }
+    ]
+  },
+  {
+    "id": "dark_nature_1",
+    "displayName": "Dark vs Nature Outpost I",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
     "primaryOrder": "DARK",
     "secondaryOrder": "NATURE",
-    "texturePath": "textures/shadowed_hollow.png",
+    "texturePath": "textures/dark_nature_1.png",
     "enemies": [
-      { "enemyType": "Ghoul", "cost": 3 },
-      { "enemyType": "Spider", "cost": 2 }
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
     ]
   },
   {
-    "id": "dark_nature2",
-    "displayName": "Abyssal Beast Hollow",
-    "tier": 7,
-    "resourceAllocation": { "IRON": 8, "COAL": 8, "COPPER": 6 },
+    "id": "dark_nature_2",
+    "displayName": "Dark vs Nature Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
     "primaryOrder": "DARK",
     "secondaryOrder": "NATURE",
-    "texturePath": "textures/abyssal_beast_hollow.png",
+    "texturePath": "textures/dark_nature_2.png",
     "enemies": [
-      { "enemyType": "Ghoul", "cost": 4 },
-      { "enemyType": "Spider", "cost": 3 }
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
     ]
   },
   {
-    "id": "light_nature1",
-    "displayName": "Luminous Grove",
+    "id": "dark_nature_3",
+    "displayName": "Dark vs Nature Outpost III",
     "tier": 3,
-    "resourceAllocation": { "IRON": 5, "COAL": 4, "COPPER": 5 },
-    "primaryOrder": "LIGHT",
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
     "secondaryOrder": "NATURE",
-    "texturePath": "textures/luminous_grove.png",
+    "texturePath": "textures/dark_nature_3.png",
     "enemies": [
-      { "enemyType": "Acolyte", "cost": 2 },
-      { "enemyType": "Spider", "cost": 2 }
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
     ]
   },
   {
-    "id": "light_nature2",
-    "displayName": "Sanctuary of Verdant Predators",
+    "id": "dark_nature_4",
+    "displayName": "Dark vs Nature Citadel",
     "tier": 7,
-    "resourceAllocation": { "IRON": 8, "COAL": 7, "COPPER": 7 },
-    "primaryOrder": "LIGHT",
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "DARK",
     "secondaryOrder": "NATURE",
-    "texturePath": "textures/sanctuary_of_verdant_predators.png",
+    "texturePath": "textures/dark_nature_4.png",
     "enemies": [
-      { "enemyType": "Acolyte", "cost": 3 },
-      { "enemyType": "Spider", "cost": 3 }
+      {
+        "enemyType": "Groblin",
+        "cost": 4
+      }
+    ]
+  },
+  {
+    "id": "dark_tech_1",
+    "displayName": "Dark vs Tech Outpost I",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "TECH",
+    "texturePath": "textures/dark_tech_1.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_tech_2",
+    "displayName": "Dark vs Tech Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "TECH",
+    "texturePath": "textures/dark_tech_2.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_tech_3",
+    "displayName": "Dark vs Tech Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "TECH",
+    "texturePath": "textures/dark_tech_3.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_tech_4",
+    "displayName": "Dark vs Tech Citadel",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "TECH",
+    "texturePath": "textures/dark_tech_4.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 4
+      }
+    ]
+  },
+  {
+    "id": "dark_fire_1",
+    "displayName": "Dark vs Fire Outpost I",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "FIRE",
+    "texturePath": "textures/dark_fire_1.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_fire_2",
+    "displayName": "Dark vs Fire Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "FIRE",
+    "texturePath": "textures/dark_fire_2.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_fire_3",
+    "displayName": "Dark vs Fire Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "FIRE",
+    "texturePath": "textures/dark_fire_3.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_fire_4",
+    "displayName": "Dark vs Fire Citadel",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "FIRE",
+    "texturePath": "textures/dark_fire_4.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 4
+      }
+    ]
+  },
+  {
+    "id": "dark_water_1",
+    "displayName": "Dark vs Water Outpost I",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "WATER",
+    "texturePath": "textures/dark_water_1.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_water_2",
+    "displayName": "Dark vs Water Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "WATER",
+    "texturePath": "textures/dark_water_2.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_water_3",
+    "displayName": "Dark vs Water Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "WATER",
+    "texturePath": "textures/dark_water_3.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_water_4",
+    "displayName": "Dark vs Water Citadel",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "WATER",
+    "texturePath": "textures/dark_water_4.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 4
+      }
+    ]
+  },
+  {
+    "id": "dark_light_1",
+    "displayName": "Dark vs Light Outpost I",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "LIGHT",
+    "texturePath": "textures/dark_light_1.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_light_2",
+    "displayName": "Dark vs Light Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "LIGHT",
+    "texturePath": "textures/dark_light_2.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_light_3",
+    "displayName": "Dark vs Light Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "LIGHT",
+    "texturePath": "textures/dark_light_3.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_light_4",
+    "displayName": "Dark vs Light Citadel",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "LIGHT",
+    "texturePath": "textures/dark_light_4.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 4
+      }
+    ]
+  },
+  {
+    "id": "dark_nature_1",
+    "displayName": "Dark vs Nature Outpost I",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NATURE",
+    "texturePath": "textures/dark_nature_1.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_nature_2",
+    "displayName": "Dark vs Nature Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NATURE",
+    "texturePath": "textures/dark_nature_2.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_nature_3",
+    "displayName": "Dark vs Nature Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NATURE",
+    "texturePath": "textures/dark_nature_3.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_nature_4",
+    "displayName": "Dark vs Nature Citadel",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "NATURE",
+    "texturePath": "textures/dark_nature_4.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 4
+      }
+    ]
+  },
+  {
+    "id": "dark_tech_1",
+    "displayName": "Dark vs Tech Outpost I",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "TECH",
+    "texturePath": "textures/dark_tech_1.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_tech_2",
+    "displayName": "Dark vs Tech Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "TECH",
+    "texturePath": "textures/dark_tech_2.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_tech_3",
+    "displayName": "Dark vs Tech Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "TECH",
+    "texturePath": "textures/dark_tech_3.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "dark_tech_4",
+    "displayName": "Dark vs Tech Citadel",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "DARK",
+    "secondaryOrder": "TECH",
+    "texturePath": "textures/dark_tech_4.png",
+    "enemies": [
+      {
+        "enemyType": "Groblin",
+        "cost": 4
+      }
+    ]
+  },
+  {
+    "id": "nature_fire_1",
+    "displayName": "Nature vs Fire Outpost I",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "FIRE",
+    "texturePath": "textures/nature_fire_1.png",
+    "enemies": [
+      {
+        "enemyType": "Spider",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "nature_fire_2",
+    "displayName": "Nature vs Fire Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "FIRE",
+    "texturePath": "textures/nature_fire_2.png",
+    "enemies": [
+      {
+        "enemyType": "Spider",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "nature_fire_3",
+    "displayName": "Nature vs Fire Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "FIRE",
+    "texturePath": "textures/nature_fire_3.png",
+    "enemies": [
+      {
+        "enemyType": "Spider",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "nature_fire_4",
+    "displayName": "Nature vs Fire Citadel",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "FIRE",
+    "texturePath": "textures/nature_fire_4.png",
+    "enemies": [
+      {
+        "enemyType": "Spider",
+        "cost": 4
+      }
+    ]
+  },
+  {
+    "id": "nature_water_1",
+    "displayName": "Nature vs Water Outpost I",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "WATER",
+    "texturePath": "textures/nature_water_1.png",
+    "enemies": [
+      {
+        "enemyType": "Spider",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "nature_water_2",
+    "displayName": "Nature vs Water Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "WATER",
+    "texturePath": "textures/nature_water_2.png",
+    "enemies": [
+      {
+        "enemyType": "Spider",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "nature_water_3",
+    "displayName": "Nature vs Water Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "WATER",
+    "texturePath": "textures/nature_water_3.png",
+    "enemies": [
+      {
+        "enemyType": "Spider",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "nature_water_4",
+    "displayName": "Nature vs Water Citadel",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "WATER",
+    "texturePath": "textures/nature_water_4.png",
+    "enemies": [
+      {
+        "enemyType": "Spider",
+        "cost": 4
+      }
+    ]
+  },
+  {
+    "id": "nature_dark_1",
+    "displayName": "Nature vs Dark Outpost I",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "DARK",
+    "texturePath": "textures/nature_dark_1.png",
+    "enemies": [
+      {
+        "enemyType": "Spider",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "nature_dark_2",
+    "displayName": "Nature vs Dark Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "DARK",
+    "texturePath": "textures/nature_dark_2.png",
+    "enemies": [
+      {
+        "enemyType": "Spider",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "nature_dark_3",
+    "displayName": "Nature vs Dark Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "DARK",
+    "texturePath": "textures/nature_dark_3.png",
+    "enemies": [
+      {
+        "enemyType": "Spider",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "nature_dark_4",
+    "displayName": "Nature vs Dark Citadel",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "DARK",
+    "texturePath": "textures/nature_dark_4.png",
+    "enemies": [
+      {
+        "enemyType": "Spider",
+        "cost": 4
+      }
+    ]
+  },
+  {
+    "id": "nature_light_1",
+    "displayName": "Nature vs Light Outpost I",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "LIGHT",
+    "texturePath": "textures/nature_light_1.png",
+    "enemies": [
+      {
+        "enemyType": "Spider",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "nature_light_2",
+    "displayName": "Nature vs Light Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "LIGHT",
+    "texturePath": "textures/nature_light_2.png",
+    "enemies": [
+      {
+        "enemyType": "Spider",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "nature_light_3",
+    "displayName": "Nature vs Light Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "LIGHT",
+    "texturePath": "textures/nature_light_3.png",
+    "enemies": [
+      {
+        "enemyType": "Spider",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "nature_light_4",
+    "displayName": "Nature vs Light Citadel",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "LIGHT",
+    "texturePath": "textures/nature_light_4.png",
+    "enemies": [
+      {
+        "enemyType": "Spider",
+        "cost": 4
+      }
+    ]
+  },
+  {
+    "id": "nature_tech_1",
+    "displayName": "Nature vs Tech Outpost I",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "TECH",
+    "texturePath": "textures/nature_tech_1.png",
+    "enemies": [
+      {
+        "enemyType": "Spider",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "nature_tech_2",
+    "displayName": "Nature vs Tech Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "TECH",
+    "texturePath": "textures/nature_tech_2.png",
+    "enemies": [
+      {
+        "enemyType": "Spider",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "nature_tech_3",
+    "displayName": "Nature vs Tech Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "TECH",
+    "texturePath": "textures/nature_tech_3.png",
+    "enemies": [
+      {
+        "enemyType": "Spider",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "nature_tech_4",
+    "displayName": "Nature vs Tech Citadel",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "NATURE",
+    "secondaryOrder": "TECH",
+    "texturePath": "textures/nature_tech_4.png",
+    "enemies": [
+      {
+        "enemyType": "Spider",
+        "cost": 4
+      }
+    ]
+  },
+  {
+    "id": "tech_fire_1",
+    "displayName": "Tech vs Fire Outpost I",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "FIRE",
+    "texturePath": "textures/tech_fire_1.png",
+    "enemies": [
+      {
+        "enemyType": "Cyborg",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "tech_fire_2",
+    "displayName": "Tech vs Fire Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "FIRE",
+    "texturePath": "textures/tech_fire_2.png",
+    "enemies": [
+      {
+        "enemyType": "Cyborg",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "tech_fire_3",
+    "displayName": "Tech vs Fire Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "FIRE",
+    "texturePath": "textures/tech_fire_3.png",
+    "enemies": [
+      {
+        "enemyType": "Cyborg",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "tech_fire_4",
+    "displayName": "Tech vs Fire Citadel",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "FIRE",
+    "texturePath": "textures/tech_fire_4.png",
+    "enemies": [
+      {
+        "enemyType": "Cyborg",
+        "cost": 4
+      }
+    ]
+  },
+  {
+    "id": "tech_water_1",
+    "displayName": "Tech vs Water Outpost I",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "WATER",
+    "texturePath": "textures/tech_water_1.png",
+    "enemies": [
+      {
+        "enemyType": "Cyborg",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "tech_water_2",
+    "displayName": "Tech vs Water Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "WATER",
+    "texturePath": "textures/tech_water_2.png",
+    "enemies": [
+      {
+        "enemyType": "Cyborg",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "tech_water_3",
+    "displayName": "Tech vs Water Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "WATER",
+    "texturePath": "textures/tech_water_3.png",
+    "enemies": [
+      {
+        "enemyType": "Cyborg",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "tech_water_4",
+    "displayName": "Tech vs Water Citadel",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "WATER",
+    "texturePath": "textures/tech_water_4.png",
+    "enemies": [
+      {
+        "enemyType": "Cyborg",
+        "cost": 4
+      }
+    ]
+  },
+  {
+    "id": "tech_dark_1",
+    "displayName": "Tech vs Dark Outpost I",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "DARK",
+    "texturePath": "textures/tech_dark_1.png",
+    "enemies": [
+      {
+        "enemyType": "Cyborg",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "tech_dark_2",
+    "displayName": "Tech vs Dark Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "DARK",
+    "texturePath": "textures/tech_dark_2.png",
+    "enemies": [
+      {
+        "enemyType": "Cyborg",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "tech_dark_3",
+    "displayName": "Tech vs Dark Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "DARK",
+    "texturePath": "textures/tech_dark_3.png",
+    "enemies": [
+      {
+        "enemyType": "Cyborg",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "tech_dark_4",
+    "displayName": "Tech vs Dark Citadel",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "DARK",
+    "texturePath": "textures/tech_dark_4.png",
+    "enemies": [
+      {
+        "enemyType": "Cyborg",
+        "cost": 4
+      }
+    ]
+  },
+  {
+    "id": "tech_light_1",
+    "displayName": "Tech vs Light Outpost I",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "LIGHT",
+    "texturePath": "textures/tech_light_1.png",
+    "enemies": [
+      {
+        "enemyType": "Cyborg",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "tech_light_2",
+    "displayName": "Tech vs Light Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "LIGHT",
+    "texturePath": "textures/tech_light_2.png",
+    "enemies": [
+      {
+        "enemyType": "Cyborg",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "tech_light_3",
+    "displayName": "Tech vs Light Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "LIGHT",
+    "texturePath": "textures/tech_light_3.png",
+    "enemies": [
+      {
+        "enemyType": "Cyborg",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "tech_light_4",
+    "displayName": "Tech vs Light Citadel",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "LIGHT",
+    "texturePath": "textures/tech_light_4.png",
+    "enemies": [
+      {
+        "enemyType": "Cyborg",
+        "cost": 4
+      }
+    ]
+  },
+  {
+    "id": "tech_nature_1",
+    "displayName": "Tech vs Nature Outpost I",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NATURE",
+    "texturePath": "textures/tech_nature_1.png",
+    "enemies": [
+      {
+        "enemyType": "Cyborg",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "tech_nature_2",
+    "displayName": "Tech vs Nature Outpost II",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 4,
+      "COAL": 5,
+      "COPPER": 4
+    },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NATURE",
+    "texturePath": "textures/tech_nature_2.png",
+    "enemies": [
+      {
+        "enemyType": "Cyborg",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "tech_nature_3",
+    "displayName": "Tech vs Nature Outpost III",
+    "tier": 3,
+    "resourceAllocation": {
+      "IRON": 5,
+      "COAL": 4,
+      "COPPER": 4
+    },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NATURE",
+    "texturePath": "textures/tech_nature_3.png",
+    "enemies": [
+      {
+        "enemyType": "Cyborg",
+        "cost": 2
+      }
+    ]
+  },
+  {
+    "id": "tech_nature_4",
+    "displayName": "Tech vs Nature Citadel",
+    "tier": 7,
+    "resourceAllocation": {
+      "IRON": 8,
+      "COAL": 8,
+      "COPPER": 8
+    },
+    "primaryOrder": "TECH",
+    "secondaryOrder": "NATURE",
+    "texturePath": "textures/tech_nature_4.png",
+    "enemies": [
+      {
+        "enemyType": "Cyborg",
+        "cost": 4
+      }
     ]
   }
 ]

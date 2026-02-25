@@ -64,8 +64,6 @@ public class LevelPopupRenderer {
         }
         lines.add("");
         lines.add("Resources:");
-        System.out.println("attempting to create hover for level "+hovered.getDisplayName());
-        System.out.println("level id "+hovered.getId());
         hovered.getResourceAllocation().forEach((t, a) -> lines.add(t.name() + ": " + a));
 
         GlyphLayout layout = new GlyphLayout();

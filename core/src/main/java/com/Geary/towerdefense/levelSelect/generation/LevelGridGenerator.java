@@ -52,18 +52,17 @@ public class LevelGridGenerator {
      * Main entry used by cluster generator.
      * Automatically decides whether this becomes a merged level.
      */
-    public LevelGridCell setLevel(LevelGridCell anchorCell, int width, int height, boolean branch) {
+    public LevelGridCell setLevel(LevelGridCell anchorCell, int width, int height, boolean branch, int tier) {
 
-        // Only allow merges outside of branches
         if (!branch && shouldCreateMergedCluster(anchorCell)) {
 
             Entity.Order primary = randomOrder();
             Entity.Order secondary = randomOrderExcluding(primary);
 
-            return setMergeLevel(anchorCell, primary, secondary, width, height);
+            return setMergeLevel(anchorCell, primary, secondary, width, height, tier);
         }
 
-        LevelData level = levelGenerator.getLevel(randomOrder(), Entity.Order.NEUTRAL, levelIndex);
+        LevelData level = levelGenerator.getLevel(randomOrder(), Entity.Order.NEUTRAL, tier);
 
         anchorCell.setLevel(level);
         levelCells.add(anchorCell);
@@ -74,9 +73,8 @@ public class LevelGridGenerator {
     }
 
     public LevelGridCell setMergeLevel(LevelGridCell anchorCell, Entity.Order primary, Entity.Order secondary,
-                                       int width, int height) {
-
-        LevelData level = levelGenerator.getLevel(primary, secondary, levelIndex);
+                                       int width, int height, int tier) {
+        LevelData level = levelGenerator.getLevel(primary, secondary, tier);
 
         System.out.println("anchor cell level: "+level.getDisplayName());
         anchorCell.setLevel(level);
